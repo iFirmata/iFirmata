@@ -46,6 +46,7 @@
 
 @protocol FirmataProtocol<NSObject>
 - (void) didUpdateDigitalPin;
+- (void) didReportFirmware:(NSData *)data;
 @end
 
 

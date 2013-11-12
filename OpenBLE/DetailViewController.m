@@ -35,9 +35,9 @@
 {
     [super viewDidLoad];
     self.pins = [NSMutableArray array];
-    for(int i = 0; i<21; i++){
-        [pins addObject:[[NSString alloc] initWithFormat:@"%d",i ]];
-    }
+//    for(int i = 0; i<21; i++){
+//        [pins addObject:[[NSString alloc] initWithFormat:@"%d",i ]];
+//    }
 
     currentFirmata = [[Firmata alloc] initWithService:currentlyDisplayingService controller:self];
     currentlyConnectedSensor.text = [[currentlyDisplayingService peripheral] name];
@@ -110,12 +110,23 @@
     NSLog(@"something");
 }
 
+- (void) didReportFirmware:(NSData*)data{
+
+    NSLog(@"%@", [[NSString alloc] initWithData:data
+                                          encoding:NSUTF8StringEncoding]);
+}
+
 
 #pragma mark -
 #pragma mark App IO
 /****************************************************************************/
 /*                              App IO Methods                              */
 /****************************************************************************/
+-(IBAction)send:(id)sender
+{
+    [currentFirmata reportFirmware];
+    
+}
 
 
 

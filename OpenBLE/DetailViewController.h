@@ -18,4 +18,5 @@
 @property (retain, nonatomic) NSMutableArray            *pins;
 @property (retain, nonatomic) IBOutlet UITableView      *pinsTable;
 
+-(IBAction)send:(id)sender;
 @end

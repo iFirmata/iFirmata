@@ -78,61 +78,126 @@
 
 
 #pragma mark -
+#pragma mark Firmata Parsers
+/****************************************************************************/
+/*				Firmata Parsers                                             */
+/****************************************************************************/
+- (void) parseReportFirmware:(NSData*)data{
+    //TODO do some parsing first
+    [peripheralDelegate didReportFirmware:data];
+}
+
+
+#pragma mark -
 #pragma mark Firmata Delegate Methods
 /****************************************************************************/
 /*				Firmata Delegate Methods                                    */
 /****************************************************************************/
 - (void) analogMappingQuery
 {
-    [currentlyDisplayingService write:[NSData dataWithBytes:(const char *[]){START_SYSEX, ANALOG_MAPPING_QUERY, END_SYSEX} length:3]];
+    const unsigned char bytes[] = {START_SYSEX, ANALOG_MAPPING_QUERY, END_SYSEX};
+    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
+    NSLog(@"Report firmware sending ascii: %@", stringToSend);
+    
+    [currentlyDisplayingService write:dataToSend];
 }
 
 - (void) capabilityQuery
 {
-
-    [currentlyDisplayingService write:[NSData dataWithBytes:(const char *[]){START_SYSEX, CAPABILITY_QUERY, END_SYSEX} length:3]];
+    const unsigned char bytes[] = {START_SYSEX, CAPABILITY_QUERY, END_SYSEX};
+    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
+    NSLog(@"Report firmware sending ascii: %@", stringToSend);
+    
+    [currentlyDisplayingService write:dataToSend];
 }
 
 - (void) pinStateQuery:(int)pin
 {
-    [currentlyDisplayingService write:[NSData dataWithBytes:(const char *[]){START_SYSEX, PIN_STATE_QUERY, pin, END_SYSEX} length:4]];
+    const unsigned char bytes[] = {START_SYSEX, PIN_STATE_QUERY, pin, END_SYSEX};
+    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
+    NSLog(@"Report firmware sending ascii: %@", stringToSend);
+    
+    [currentlyDisplayingService write:dataToSend];
+
 }
 
 //- (void) extendedAnalogQuery:(int)pin:] withData:(NSData)data{
-//    [self write:[NSData dataWithBytes:(const char *[]){START_SYSEX, EXTENDED_ANALOG, pin, END_SYSEX} length:3]];
+//    const unsigned char bytes[] = {START_SYSEX, EXTENDED_ANALOG, pin, END_SYSEX};
+//    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+//    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
+//    NSLog(@"Report firmware sending ascii: %@", stringToSend);
+//
+//    [currentlyDisplayingService write:dataToSend];
 //}
 
     
 - (void) servoConfig:(int)pin minPulseLSB:(int)minPulseLSB minPulseMSB:(int)minPulseMSB maxPulseLSB:(int)maxPulseLSB maxPulseMSB:(int)maxPulseMSB
 {
-
-    [currentlyDisplayingService write:[NSData dataWithBytes:(const char *[]){START_SYSEX, SERVO_CONFIG, pin, minPulseLSB, minPulseMSB, maxPulseLSB, maxPulseMSB, END_SYSEX} length:8]];
+    const unsigned char bytes[] = {START_SYSEX, SERVO_CONFIG, pin, minPulseLSB, minPulseMSB, maxPulseLSB, maxPulseMSB, END_SYSEX};
+    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
+    NSLog(@"Report firmware sending ascii: %@", stringToSend);
+    
+    [currentlyDisplayingService write:dataToSend];
 }
 
 //- (void) stringData:(NSString)string{
-//    [self write:[NSData dataWithBytes:(const char *[]){START_SYSEX, STRING_DATA, END_SYSEX} length:3]];
+//    const unsigned char bytes[] = {START_SYSEX, STRING_DATA, pin, END_SYSEX};
+//    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+//    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
+//    NSLog(@"Report firmware sending ascii: %@", stringToSend);
+//
+//    [currentlyDisplayingService write:dataToSend];
 //}
 
 //- (void) shiftData:(int)high{
-//    [self write:[NSData dataWithBytes:(const char *[]){START_SYSEX, SHIFT_DATA, END_SYSEX} length:3]];
-//}
+//    const unsigned char bytes[] = {START_SYSEX, SHIFT_DATA, pin, END_SYSEX};
+//    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+//    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
+//    NSLog(@"Report firmware sending ascii: %@", stringToSend);
 //
+//    [currentlyDisplayingService write:dataToSend];
+//}
+
 //- (void) i2cRequest:(int)high{
-//    [self write:[NSData dataWithBytes:(const char *[]){START_SYSEX, I2C_REQUEST, END_SYSEX} length:3]];
-//}
+//    const unsigned char bytes[] = {START_SYSEX, I2C_REQUEST, pin, END_SYSEX};
+//    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+//    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
+//    NSLog(@"Report firmware sending ascii: %@", stringToSend);
 //
+//    [currentlyDisplayingService write:dataToSend];
+//}
+
 //- (void) i2cConfig:(int)high{
-//    [self write:[NSData dataWithBytes:(const char *[]){START_SYSEX, I2C_CONFIG, END_SYSEX} length:3]];
+//    const unsigned char bytes[] = {START_SYSEX, I2C_CONFIG, pin, END_SYSEX};
+//    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+//    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
+//    NSLog(@"Report firmware sending ascii: %@", stringToSend);
+//
+//    [currentlyDisplayingService write:dataToSend];
 //}
 
 - (void) reportFirmware
 {
-    [currentlyDisplayingService write:[NSData dataWithBytes:(const char *[]){START_SYSEX, REPORT_FIRMWARE, END_SYSEX} length:3]];
+    const unsigned char bytes[] = {START_SYSEX, REPORT_FIRMWARE, END_SYSEX};
+    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
+    NSLog(@"Report firmware sending ascii: %@", stringToSend);
+    
+    [currentlyDisplayingService write:dataToSend];
 }
 
 - (void) samplingInterval:(int)intervalMillisecondLSB intervalMillisecondMSB:(int)intervalMillisecondMSB
 {
-    [currentlyDisplayingService write:[NSData dataWithBytes:(const char *[]){START_SYSEX, SAMPLING_INTERVAL, intervalMillisecondMSB, intervalMillisecondMSB, END_SYSEX} length:5]];
+    const unsigned char bytes[] = {START_SYSEX, SAMPLING_INTERVAL, intervalMillisecondMSB, intervalMillisecondMSB, END_SYSEX};
+    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
+    NSLog(@"Report firmware sending ascii: %@", stringToSend);
+    
+    [currentlyDisplayingService write:dataToSend];
 }
 
 
@@ -183,6 +248,7 @@
                         
                     case REPORT_FIRMWARE:
                         NSLog(@"type of message is firmware report");
+                        [self parseReportFirmware:firmataData];
                         break;
                         
                     case REPORT_VERSION:
