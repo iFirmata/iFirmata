@@ -1,35 +1,24 @@
-### TemperatureSensor ###
+### iosFirmata ###
  
 ===========================================================================
 DESCRIPTION:
  
-A simple iOS iPhone application that demonstrates how to use the CoreBluetooth Framework to connect to a Bluetooth LE peripheral and read, write and be notified of changes to the characteristics of the peripheral.
+A basic firmata host implmentation for ios. This example utilizes the OpenBLE code and DataService files. https://github.com/jacobrosenthal/OpenBLE. It allows you to test your firmata setup and do some basic operations, and then utilize the source code to make your own application.
 
-The application is designed to work with a custom Bluetooth LE device which allows for the setting of a high and low temperature alarm settings. When the temperature exceeds the minimum or maximum temperature setting, a notification is issued for which the application presents an alarm.
+Currently supports the Seeed Studio Xadow BLE device http://www.seeedstudio.com/depot/xadow-ble-slave-p-1546.html and whoever else uses that part. The Xadow is a Leonardo style arduino part. It was necessary to change the Firmata classes to use Serial1 instead of Serial.
 
-This sample covers the use of non-published Bluetooth LE Services, which require full 128-bit UUIDs for identification.
- 
 Important:
-This project requires a Bluetooth LE Capable Device (Currently only the iPhone 4S) and will not work on the simulator.
+This project requires a Bluetooth LE Capable Device (iPhone 4s and later; iPad 3 and later; iPod Touch 5; iPad mini) and will not work on the simulator.
  
 ===========================================================================
 BUILD REQUIREMENTS:
  
-- Xcode 4.3 or greater
-- iOS 5.1 SDK or greater
+- Xcode 5 or greater
+- iOS 7 SDK or greater
  
 ===========================================================================
 RUNTIME REQUIREMENTS:
  
-iOS 5.1 or later which has full 128-bit UUID support
+iOS 6 or later
 Bluetooth LE Capable Device
 Bluetooth LE Sensor/s
- 
-===========================================================================
-CHANGES FROM PREVIOUS VERSIONS:
- 
-Version 1.0
-- First version.
- 
-===========================================================================
-Copyright (C) 2011 Apple Inc. All rights reserved.
