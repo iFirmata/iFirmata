@@ -13,7 +13,9 @@
 
 @synthesize currentlyDisplayingService;
 @synthesize currentlyConnectedSensor;
-@synthesize response;
+@synthesize currentFirmata;
+@synthesize pins;
+@synthesize pinsTable;
 
 #pragma mark -
 #pragma mark View lifecycle
@@ -32,16 +34,22 @@
 - (void) viewDidLoad
 {
     [super viewDidLoad];
-    
+    self.pins = [NSMutableArray array];
+    for(int i = 0; i<21; i++){
+        [pins addObject:[[NSString alloc] initWithFormat:@"%d",i ]];
+    }
+
+    currentFirmata = [[Firmata alloc] initWithService:currentlyDisplayingService controller:self];
     currentlyConnectedSensor.text = [[currentlyDisplayingService peripheral] name];
+
 }
 
 - (void) viewDidUnload
 {
     [self setCurrentlyConnectedSensor:nil];
-    [self setResponse:nil];
     [self setCurrentlyDisplayingService:nil];
-    
+    [self setPinsTable:nil];
+
     [super viewDidUnload];
 }
 - (void)didReceiveMemoryWarning
@@ -50,65 +58,65 @@
     // Dispose of any resources that can be recreated.
 }
 
+
+#pragma mark -
+#pragma mark TableView Delegates
+/****************************************************************************/
+/*							TableView Delegates								*/
+/****************************************************************************/
+- (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"PinList"];
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"PinList"];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    }
+    
+    //copy trends strings into datasource object
+    cell.textLabel.text = [pins objectAtIndex:indexPath.row];
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"%d",indexPath.row];
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    cell.userInteractionEnabled = YES;
+	return cell;
+}
+
+- (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
+{
+	return 1;
+}
+
+- (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [pins count];
+}
+
+- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+
+        //todo, SUPPOSED to this this from IB but fuck if I know how
+        //[self performSegueWithIdentifier: @"deviceView" sender:self];
+
+    
+}
+
+
+
+#pragma mark -
+#pragma mark Firmata Delegates
+/****************************************************************************/
+/*                              Firmata Delegates                           */
+/****************************************************************************/
+- (void) didUpdateDigitalPin{
+    NSLog(@"something");
+}
+
+
 #pragma mark -
 #pragma mark App IO
 /****************************************************************************/
 /*                              App IO Methods                              */
 /****************************************************************************/
--(IBAction)send:(id)sender
-{
-    UITextField *input = (UITextField*)sender;
-    [sender resignFirstResponder];
-    NSLog(@"Sending ascii: %@", [input text]);
-    
-    NSData* tosend=[[input text] dataUsingEncoding:NSUTF8StringEncoding];
-    
-    [currentlyDisplayingService write:tosend];
-    
-}
-
--(IBAction)dismissKeyboard:(id)sender
-{
-    [sender resignFirstResponder];
-}
 
 
-#pragma mark -
-#pragma mark LeDataProtocol Delegate Methods
-/****************************************************************************/
-/*				LeDataProtocol Delegate Methods                             */
-/****************************************************************************/
-/** Received data */
-- (void) serviceDidReceiveData:(NSData*)data fromService:(LeDataService*)service
-{
-    if (service != currentlyDisplayingService)
-        return;
-    
-    NSString* newStr = [[NSString alloc] initWithData:data
-                                              encoding:NSUTF8StringEncoding] ;
-    
-    [response setText:newStr];
-}
-
-/** Central Manager reset */
-- (void) serviceDidReset
-{
-    //TODO do something? probably have to go back to root controller and reconnect?
-}
-
-/** Peripheral connected or disconnected */
-- (void) serviceDidChangeStatus:(LeDataService*)service
-{
-    
-    //TODO do something?
-    if ( [[service peripheral] isConnected] ) {
-        NSLog(@"Service (%@) connected", service.peripheral.name);
-    }
-    
-    else {
-        NSLog(@"Service (%@) disconnected", service.peripheral.name);
-
-    }
-}
 
 @end

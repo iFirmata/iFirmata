@@ -20,6 +20,7 @@
 		5B4BCB4318321E8B00ADAE0E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B4BCB4218321E8B00ADAE0E /* ViewController.m */; };
 		5B4BCB4718321ECD00ADAE0E /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5B4BCB4518321ECD00ADAE0E /* MainStoryboard.storyboard */; };
 		5B4BCB48183220F200ADAE0E /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BA1100418321D1E00A5398C /* CoreBluetooth.framework */; };
+		5B7CBCE21832273F004FD94A /* Firmata.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B7CBCE11832273F004FD94A /* Firmata.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,8 @@
 		5B4BCB4118321E8B00ADAE0E /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		5B4BCB4218321E8B00ADAE0E /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		5B4BCB4618321ECD00ADAE0E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard.storyboard; sourceTree = "<group>"; };
+		5B7CBCE01832273F004FD94A /* Firmata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Firmata.h; sourceTree = "<group>"; };
+		5B7CBCE11832273F004FD94A /* Firmata.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Firmata.m; sourceTree = "<group>"; };
 		5BA1100418321D1E00A5398C /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		B9182534148D762600D6064E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		B9182536148D762600D6064E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -70,6 +73,8 @@
 				5B4BCB4418321E9800ADAE0E /* LE */,
 				5B158E7718321E53006EE7C2 /* AppDelegate.h */,
 				5B158E7818321E53006EE7C2 /* AppDelegate.m */,
+				5B7CBCE01832273F004FD94A /* Firmata.h */,
+				5B7CBCE11832273F004FD94A /* Firmata.m */,
 				5B4BCB4118321E8B00ADAE0E /* ViewController.h */,
 				5B4BCB4218321E8B00ADAE0E /* ViewController.m */,
 				5B4BCB3818321E8500ADAE0E /* DetailViewController.h */,
@@ -95,10 +100,10 @@
 		5B4BCB4418321E9800ADAE0E /* LE */ = {
 			isa = PBXGroup;
 			children = (
-				5B4BCB3A18321E8500ADAE0E /* LeDataService.h */,
-				5B4BCB3B18321E8500ADAE0E /* LeDataService.m */,
 				5B4BCB3C18321E8500ADAE0E /* LeDiscovery.h */,
 				5B4BCB3D18321E8500ADAE0E /* LeDiscovery.m */,
+				5B4BCB3A18321E8500ADAE0E /* LeDataService.h */,
+				5B4BCB3B18321E8500ADAE0E /* LeDataService.m */,
 			);
 			name = LE;
 			sourceTree = "<group>";
@@ -199,6 +204,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B4BCB4318321E8B00ADAE0E /* ViewController.m in Sources */,
+				5B7CBCE21832273F004FD94A /* Firmata.m in Sources */,
 				5B158E7918321E53006EE7C2 /* AppDelegate.m in Sources */,
 				5B4BCB4018321E8500ADAE0E /* LeDiscovery.m in Sources */,
 				5B158E7518321E53006EE7C2 /* main.m in Sources */,

@@ -8,14 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import "LeDataService.h"
+#import "Firmata.h"
 
-@interface DetailViewController : UIViewController  <LeDataProtocol>
+@interface DetailViewController : UITableViewController  <FirmataProtocol>
 
 @property (strong, nonatomic) LeDataService             *currentlyDisplayingService;
+@property (strong, nonatomic) Firmata                   *currentFirmata;
 @property (strong, nonatomic) IBOutlet UILabel          *currentlyConnectedSensor;
-@property (strong, nonatomic) IBOutlet UITextField      *response;
-@property (strong, nonatomic) IBOutlet UITextField      *input;
+@property (retain, nonatomic) NSMutableArray            *pins;
+@property (retain, nonatomic) IBOutlet UITableView      *pinsTable;
 
--(IBAction)dismissKeyboard:(id)sender;
--(IBAction)send:(id)sender;
 @end

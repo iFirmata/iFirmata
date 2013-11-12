@@ -75,7 +75,6 @@
     
     DetailViewController *dest =[segue destinationViewController];
     dest.currentlyDisplayingService = currentlyDisplayingService;
-    [currentlyDisplayingService setController:dest];
     
 }
 
@@ -139,6 +138,7 @@
 /** Received Data */
 - (void) serviceDidReceiveData:(NSData*)data fromService:(LeDataService*)service
 {
+    NSLog(@"Shouldn't be getting data here");
     
 }
 
