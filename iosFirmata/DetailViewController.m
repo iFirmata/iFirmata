@@ -7,6 +7,7 @@
 //
 
 #import "DetailViewController.h"
+#import "PinViewController.h"
 #import "LeDataService.h"
 
 @implementation DetailViewController
@@ -34,10 +35,21 @@
 - (void) viewDidLoad
 {
     [super viewDidLoad];
-    self.pins = [NSMutableArray array];
-//    for(int i = 0; i<21; i++){
-//        [pins addObject:[[NSString alloc] initWithFormat:@"%d",i ]];
+    
+//    NSDictionary *trends;
+//
+//    NSDictionary *jsonDictionary = [json objectAtIndex:0];
+//    trends = [jsonDictionary objectForKey:@"trends"];
+//    NSDictionary *trend;
+//    for(trend in trends)
+//    {
+//        NSLog(@"%@", [trend objectForKey:@"name"]);
 //    }
+    
+    self.pins = [NSMutableArray array];
+    for(int i = 0; i<21; i++){
+        [pins addObject:[[NSString alloc] initWithFormat:@"%d",i ]];
+    }
 
     currentFirmata = [[Firmata alloc] initWithService:currentlyDisplayingService controller:self];
     currentlyConnectedSensor.text = [[currentlyDisplayingService peripheral] name];
@@ -52,10 +64,19 @@
 
     [super viewDidUnload];
 }
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+    
+    PinViewController *dest =[segue destinationViewController];
+    dest.currentlyDisplayingService = currentlyDisplayingService;
+    dest.currentFirmata = currentFirmata;
+    
 }
 
 
@@ -68,15 +89,16 @@
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"PinList"];
     if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"PinList"];
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue2 reuseIdentifier:@"PinList"];
+        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+
     }
     
-    //copy trends strings into datasource object
-    cell.textLabel.text = [pins objectAtIndex:indexPath.row];
-    cell.detailTextLabel.text = [NSString stringWithFormat:@"%d",indexPath.row];
-    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-    cell.userInteractionEnabled = YES;
+    [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+    [[cell textLabel] setText:[NSString stringWithFormat:@"Pin: %ld",(long)indexPath.row]];
+    [[cell detailTextLabel] setText:[NSString stringWithFormat:@"%@",@"Analog, Digital, PWM"]];
+    
 	return cell;
 }
 
@@ -92,13 +114,9 @@
 
 - (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-
-        //todo, SUPPOSED to this this from IB but fuck if I know how
-        //[self performSegueWithIdentifier: @"deviceView" sender:self];
-
-    
+    //todo, SUPPOSED to this this from IB but fuck if I know how
+    [self performSegueWithIdentifier: @"pinView" sender:self];
 }
-
 
 
 #pragma mark -
@@ -128,6 +146,10 @@
     
 }
 
-
-
+-(void)buttonPressed:(id)sender {
+    UITableViewCell *clickedCell = (UITableViewCell *)[[sender superview] superview];
+    NSIndexPath *clickedButtonPath = [self.tableView indexPathForCell:clickedCell];
+    NSLog(@"%@",clickedButtonPath);
+    
+}
 @end

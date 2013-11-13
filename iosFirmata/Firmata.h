@@ -60,7 +60,7 @@
 @property (strong, nonatomic) NSMutableData         *firmataData;
 
 - (id) initWithService:(LeDataService*)service controller:(id<FirmataProtocol>)controller;
-//- (void) setController:(id<LeDataProtocol>)controller;
+- (void) setController:(id<FirmataProtocol>)controller;
 
 //- (void) reset;
 //- (void) start;

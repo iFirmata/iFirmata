@@ -21,6 +21,7 @@
 		5B4B0C881832D12A003800ED /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B4B0C861832D12A003800ED /* InfoPlist.strings */; };
 		5B4B0C8A1832D12A003800ED /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B4B0C891832D12A003800ED /* main.m */; };
 		5B4B0C901832D12A003800ED /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B4B0C8F1832D12A003800ED /* Images.xcassets */; };
+		5BB9F50F18332C80007BE0E2 /* PinViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BB9F50E18332C80007BE0E2 /* PinViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,10 +46,9 @@
 		5B4B0C891832D12A003800ED /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		5B4B0C8B1832D12A003800ED /* iosFirmata-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iosFirmata-Prefix.pch"; sourceTree = "<group>"; };
 		5B4B0C8F1832D12A003800ED /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		5B4B0C9D1832D12A003800ED /* iosFirmataTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "iosFirmataTests-Info.plist"; sourceTree = "<group>"; };
-		5B4B0C9F1832D12A003800ED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		5B4B0CA11832D12A003800ED /* iosFirmataTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iosFirmataTests.m; sourceTree = "<group>"; };
 		5BA1100418321D1E00A5398C /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
+		5BB9F50D18332C80007BE0E2 /* PinViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PinViewController.h; sourceTree = "<group>"; };
+		5BB9F50E18332C80007BE0E2 /* PinViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PinViewController.m; sourceTree = "<group>"; };
 		B9182534148D762600D6064E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		B9182536148D762600D6064E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		B9182538148D762600D6064E /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -87,12 +87,14 @@
 				5B410B121832D21D000959E7 /* LE */,
 				5B410B001832D216000959E7 /* AppDelegate.h */,
 				5B410B011832D216000959E7 /* AppDelegate.m */,
-				5B410B021832D216000959E7 /* DetailViewController.h */,
-				5B410B031832D216000959E7 /* DetailViewController.m */,
-				5B410B041832D216000959E7 /* Firmata.h */,
-				5B410B051832D216000959E7 /* Firmata.m */,
 				5B410B0A1832D216000959E7 /* ViewController.h */,
 				5B410B0B1832D216000959E7 /* ViewController.m */,
+				5B410B021832D216000959E7 /* DetailViewController.h */,
+				5B410B031832D216000959E7 /* DetailViewController.m */,
+				5BB9F50D18332C80007BE0E2 /* PinViewController.h */,
+				5BB9F50E18332C80007BE0E2 /* PinViewController.m */,
+				5B410B041832D216000959E7 /* Firmata.h */,
+				5B410B051832D216000959E7 /* Firmata.m */,
 				5B4B0C8F1832D12A003800ED /* Images.xcassets */,
 				5B4B0C841832D12A003800ED /* Supporting Files */,
 			);
@@ -111,31 +113,12 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		5B4B0C9B1832D12A003800ED /* iosFirmataTests */ = {
-			isa = PBXGroup;
-			children = (
-				5B4B0CA11832D12A003800ED /* iosFirmataTests.m */,
-				5B4B0C9C1832D12A003800ED /* Supporting Files */,
-			);
-			path = iosFirmataTests;
-			sourceTree = "<group>";
-		};
-		5B4B0C9C1832D12A003800ED /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				5B4B0C9D1832D12A003800ED /* iosFirmataTests-Info.plist */,
-				5B4B0C9E1832D12A003800ED /* InfoPlist.strings */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
 		B9182525148D762500D6064E = {
 			isa = PBXGroup;
 			children = (
 				5B4AE3F7182F88C700E9DD0A /* Default-568h@2x.png */,
 				B9ADCFD41497DA600098522D /* ReadMe.txt */,
 				5B4B0C831832D12A003800ED /* iosFirmata */,
-				5B4B0C9B1832D12A003800ED /* iosFirmataTests */,
 				B9182533148D762600D6064E /* Frameworks */,
 				B9182531148D762600D6064E /* Products */,
 			);
@@ -229,6 +212,7 @@
 				5B410B0E1832D216000959E7 /* Firmata.m in Sources */,
 				5B410B0F1832D216000959E7 /* LeDataService.m in Sources */,
 				5B410B0C1832D216000959E7 /* AppDelegate.m in Sources */,
+				5BB9F50F18332C80007BE0E2 /* PinViewController.m in Sources */,
 				5B410B101832D216000959E7 /* LeDiscovery.m in Sources */,
 				5B4B0C8A1832D12A003800ED /* main.m in Sources */,
 				5B410B0D1832D216000959E7 /* DetailViewController.m in Sources */,
@@ -250,14 +234,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				5B4B0C871832D12A003800ED /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		5B4B0C9E1832D12A003800ED /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5B4B0C9F1832D12A003800ED /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";

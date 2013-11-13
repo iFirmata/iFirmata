@@ -48,6 +48,12 @@
     
 }
 
+- (void) setController:(id<FirmataProtocol>)controller
+{
+    peripheralDelegate = controller;
+    
+}
+
 
 #pragma mark -
 #pragma mark LeData Interactions
