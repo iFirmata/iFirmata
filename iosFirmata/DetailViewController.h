@@ -15,6 +15,7 @@
 @property (strong, nonatomic) LeDataService             *currentlyDisplayingService;
 @property (strong, nonatomic) Firmata                   *currentFirmata;
 @property (strong, nonatomic) IBOutlet UILabel          *currentlyConnectedSensor;
+@property (strong, nonatomic) IBOutlet UILabel          *firmwareVersion;
 @property (retain, nonatomic) NSMutableArray            *pins;
 @property (retain, nonatomic) IBOutlet UITableView      *pinsTable;
 -(IBAction)send:(id)sender;

@@ -14,6 +14,7 @@
 
 @synthesize currentlyDisplayingService;
 @synthesize currentlyConnectedSensor;
+@synthesize firmwareVersion;
 @synthesize currentFirmata;
 @synthesize pins;
 @synthesize pinsTable;
@@ -36,19 +37,15 @@
 {
     [super viewDidLoad];
     
-//    NSDictionary *trends;
-//
-//    NSDictionary *jsonDictionary = [json objectAtIndex:0];
-//    trends = [jsonDictionary objectForKey:@"trends"];
-//    NSDictionary *trend;
-//    for(trend in trends)
-//    {
-//        NSLog(@"%@", [trend objectForKey:@"name"]);
-//    }
-    
     self.pins = [NSMutableArray array];
+    
     for(int i = 0; i<21; i++){
-        [pins addObject:[[NSString alloc] initWithFormat:@"%d",i ]];
+        NSMutableDictionary *values = [[NSMutableDictionary alloc] init];
+        
+        [values setValue:[NSNumber numberWithInt:i] forKey:@"pin"];
+        [values setValue:[NSNumber numberWithInt:0] forKey:@"value"];
+        
+        [pins addObject:values];
     }
 
     currentFirmata = [[Firmata alloc] initWithService:currentlyDisplayingService controller:self];
@@ -95,9 +92,11 @@
 
     }
     
+    NSDictionary *dict = pins[indexPath.row];
+    
     [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-    [[cell textLabel] setText:[NSString stringWithFormat:@"Pin: %ld",(long)indexPath.row]];
-    [[cell detailTextLabel] setText:[NSString stringWithFormat:@"%@",@"Analog, Digital, PWM"]];
+    [[cell textLabel] setText:[NSString stringWithFormat:@"Pin: %@",[dict objectForKey:@"pin"]]];
+    [[cell detailTextLabel] setText:[NSString stringWithFormat:@"%@",[dict objectForKey:@"value"]]];
     
 	return cell;
 }
@@ -124,16 +123,21 @@
 /****************************************************************************/
 /*                              Firmata Delegates                           */
 /****************************************************************************/
-- (void) didUpdateDigitalPin{
+- (void) didUpdatePin:(int)pin mode:(Mode)mode;
+{
     NSLog(@"something");
 }
 
-- (void) didReportFirmware:(NSData*)data{
-
-    NSLog(@"%@", [[NSString alloc] initWithData:data
-                                          encoding:NSUTF8StringEncoding]);
+- (void) didReportFirmware:(NSString*)name major:(unsigned int*)major minor:(unsigned int*)minor
+{
+    firmwareVersion.text = [NSString stringWithFormat:@"%@ %ld.%ld",
+                            name, (long)major, (long)minor];
 }
 
+- (void) didReportAnalogPin:(int)pin value:(unsigned int*)value
+{
+    [self.tableView reloadData];
+}
 
 #pragma mark -
 #pragma mark App IO
@@ -142,7 +146,7 @@
 /****************************************************************************/
 -(IBAction)send:(id)sender
 {
-    [currentFirmata reportFirmware];
+    [currentFirmata analogMappingQuery];
     
 }
 

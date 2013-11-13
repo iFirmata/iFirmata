@@ -14,10 +14,14 @@
 #define START_SYSEX             0xF0
 #define END_SYSEX               0xF7
 
-#define DIGITAL_MESSAGE         0x90 // send data for a digital pin
-#define ANALOG_MESSAGE          0xE0 //
+#define REPORT_ANALOG           0xC0 // query for analog pin
+#define REPORT_DIGITAL          0xD0 // query for digital pin
 #define REPORT_VERSION          0xF9 // report firmware version
 #define REPORT_FIRMWARE         0x79 // report name and version of the firmware
+
+#define SET_PIN_MODE            0xF4
+#define DIGITAL_MESSAGE         0x90 // send data for a digital pin
+#define ANALOG_MESSAGE          0xE0 //
 
 #define RESERVED_COMMAND        0x00 // 2nd SysEx data byte is a chip-specific command (AVR, PIC, TI, etc).
 #define ANALOG_MAPPING_QUERY    0x69 // ask for mapping of analog to pin numbers
@@ -33,7 +37,6 @@
 #define I2C_REQUEST             0x76 // I2C request messages from a host to an I/O board
 #define I2C_REPLY               0x77 // I2C reply messages from an I/O board to a host
 #define I2C_CONFIG              0x78 // Configure special I2C settings such as power pins and delay times
-#define REPORT_FIRMWARE         0x79 // report name and version of the firmware
 #define SAMPLING_INTERVAL       0x7A // sampling interval
 #define SYSEX_NON_REALTIME      0x7E // MIDI Reserved for non-realtime messages
 #define SYSEX_REALTIME          0x7F // MIDI Reserved for realtime messages
@@ -44,9 +47,19 @@
 /****************************************************************************/
 @class Firmata;
 
+typedef enum {
+    input   = 0,
+    output  = 1,
+    analog  = 2,
+    pwm     = 3,
+    servo   = 4,
+} Mode;
+
+
 @protocol FirmataProtocol<NSObject>
-- (void) didUpdateDigitalPin;
-- (void) didReportFirmware:(NSData *)data;
+- (void) didUpdatePin:(int)pin mode:(Mode)mode;
+- (void) didReportFirmware:(NSString*)name major:(unsigned int*)major minor:(unsigned int*)minor;
+
 @end
 
 
@@ -65,10 +78,15 @@
 //- (void) reset;
 //- (void) start;
 
-- (void) analogMappingQuery;
-- (void) capabilityQuery;
 - (void) pinStateQuery:(int)pin;
 - (void) reportFirmware;
+
+- (void) analogMappingQuery;
+- (void) capabilityQuery;
+
+- (void) reportDigital:(BOOL)state;
+- (void) setPinMode:(int)pin state:(Mode)state;
+
 - (void) samplingInterval:(int)intervalMillisecondLSB intervalMillisecondMSB:(int)intervalMillisecondMSB;
 - (void) servoConfig:(int)pin minPulseLSB:(int)minPulseLSB minPulseMSB:(int)minPulseMSB maxPulseLSB:(int)maxPulseLSB maxPulseMSB:(int)maxPulseMSB;
 
