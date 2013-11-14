@@ -23,6 +23,15 @@
 @synthesize firmataData;
 
 
+// Place this in the .m file, inside the @implementation block
+// A method to convert an enum to string
+- (NSString*) modeEnumToString:(Mode)enumVal
+{
+    NSArray *enumArray = [[NSArray alloc] initWithObjects:modeArray];
+    return [enumArray objectAtIndex:enumVal];
+}
+
+
 #pragma mark -
 #pragma mark Init
 /****************************************************************************/
@@ -98,7 +107,7 @@
  * x  ...for as many bytes as it needs)
  * 6  END_SYSEX (0xF7)
  */
-- (void) parseReportFirmware:(NSData*)data
+- (void) parseReportFirmwareResponse:(NSData*)data
 {
     //location 0+1 to ditch start sysex, +1 command byte, +1 major +1 minor
     //length = -1 to kill end sysex, -1 start sysex, -1 command byte -1 major -1 minor =
@@ -127,9 +136,8 @@
 - (void) parsePinStateResponse:(NSData*)data
 {
     unsigned char *bytePtr = (unsigned char *)[data bytes];
-    [peripheralDelegate didUpdatePin:(int)bytePtr[2] mode:(Mode)bytePtr[3]];
+    [peripheralDelegate didUpdatePin:(int)bytePtr[2] currentMode:(Mode)bytePtr[3] value:(unsigned int)bytePtr[4]];
 }
-
 
 /* analog mapping response
  * -------------------------------
@@ -143,9 +151,7 @@
  */
 - (void) parseAnalogMappingResponse:(NSData*)data
 {
-    unsigned char *bytePtr = (unsigned char *)[data bytes];
-    //nsdictionary or array?
-    //[peripheralDelegate didUpdateAnalogPins:;
+    //argue we dont need analog if we have capability
 }
 
 /* capabilities response
@@ -163,8 +169,37 @@
  */
 - (void) parseCapabilityResponse:(NSData*)data
  {
-     unsigned char *bytePtr = (unsigned char *)[data bytes];
-     //[peripheralDelegate didUpdateDigitalPin:(int)bytePtr[0] value:(unsigned int*)(bytePtr[2]<<7 || bytePtr[1])];
+     
+     NSMutableArray *pins = [[NSMutableArray alloc] init];
+     
+     const char *bytes = [data bytes];
+     //start at 2 to ditch start and command byte
+     //take end byte off the end
+     for (int i = 2; i < [data length] - 1; i++)
+     {
+         //ugh altering i inside of loop...
+         NSMutableDictionary *modes = [[NSMutableDictionary alloc] init];
+
+         while(bytes[i]!=127){
+
+             const char* mode = bytes[i++];
+             const char* resolution = bytes[i++];
+             
+             NSLog(@"%02hhx,%02hhx",mode,resolution);
+             
+             [modes setObject:[NSNumber numberWithChar:resolution] forKey:[NSNumber numberWithChar:mode]];
+             
+         }
+     
+         //end of pin
+         NSMutableDictionary *pin = [[NSMutableDictionary alloc] init];
+         //[pin setObject:0 forKey:@"value"];
+         [pin setObject:modes forKey:@"modes"];
+         [pins addObject:pin];
+     }
+     NSLog(@"%@",pins);
+
+     [peripheralDelegate didUpdateCapability:(NSMutableArray*)pins];
  }
 
 
@@ -176,12 +211,90 @@
 /****************************************************************************/
 /*				Firmata Delegate Methods                                    */
 /****************************************************************************/
+/* Query Firmware Name and Version
+ * 0  START_SYSEX (0xF0)
+ * 1  queryFirmware (0x79)
+ * 2  END_SYSEX (0xF7)
+ */
+- (void) reportFirmware
+{
+    const unsigned char bytes[] = {START_SYSEX, REPORT_FIRMWARE, END_SYSEX};
+    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
+    NSLog(@"reportFirmware sending ascii: %@", stringToSend);
+    
+    [currentlyDisplayingService write:dataToSend];
+}
+
+/* write to servo, servo write is performed if the pins mode is SERVO
+ * ------------------------------
+ * 0  ANALOG_MESSAGE (0xE0-0xEF)
+ * 1  value lsb
+ * 2  value msb
+ */
+- (void) analogMessagePin:(int)pin value:(unsigned int)value
+{
+    const unsigned char bytes[] = {START_SYSEX, ANALOG_MESSAGE + pin, 0, 0, END_SYSEX};
+    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSUTF8StringEncoding];
+    NSLog(@"analogMessage sending ascii: %@", stringToSend);
+    
+    [currentlyDisplayingService write:dataToSend];
+}
+
+/* two byte digital data format, second nibble of byte 0 gives the port number (e.g. 0x92 is the third port, port 2)
+ * 0  digital data, 0x90-0x9F, (MIDI NoteOn, but different data format)
+ * 1  digital pins 0-6 bitmask
+ * 2  digital pin 7 bitmask
+ */
+- (void) digitalMessagePin:(int)pin value:(unsigned int)value
+{
+    const unsigned char bytes[] = {START_SYSEX, DIGITAL_MESSAGE + pin, 0 , 0, END_SYSEX};
+    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSUTF8StringEncoding];
+    NSLog(@"digitalMessage sending ascii: %@", stringToSend);
+    
+    [currentlyDisplayingService write:dataToSend];
+}
+
+/* request version report
+ * 0  request version report (0xF9) (MIDI Undefined)
+ */
+- (void) reportAnalog:(int)pin enable:(BOOL)enable
+{
+    const unsigned char bytes[] = {START_SYSEX, REPORT_ANALOG + pin, enable, END_SYSEX};
+    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSUTF8StringEncoding];
+    NSLog(@"reportAnalog sending ascii: %@", stringToSend);
+    
+    [currentlyDisplayingService write:dataToSend];
+}
+
+/* toggle digital port reporting by port (second nibble of byte 0), e.g. 0xD1 is port 1 is pins 8 to 15,
+ * 0  toggle digital port reporting (0xD0-0xDF) (MIDI Aftertouch)
+ * 1  disable(0)/enable(non-zero)
+ */
+- (void) reportDigital:(int)pin enable:(BOOL)enable
+{
+    const unsigned char bytes[] = {START_SYSEX, REPORT_DIGITAL + pin, enable, END_SYSEX};
+    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSUTF8StringEncoding];
+    NSLog(@"reportDigital sending ascii: %@", stringToSend);
+    
+    [currentlyDisplayingService write:dataToSend];
+}
+
+/* set pin mode
+ * 1  set digital pin mode (0xF4) (MIDI Undefined)
+ * 2  pin number (0-127)
+ * 3  state (INPUT/OUTPUT/ANALOG/PWM/SERVO, 0/1/2/3/4)
+ */
 - (void) setPinMode:(int)pin mode:(Mode)mode
 {
     const unsigned char bytes[] = {START_SYSEX, SET_PIN_MODE, pin, mode, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
     NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSUTF8StringEncoding];
-    NSLog(@"analogMappingQuery sending ascii: %@", stringToSend);
+    NSLog(@"setPinMode sending ascii: %@", stringToSend);
     
     [currentlyDisplayingService write:dataToSend];
 }
@@ -194,20 +307,10 @@
  */
 - (void) analogMappingQuery
 {
-    const unsigned char bytes[] = {START_SYSEX, REPORT_DIGITAL, END_SYSEX};
+    const unsigned char bytes[] = {START_SYSEX, ANALOG_MAPPING_QUERY, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
     NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSUTF8StringEncoding];
     NSLog(@"analogMappingQuery sending ascii: %@", stringToSend);
-    
-    [currentlyDisplayingService write:dataToSend];
-}
-
-- (void) reportDigital
-{
-    const unsigned char bytes[] = {START_SYSEX, REPORT_DIGITAL, END_SYSEX};
-    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
-    NSLog(@"digitalQuery sending ascii: %@", stringToSend);
     
     [currentlyDisplayingService write:dataToSend];
 }
@@ -228,6 +331,13 @@
     [currentlyDisplayingService write:dataToSend];
 }
 
+/* pin state query
+ * -------------------------------
+ * 0  START_SYSEX (0xF0) (MIDI System Exclusive)
+ * 1  pin state query (0x6D)
+ * 2  pin (0 to 127)
+ * 3  END_SYSEX (0xF7) (MIDI End of SysEx - EOX)
+ */
 - (void) pinStateQuery:(int)pin
 {
     const unsigned char bytes[] = {START_SYSEX, PIN_STATE_QUERY, pin, END_SYSEX};
@@ -239,6 +349,63 @@
 
 }
 
+/* servo config
+ * --------------------
+ * 0  START_SYSEX (0xF0)
+ * 1  SERVO_CONFIG (0x70)
+ * 2  pin number (0-127)
+ * 3  minPulse LSB (0-6)
+ * 4  minPulse MSB (7-13)
+ * 5  maxPulse LSB (0-6)
+ * 6  maxPulse MSB (7-13)
+ * 7  END_SYSEX (0xF7)
+ */
+- (void) servoConfig:(int)pin minPulse:(unsigned int*)minPulse maxPulse:(unsigned int*)maxPulse
+{
+    int maxPulseLSB = maxPulse;
+    int maxPulseMSB = maxPulse;
+    
+    int minPulseLSB = minPulse;
+    int minPulseMSB = minPulse;
+    
+    const unsigned char bytes[] = {START_SYSEX, SERVO_CONFIG, pin, minPulseLSB, minPulseMSB, maxPulseLSB, maxPulseMSB, END_SYSEX};
+    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
+    NSLog(@"servoConfig sending ascii: %@", stringToSend);
+    
+    [currentlyDisplayingService write:dataToSend];
+}
+
+/* I2C config
+ * -------------------------------
+ * 0  START_SYSEX (0xF0) (MIDI System Exclusive)
+ * 1  I2C_CONFIG (0x78)
+ * 2  Delay in microseconds (LSB)
+ * 3  Delay in microseconds (MSB)
+ * ... user defined for special cases, etc
+ * n  END_SYSEX (0xF7)
+ */
+//- (void) i2cConfig:(int)high{
+//    const unsigned char bytes[] = {START_SYSEX, I2C_CONFIG, pin, END_SYSEX};
+//    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+//    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
+//    NSLog(@"i2cConfig sending ascii: %@", stringToSend);
+//
+//    [currentlyDisplayingService write:dataToSend];
+//}
+
+
+
+/* extended analog
+ * -------------------------------
+ * 0  START_SYSEX (0xF0) (MIDI System Exclusive)
+ * 1  extended analog message (0x6F)
+ * 2  pin (0 to 127)
+ * 3  bits 0-6 (least significant byte)
+ * 4  bits 7-13
+ * ... additional bytes may be sent if more bits needed
+ * N  END_SYSEX (0xF7) (MIDI End of SysEx - EOX)
+ */
 //- (void) extendedAnalogQuery:(int)pin:] withData:(NSData)data{
 //    const unsigned char bytes[] = {START_SYSEX, EXTENDED_ANALOG, pin, END_SYSEX};
 //    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
@@ -247,17 +414,6 @@
 //
 //    [currentlyDisplayingService write:dataToSend];
 //}
-
-    
-- (void) servoConfig:(int)pin minPulseLSB:(int)minPulseLSB minPulseMSB:(int)minPulseMSB maxPulseLSB:(int)maxPulseLSB maxPulseMSB:(int)maxPulseMSB
-{
-    const unsigned char bytes[] = {START_SYSEX, SERVO_CONFIG, pin, minPulseLSB, minPulseMSB, maxPulseLSB, maxPulseMSB, END_SYSEX};
-    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
-    NSLog(@"servoConfig sending ascii: %@", stringToSend);
-    
-    [currentlyDisplayingService write:dataToSend];
-}
 
 //- (void) stringData:(NSString)string{
 //    const unsigned char bytes[] = {START_SYSEX, STRING_DATA, pin, END_SYSEX};
@@ -277,6 +433,22 @@
 //    [currentlyDisplayingService write:dataToSend];
 //}
 
+/* I2C read/write request
+ * -------------------------------
+ * 0  START_SYSEX (0xF0) (MIDI System Exclusive)
+ * 1  I2C_REQUEST (0x76)
+ * 2  slave address (LSB)
+ * 3  slave address (MSB) + read/write and address mode bits
+ {7: always 0} + {6: reserved} + {5: address mode, 1 means 10-bit mode} +
+ {4-3: read/write, 00 => write, 01 => read once, 10 => read continuously, 11 => stop reading} +
+ {2-0: slave address MSB in 10-bit mode, not used in 7-bit mode}
+ * 4  data 0 (LSB)
+ * 5  data 0 (MSB)
+ * 6  data 1 (LSB)
+ * 7  data 1 (MSB)
+ * ...
+ * n  END_SYSEX (0xF7)
+ */
 //- (void) i2cRequest:(int)high{
 //    const unsigned char bytes[] = {START_SYSEX, I2C_REQUEST, pin, END_SYSEX};
 //    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
@@ -286,33 +458,17 @@
 //    [currentlyDisplayingService write:dataToSend];
 //}
 
-//- (void) i2cConfig:(int)high{
-//    const unsigned char bytes[] = {START_SYSEX, I2C_CONFIG, pin, END_SYSEX};
-//    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-//    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
-//    NSLog(@"i2cConfig sending ascii: %@", stringToSend);
-//
-//    [currentlyDisplayingService write:dataToSend];
-//}
-
-/* Query Firmware Name and Version
- * 0  START_SYSEX (0xF0)
- * 1  queryFirmware (0x79)
- * 2  END_SYSEX (0xF7)
+/* Set sampling interval
+ * -------------------------------
+ * 0  START_SYSEX (0xF0) (MIDI System Exclusive)
+ * 1  SAMPLING_INTERVAL (0x7A)
+ * 2  sampling interval on the millisecond time scale (LSB)
+ * 3  sampling interval on the millisecond time scale (MSB)
+ * 4  END_SYSEX (0xF7)
  */
-- (void) reportFirmware
+- (void) samplingInterval:(unsigned int)intervalMilliseconds
 {
-    const unsigned char bytes[] = {START_SYSEX, REPORT_FIRMWARE, END_SYSEX};
-    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
-    NSLog(@"reportFirmware sending ascii: %@", stringToSend);
-    
-    [currentlyDisplayingService write:dataToSend];
-}
-
-- (void) samplingInterval:(int)intervalMillisecondLSB intervalMillisecondMSB:(int)intervalMillisecondMSB
-{
-    const unsigned char bytes[] = {START_SYSEX, SAMPLING_INTERVAL, intervalMillisecondMSB, intervalMillisecondMSB, END_SYSEX};
+    const unsigned char bytes[] = {START_SYSEX, SAMPLING_INTERVAL, intervalMilliseconds, intervalMilliseconds, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
     NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
     NSLog(@"samplingInterval sending ascii: %@", stringToSend);
@@ -363,21 +519,26 @@
             
             switch ( firmataDataBytes[1] )
             {
+
+                case ANALOG_MAPPING_RESPONSE:
+                    [self parseAnalogMappingResponse:firmataData];
+                    break;
+                
+                case CAPABILITY_RESPONSE:
+                    [self parseCapabilityResponse:firmataData];
+                    break;
+                    
                 case PIN_STATE_RESPONSE:
                     [self parsePinStateResponse:firmataData];
                     break;
-                case DIGITAL_MESSAGE:
-                    NSLog(@"type of message is digital");
-                    [self parseDigitalResponse:firmataData];
-                    break;
-                    
+
                 case ANALOG_MESSAGE:
                     NSLog(@"type of message is anlog");
                     break;
                     
                 case REPORT_FIRMWARE:
                     NSLog(@"type of message is firmware report");
-                    [self parseReportFirmware:firmataData];
+                    [self parseReportFirmwareResponse:firmataData];
                     break;
                     
                 case REPORT_VERSION:
@@ -397,6 +558,7 @@
 /** Central Manager reset */
 - (void) serviceDidReset
 {
+    NSLog(@"Service reset");
     //TODO do something? probably have to go back to root controller and reconnect?
 }
 

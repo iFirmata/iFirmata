@@ -37,19 +37,11 @@
 {
     [super viewDidLoad];
     
-    self.pins = [NSMutableArray array];
+    self.pins = nil;
     
-    for(int i = 0; i<21; i++){
-        NSMutableDictionary *values = [[NSMutableDictionary alloc] init];
-        
-        [values setValue:[NSNumber numberWithInt:i] forKey:@"pin"];
-        [values setValue:[NSNumber numberWithInt:0] forKey:@"value"];
-        
-        [pins addObject:values];
-    }
-
     currentFirmata = [[Firmata alloc] initWithService:currentlyDisplayingService controller:self];
     currentlyConnectedSensor.text = [[currentlyDisplayingService peripheral] name];
+
 
 }
 
@@ -92,11 +84,25 @@
 
     }
     
-    NSDictionary *dict = pins[indexPath.row];
+    NSDictionary *pin = pins[indexPath.row];
+    
+    NSMutableDictionary *modesDictionary = [pin objectForKey:@"modes"];
+    
+    NSString *modesString = [[NSString alloc] init];
+    
+    for (NSString* mode in modesDictionary) {
+        //NSLog(@"%d",[mode intValue]);
+        //NSLog([currentFirmata modeEnumToString:0]);
+        modesString = [modesString stringByAppendingString:
+                       [NSString stringWithFormat:@"%@,", [currentFirmata modeEnumToString:(Mode)[mode intValue]] ]
+                       ];
+    }
+    
     
     [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-    [[cell textLabel] setText:[NSString stringWithFormat:@"Pin: %@",[dict objectForKey:@"pin"]]];
-    [[cell detailTextLabel] setText:[NSString stringWithFormat:@"%@",[dict objectForKey:@"value"]]];
+    [[cell textLabel] setText:[NSString stringWithFormat:@"Pin: %ld",(long)indexPath.row]];
+    
+    [[cell detailTextLabel] setText:[NSString stringWithFormat:@"%@ %@", modesString,[pin objectForKey:@"value"]]];
     
 	return cell;
 }
@@ -123,15 +129,29 @@
 /****************************************************************************/
 /*                              Firmata Delegates                           */
 /****************************************************************************/
-- (void) didUpdatePin:(int)pin mode:(Mode)mode;
+- (void) didUpdatePin:(int)pin currentMode:(Mode)mode value:(unsigned int)value
 {
-    NSLog(@"something");
+     NSMutableDictionary *pinObject =[pins objectAtIndex:pin];
+    [pinObject setObject:[NSNumber numberWithInt:value] forKey:@"value"];
+    [pinObject setObject:[NSNumber numberWithInt:mode] forKey:@"currentMode"];
+    [self.tableView reloadData];
+    
 }
 
 - (void) didReportFirmware:(NSString*)name major:(unsigned int*)major minor:(unsigned int*)minor
 {
     firmwareVersion.text = [NSString stringWithFormat:@"%@ %ld.%ld",
                             name, (long)major, (long)minor];
+}
+
+- (void) didUpdateCapability:(NSMutableArray*)pins
+{
+    self.pins = pins;
+    [self.tableView reloadData];
+    
+    for (int i =0; i< [pins count]; i++) {
+        [currentFirmata pinStateQuery:i];
+    }
 }
 
 - (void) didReportAnalogPin:(int)pin value:(unsigned int*)value
@@ -146,8 +166,9 @@
 /****************************************************************************/
 -(IBAction)send:(id)sender
 {
-    [currentFirmata analogMappingQuery];
-    
+    [currentFirmata capabilityQuery];
+    //[currentFirmata reportDigital:1 enable:YES];
+
 }
 
 -(void)buttonPressed:(id)sender {

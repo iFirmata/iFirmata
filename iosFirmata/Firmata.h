@@ -53,13 +53,15 @@ typedef enum {
     analog  = 2,
     pwm     = 3,
     servo   = 4,
+    shift     = 5,
+    i2c   = 6,
 } Mode;
-
+#define modeArray @"input", @"output", @"analog", @"pwm", @"servo", @"shift", @"i2c", nil
 
 @protocol FirmataProtocol<NSObject>
-- (void) didUpdatePin:(int)pin mode:(Mode)mode;
+- (void) didUpdatePin:(int)pin currentMode:(Mode)mode value:(unsigned int)value;
 - (void) didReportFirmware:(NSString*)name major:(unsigned int*)major minor:(unsigned int*)minor;
-
+- (void) didUpdateCapability:(NSMutableArray*)pins;
 @end
 
 
@@ -75,6 +77,8 @@ typedef enum {
 - (id) initWithService:(LeDataService*)service controller:(id<FirmataProtocol>)controller;
 - (void) setController:(id<FirmataProtocol>)controller;
 
+- (NSString*) modeEnumToString:(Mode)enumVal;
+
 //- (void) reset;
 //- (void) start;
 
@@ -84,7 +88,12 @@ typedef enum {
 - (void) analogMappingQuery;
 - (void) capabilityQuery;
 
-- (void) reportDigital:(BOOL)state;
+- (void) reportDigital:(int)pin enable:(BOOL)enable;
+- (void) reportAnalog:(int)pin enable:(BOOL)enable;
+
+- (void) analogMessagePin:(int)pin enable:(BOOL)enable;
+- (void) digitalMessagePin:(int)pin enable:(BOOL)enable;
+
 - (void) setPinMode:(int)pin state:(Mode)state;
 
 - (void) samplingInterval:(int)intervalMillisecondLSB intervalMillisecondMSB:(int)intervalMillisecondMSB;
