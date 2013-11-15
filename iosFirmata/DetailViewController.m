@@ -79,7 +79,7 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"PinList"];
     if (cell == nil) {
         
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue2 reuseIdentifier:@"PinList"];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"PinList"];
         [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
 
     }
@@ -159,6 +159,11 @@
     [self.tableView reloadData];
 }
 
+
+
+
+
+
 #pragma mark -
 #pragma mark App IO
 /****************************************************************************/
@@ -166,8 +171,41 @@
 /****************************************************************************/
 -(IBAction)send:(id)sender
 {
-    [currentFirmata capabilityQuery];
+    
+    unsigned short int test = 0xfff;
+    
+    NSLog(@"%u",test);
+    
+    NSLog(@"%u",test>>4);
+    
+//    for (NSDictionary object in pins) {
+//        // do something with object
+//    }
+    
+    [currentFirmata setPinMode:11 mode:1];
+
+    [currentFirmata digitalMessagePin:11 value:test];
+    
+    //[currentFirmata capabilityQuery];
     //[currentFirmata reportDigital:1 enable:YES];
+    
+    //#define I2C_WRITE_MASK              0x00
+    //#define I2C_READ_ONCE_MASK          0x01
+    //#define I2C_READ_CONTINUOUSLY_MASK  0x10
+    //#define I2C_STOP_READING_MASK       0x11
+    
+//#define DISP_CHAR_5X7	0x80
+//#define LEDAddress 0x04
+//    
+//    const unsigned char led[] = {DISP_CHAR_5X7, 'a', 0x03, 0xE8};
+//    
+//    NSData *data = [[NSData alloc] initWithBytes:led length:4];
+//    
+//    NSLog(@"i2cRequest bytes in hex: %@", [data description]);
+//
+//    
+//    [currentFirmata i2cRequest:I2C_WRITE_MASK address:LEDAddress data:data];
+
 
 }
 

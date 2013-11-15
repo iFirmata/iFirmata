@@ -118,7 +118,7 @@
     NSData *nameData =[data subdataWithRange:range];
     NSString *name = [[NSString alloc] initWithData:nameData encoding:NSASCIIStringEncoding];
     
-    [peripheralDelegate didReportFirmware:name major:(unsigned int*)bytePtr[2] minor:(unsigned int*)bytePtr[3]];
+    [peripheralDelegate didReportFirmware:name major:(unsigned short int)bytePtr[2] minor:(unsigned short int)bytePtr[3]];
 }
 
 /* pin state response
@@ -136,7 +136,7 @@
 - (void) parsePinStateResponse:(NSData*)data
 {
     unsigned char *bytePtr = (unsigned char *)[data bytes];
-    [peripheralDelegate didUpdatePin:(int)bytePtr[2] currentMode:(Mode)bytePtr[3] value:(unsigned int)bytePtr[4]];
+    [peripheralDelegate didUpdatePin:(int)bytePtr[2] currentMode:(Mode)bytePtr[3] value:(unsigned short int)bytePtr[4]];
 }
 
 /* analog mapping response
@@ -182,10 +182,10 @@
 
          while(bytes[i]!=127){
 
-             const char* mode = bytes[i++];
-             const char* resolution = bytes[i++];
+             const char *mode = bytes[i++];
+             const char *resolution = bytes[i++];
              
-             NSLog(@"%02hhx,%02hhx",mode,resolution);
+             NSLog(@"%02hhx,%02hhx", mode, resolution);
              
              [modes setObject:[NSNumber numberWithChar:resolution] forKey:[NSNumber numberWithChar:mode]];
              
@@ -203,9 +203,6 @@
  }
 
 
-
-
-
 #pragma mark -
 #pragma mark Firmata Delegate Methods
 /****************************************************************************/
@@ -220,8 +217,8 @@
 {
     const unsigned char bytes[] = {START_SYSEX, REPORT_FIRMWARE, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
-    NSLog(@"reportFirmware sending ascii: %@", stringToSend);
+
+    NSLog(@"reportFirmware bytes in hex: %@", [dataToSend description]);
     
     [currentlyDisplayingService write:dataToSend];
 }
@@ -232,12 +229,12 @@
  * 1  value lsb
  * 2  value msb
  */
-- (void) analogMessagePin:(int)pin value:(unsigned int)value
+- (void) analogMessagePin:(int)pin value:(unsigned short int)value
 {
-    const unsigned char bytes[] = {START_SYSEX, ANALOG_MESSAGE + pin, 0, 0, END_SYSEX};
+    const unsigned char bytes[] = {START_SYSEX, ANALOG_MESSAGE + pin, value, value>>4, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSUTF8StringEncoding];
-    NSLog(@"analogMessage sending ascii: %@", stringToSend);
+
+    NSLog(@"analogMessagePin bytes in hex: %@", [dataToSend description]);
     
     [currentlyDisplayingService write:dataToSend];
 }
@@ -247,12 +244,12 @@
  * 1  digital pins 0-6 bitmask
  * 2  digital pin 7 bitmask
  */
-- (void) digitalMessagePin:(int)pin value:(unsigned int)value
+- (void) digitalMessagePin:(int)pin value:(unsigned short int)value
 {
-    const unsigned char bytes[] = {START_SYSEX, DIGITAL_MESSAGE + pin, 0 , 0, END_SYSEX};
+    const unsigned char bytes[] = {START_SYSEX, DIGITAL_MESSAGE + pin, value , value>>4, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSUTF8StringEncoding];
-    NSLog(@"digitalMessage sending ascii: %@", stringToSend);
+
+    NSLog(@"digitalMessagePin bytes in hex: %@", [dataToSend description]);
     
     [currentlyDisplayingService write:dataToSend];
 }
@@ -264,8 +261,8 @@
 {
     const unsigned char bytes[] = {START_SYSEX, REPORT_ANALOG + pin, enable, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSUTF8StringEncoding];
-    NSLog(@"reportAnalog sending ascii: %@", stringToSend);
+
+    NSLog(@"reportAnalog bytes in hex: %@", [dataToSend description]);
     
     [currentlyDisplayingService write:dataToSend];
 }
@@ -278,8 +275,8 @@
 {
     const unsigned char bytes[] = {START_SYSEX, REPORT_DIGITAL + pin, enable, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSUTF8StringEncoding];
-    NSLog(@"reportDigital sending ascii: %@", stringToSend);
+
+    NSLog(@"reportDigital bytes in hex: %@", [dataToSend description]);
     
     [currentlyDisplayingService write:dataToSend];
 }
@@ -293,9 +290,9 @@
 {
     const unsigned char bytes[] = {START_SYSEX, SET_PIN_MODE, pin, mode, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSUTF8StringEncoding];
-    NSLog(@"setPinMode sending ascii: %@", stringToSend);
-    
+ 
+    NSLog(@"setPinMode bytes in hex: %@", [dataToSend description]);
+
     [currentlyDisplayingService write:dataToSend];
 }
 
@@ -309,8 +306,8 @@
 {
     const unsigned char bytes[] = {START_SYSEX, ANALOG_MAPPING_QUERY, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSUTF8StringEncoding];
-    NSLog(@"analogMappingQuery sending ascii: %@", stringToSend);
+
+    NSLog(@"analogMappingQuery bytes in hex: %@", [dataToSend description]);
     
     [currentlyDisplayingService write:dataToSend];
 }
@@ -325,9 +322,9 @@
 {
     const unsigned char bytes[] = {START_SYSEX, CAPABILITY_QUERY, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
-    NSLog(@"capabilityQuery sending ascii: %@", stringToSend);
-    
+
+    NSLog(@"capabilityQuery bytes in hex: %@", [dataToSend description]);
+
     [currentlyDisplayingService write:dataToSend];
 }
 
@@ -342,8 +339,8 @@
 {
     const unsigned char bytes[] = {START_SYSEX, PIN_STATE_QUERY, pin, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
-    NSLog(@"pinStateQuery sending ascii: %@", stringToSend);
+
+    NSLog(@"pinStateQuery bytes in hex: %@", [dataToSend description]);
     
     [currentlyDisplayingService write:dataToSend];
 
@@ -360,18 +357,12 @@
  * 6  maxPulse MSB (7-13)
  * 7  END_SYSEX (0xF7)
  */
-- (void) servoConfig:(int)pin minPulse:(unsigned int*)minPulse maxPulse:(unsigned int*)maxPulse
+- (void) servoConfig:(int)pin minPulse:(unsigned short int)minPulse maxPulse:(unsigned short int)maxPulse
 {
-    int maxPulseLSB = maxPulse;
-    int maxPulseMSB = maxPulse;
-    
-    int minPulseLSB = minPulse;
-    int minPulseMSB = minPulse;
-    
-    const unsigned char bytes[] = {START_SYSEX, SERVO_CONFIG, pin, minPulseLSB, minPulseMSB, maxPulseLSB, maxPulseMSB, END_SYSEX};
+    const unsigned char bytes[] = {START_SYSEX, SERVO_CONFIG, pin, minPulse, minPulse>>4, maxPulse, maxPulse>>4, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
-    NSLog(@"servoConfig sending ascii: %@", stringToSend);
+
+    NSLog(@"servoConfig bytes in hex: %@", [dataToSend description]);
     
     [currentlyDisplayingService write:dataToSend];
 }
@@ -385,53 +376,19 @@
  * ... user defined for special cases, etc
  * n  END_SYSEX (0xF7)
  */
-//- (void) i2cConfig:(int)high{
-//    const unsigned char bytes[] = {START_SYSEX, I2C_CONFIG, pin, END_SYSEX};
-//    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-//    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
-//    NSLog(@"i2cConfig sending ascii: %@", stringToSend);
-//
-//    [currentlyDisplayingService write:dataToSend];
-//}
+- (void) i2cConfig:(unsigned short int)delay data:(NSData *)data{
 
+    const unsigned char first[] = {START_SYSEX, I2C_CONFIG, delay, delay>>4};
+    const unsigned char second[] = {END_SYSEX};
+    
+    NSMutableData *dataToSend = [[NSMutableData alloc] initWithBytes:first length:sizeof(first)];
+    [dataToSend appendData:data];
+    [dataToSend appendBytes:second length:sizeof(second)];
 
-
-/* extended analog
- * -------------------------------
- * 0  START_SYSEX (0xF0) (MIDI System Exclusive)
- * 1  extended analog message (0x6F)
- * 2  pin (0 to 127)
- * 3  bits 0-6 (least significant byte)
- * 4  bits 7-13
- * ... additional bytes may be sent if more bits needed
- * N  END_SYSEX (0xF7) (MIDI End of SysEx - EOX)
- */
-//- (void) extendedAnalogQuery:(int)pin:] withData:(NSData)data{
-//    const unsigned char bytes[] = {START_SYSEX, EXTENDED_ANALOG, pin, END_SYSEX};
-//    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-//    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
-//    NSLog(@"Report firmware sending ascii: %@", stringToSend);
-//
-//    [currentlyDisplayingService write:dataToSend];
-//}
-
-//- (void) stringData:(NSString)string{
-//    const unsigned char bytes[] = {START_SYSEX, STRING_DATA, pin, END_SYSEX};
-//    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-//    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
-//    NSLog(@"stringData sending ascii: %@", stringToSend);
-//
-//    [currentlyDisplayingService write:dataToSend];
-//}
-
-//- (void) shiftData:(int)high{
-//    const unsigned char bytes[] = {START_SYSEX, SHIFT_DATA, pin, END_SYSEX};
-//    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-//    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
-//    NSLog(@"shiftData sending ascii: %@", stringToSend);
-//
-//    [currentlyDisplayingService write:dataToSend];
-//}
+    NSLog(@"i2cConfig bytes in hex: %@", [dataToSend description]);
+    
+    [currentlyDisplayingService write:dataToSend];
+}
 
 /* I2C read/write request
  * -------------------------------
@@ -449,14 +406,58 @@
  * ...
  * n  END_SYSEX (0xF7)
  */
-//- (void) i2cRequest:(int)high{
-//    const unsigned char bytes[] = {START_SYSEX, I2C_REQUEST, pin, END_SYSEX};
+- (void) i2cRequest:(int)request address:(unsigned short int)address data:(NSData *)data{
+    
+    const unsigned char first[] = {START_SYSEX, I2C_REQUEST, address, request};
+    NSMutableData *dataToSend = [[NSMutableData alloc] initWithBytes:first length:sizeof(first)];
+    [dataToSend appendData:data];
+    const unsigned char second[] = {END_SYSEX};
+    [dataToSend appendBytes:second length:sizeof(second)];
+    
+    NSLog(@"i2cRequest bytes in hex: %@", [dataToSend description]);
+
+    [currentlyDisplayingService write:dataToSend];
+}
+
+/* extended analog
+ * -------------------------------
+ * 0  START_SYSEX (0xF0) (MIDI System Exclusive)
+ * 1  extended analog message (0x6F)
+ * 2  pin (0 to 127)
+ * 3  bits 0-6 (least significant byte)
+ * 4  bits 7-13
+ * ... additional bytes may be sent if more bits needed
+ * N  END_SYSEX (0xF7) (MIDI End of SysEx - EOX)
+ */
+//- (void) extendedAnalogQuery:(int)pin:] withData:(NSData)data{
+//    const unsigned char bytes[] = {START_SYSEX, EXTENDED_ANALOG, pin, END_SYSEX};
 //    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-//    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
-//    NSLog(@"i2cRequest sending ascii: %@", stringToSend);
+
+//    NSLog(@"extendedAnalogQuery bytes in hex: %@", [dataToSend description]);
+
 //
 //    [currentlyDisplayingService write:dataToSend];
 //}
+
+//- (void) stringData:(NSString)string{
+//    const unsigned char bytes[] = {START_SYSEX, STRING_DATA, pin, END_SYSEX};
+//    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+
+//    NSLog(@"stringData bytes in hex: %@", [dataToSend description]);
+
+//
+//    [currentlyDisplayingService write:dataToSend];
+//}
+
+//- (void) shiftData:(int)high{
+//    const unsigned char bytes[] = {START_SYSEX, SHIFT_DATA, pin, END_SYSEX};
+//    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+
+//    NSLog(@"shiftData bytes in hex: %@", [dataToSend description]);
+//
+//    [currentlyDisplayingService write:dataToSend];
+//}
+
 
 /* Set sampling interval
  * -------------------------------
@@ -466,12 +467,12 @@
  * 3  sampling interval on the millisecond time scale (MSB)
  * 4  END_SYSEX (0xF7)
  */
-- (void) samplingInterval:(unsigned int)intervalMilliseconds
+- (void) samplingInterval:(unsigned short int)intervalMilliseconds
 {
-    const unsigned char bytes[] = {START_SYSEX, SAMPLING_INTERVAL, intervalMilliseconds, intervalMilliseconds, END_SYSEX};
+    const unsigned char bytes[] = {START_SYSEX, SAMPLING_INTERVAL, intervalMilliseconds, intervalMilliseconds>>4, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-    NSString* stringToSend = [[NSString alloc] initWithData:dataToSend encoding:NSASCIIStringEncoding];
-    NSLog(@"samplingInterval sending ascii: %@", stringToSend);
+
+    NSLog(@"samplingInterval bytes in hex: %@", [dataToSend description]);
     
     [currentlyDisplayingService write:dataToSend];
 }
