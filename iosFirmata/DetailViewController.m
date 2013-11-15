@@ -94,7 +94,7 @@
         //NSLog(@"%d",[mode intValue]);
         //NSLog([currentFirmata modeEnumToString:0]);
         modesString = [modesString stringByAppendingString:
-                       [NSString stringWithFormat:@"%@,", [currentFirmata modeEnumToString:(Mode)[mode intValue]] ]
+                       [NSString stringWithFormat:@"%@,", [currentFirmata pinmodeEnumToString:(PINMODE)[mode intValue]] ]
                        ];
     }
     
@@ -129,7 +129,7 @@
 /****************************************************************************/
 /*                              Firmata Delegates                           */
 /****************************************************************************/
-- (void) didUpdatePin:(int)pin currentMode:(Mode)mode value:(unsigned int)value
+- (void) didUpdatePin:(int)pin currentMode:(PINMODE)mode value:(unsigned int)value
 {
      NSMutableDictionary *pinObject =[pins objectAtIndex:pin];
     [pinObject setObject:[NSNumber numberWithInt:value] forKey:@"value"];
@@ -171,28 +171,17 @@
 /****************************************************************************/
 -(IBAction)send:(id)sender
 {
-    
-    unsigned short int test = 0xfff;
-    
-    NSLog(@"%u",test);
-    
-    NSLog(@"%u",test>>4);
-    
-//    for (NSDictionary object in pins) {
-//        // do something with object
-//    }
-    
-    [currentFirmata setPinMode:11 mode:1];
 
-    [currentFirmata digitalMessagePin:11 value:test];
     
-    //[currentFirmata capabilityQuery];
+
+//    
+//    [currentFirmata setPinMode:11 mode:OUTPUT];
+//
+//    [currentFirmata digitalMessagePin:11 value:0xffff];
+    
+    [currentFirmata capabilityQuery];
     //[currentFirmata reportDigital:1 enable:YES];
     
-    //#define I2C_WRITE_MASK              0x00
-    //#define I2C_READ_ONCE_MASK          0x01
-    //#define I2C_READ_CONTINUOUSLY_MASK  0x10
-    //#define I2C_STOP_READING_MASK       0x11
     
 //#define DISP_CHAR_5X7	0x80
 //#define LEDAddress 0x04
@@ -204,7 +193,7 @@
 //    NSLog(@"i2cRequest bytes in hex: %@", [data description]);
 //
 //    
-//    [currentFirmata i2cRequest:I2C_WRITE_MASK address:LEDAddress data:data];
+//    [currentFirmata i2cRequest:WRITE address:LEDAddress data:data];
 
 
 }

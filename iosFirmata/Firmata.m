@@ -25,9 +25,9 @@
 
 // Place this in the .m file, inside the @implementation block
 // A method to convert an enum to string
-- (NSString*) modeEnumToString:(Mode)enumVal
+- (NSString*) pinmodeEnumToString:(PINMODE)enumVal
 {
-    NSArray *enumArray = [[NSArray alloc] initWithObjects:modeArray];
+    NSArray *enumArray = [[NSArray alloc] initWithObjects:pinmodeArray];
     return [enumArray objectAtIndex:enumVal];
 }
 
@@ -136,7 +136,7 @@
 - (void) parsePinStateResponse:(NSData*)data
 {
     unsigned char *bytePtr = (unsigned char *)[data bytes];
-    [peripheralDelegate didUpdatePin:(int)bytePtr[2] currentMode:(Mode)bytePtr[3] value:(unsigned short int)bytePtr[4]];
+    [peripheralDelegate didUpdatePin:(int)bytePtr[2] currentMode:(PINMODE)bytePtr[3] value:(unsigned short int)bytePtr[4]];
 }
 
 /* analog mapping response
@@ -286,7 +286,7 @@
  * 2  pin number (0-127)
  * 3  state (INPUT/OUTPUT/ANALOG/PWM/SERVO, 0/1/2/3/4)
  */
-- (void) setPinMode:(int)pin mode:(Mode)mode
+- (void) setPinMode:(int)pin mode:(PINMODE)mode
 {
     const unsigned char bytes[] = {START_SYSEX, SET_PIN_MODE, pin, mode, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
@@ -406,9 +406,9 @@
  * ...
  * n  END_SYSEX (0xF7)
  */
-- (void) i2cRequest:(int)request address:(unsigned short int)address data:(NSData *)data{
+- (void) i2cRequest:(I2CMODE)i2cMode address:(unsigned short int)address data:(NSData *)data{
     
-    const unsigned char first[] = {START_SYSEX, I2C_REQUEST, address, request};
+    const unsigned char first[] = {START_SYSEX, I2C_REQUEST, address, i2cMode};
     NSMutableData *dataToSend = [[NSMutableData alloc] initWithBytes:first length:sizeof(first)];
     [dataToSend appendData:data];
     const unsigned char second[] = {END_SYSEX};

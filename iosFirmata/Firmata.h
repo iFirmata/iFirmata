@@ -41,29 +41,33 @@
 #define SYSEX_NON_REALTIME          0x7E // MIDI Reserved for non-realtime messages
 #define SYSEX_REALTIME              0x7F // MIDI Reserved for realtime messages
 
-#define I2C_WRITE_MASK              0x00
-#define I2C_READ_ONCE_MASK          0x01
-#define I2C_READ_CONTINUOUSLY_MASK  0x10
-#define I2C_STOP_READING_MASK       0x11
-
 /****************************************************************************/
 /*								Protocol									*/
 /****************************************************************************/
 @class Firmata;
 
 typedef enum {
-    input   = 0,
-    output  = 1,
-    analog  = 2,
-    pwm     = 3,
-    servo   = 4,
-    shift   = 5,
-    i2c     = 6,
-} Mode;
-#define modeArray @"input", @"output", @"analog", @"pwm", @"servo", @"shift", @"i2c", nil
+    WRITE               = 0,
+    READ                = 1,
+    READ_CONTINUOUSLY   = 2,
+    STOP                = 3,
+} I2CMODE;
+
+typedef enum {
+    INPUT   = 0,
+    OUTPUT  = 1,
+    ANALOG  = 2,
+    PWM     = 3,
+    SERVO   = 4,
+    SHIFT   = 5,
+    I2C     = 6,
+} PINMODE;
+#define pinmodeArray @"input", @"output", @"analog", @"pwm", @"servo", @"shift", @"i2c", nil
+
+
 
 @protocol FirmataProtocol<NSObject>
-- (void) didUpdatePin:(int)pin currentMode:(Mode)mode value:(unsigned short int)value;
+- (void) didUpdatePin:(int)pin currentMode:(PINMODE)mode value:(unsigned short int)value;
 - (void) didReportFirmware:(NSString*)name major:(unsigned short int)major minor:(unsigned short int)minor;
 - (void) didUpdateCapability:(NSMutableArray*)pins;
 @end
@@ -81,7 +85,7 @@ typedef enum {
 - (id) initWithService:(LeDataService*)service controller:(id<FirmataProtocol>)controller;
 - (void) setController:(id<FirmataProtocol>)controller;
 
-- (NSString*) modeEnumToString:(Mode)enumVal;
+- (NSString*) pinmodeEnumToString:(PINMODE)enumVal;
 
 //- (void) reset;
 //- (void) start;
@@ -93,7 +97,7 @@ typedef enum {
 - (void) capabilityQuery;
 
 - (void) i2cConfig:(unsigned short int)delay data:(NSData *)data;
-- (void) i2cRequest:(int)request address:(unsigned short int)address data:(NSData *)data;
+- (void) i2cRequest:(I2CMODE)i2cMode address:(unsigned short int)address data:(NSData *)data;
 
 - (void) reportDigital:(int)pin enable:(BOOL)enable;
 - (void) reportAnalog:(int)pin enable:(BOOL)enable;
@@ -101,7 +105,7 @@ typedef enum {
 - (void) analogMessagePin:(int)pin value:(unsigned short int)value;
 - (void) digitalMessagePin:(int)pin value:(unsigned short int)value;
 
-- (void) setPinMode:(int)pin mode:(Mode)mode;
+- (void) setPinMode:(int)pin mode:(PINMODE)mode;
 
 - (void) samplingInterval:(unsigned short int)intervalMilliseconds;
 - (void) servoConfig:(int)pin minPulse:(unsigned short int)minPulse maxPulse:(unsigned short int)maxPulse;
