@@ -11,11 +11,12 @@
 
 @implementation PinViewController
 
-@synthesize currentlyConnectedSensor;
+
 @synthesize currentFirmata;
-@synthesize pinLabel;
 @synthesize pinDictionary;
-@synthesize status;
+@synthesize deviceLabel;
+@synthesize pinLabel;
+@synthesize pinStatus;
 
 #pragma mark -
 #pragma mark View lifecycle
@@ -36,10 +37,24 @@
     
     [super viewDidLoad];
     
+    NSLog(@"Setting controller");
+    
     [currentFirmata setController:self];
 
-    [pinLabel setText:[pinDictionary valueForKey:@"name"]];
-    currentlyConnectedSensor.text = [[[currentFirmata currentlyDisplayingService] peripheral] name];
+    NSLog(@"getting pinlable text");
+
+    NSString *text = [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"]stringValue];
+    
+    NSLog(@"%@", text);
+    NSLog(@"setting pinlable text");
+
+    
+    [pinLabel setText:text];
+    
+    NSLog(@"setting device label text");
+
+    deviceLabel.text = [[[currentFirmata currentlyDisplayingService] peripheral] name];
+    NSLog(@"View done loading");
 }
 
 - (void)didReceiveMemoryWarning
@@ -56,18 +71,25 @@
 /****************************************************************************/
 - (void) didReceiveAnalogPin:(int)pin value:(unsigned short)value
 {
-    
-    //check if this is our pin
-    NSLog(@"pin: %i, value:%i", pin, value);
-    [status setText:[[NSString alloc] initWithFormat:@"%i",value] ];
+    if(pin == [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue])
+    {
+        NSLog(@"Analog update pin: %i, value:%i", pin, value);
+        [pinStatus setText:[[NSString alloc] initWithFormat:@"%i",value] ];
+    }
 }
 
-- (void) didReceiveDigitalPin:(int)pin value:(unsigned short)value
-{
-    //check if this is our pin
-    NSLog(@"pin: %i, value:%i", pin, value);
-    [status setText:[[NSString alloc] initWithFormat:@"%i",value] ];
 
+- (void) didReceiveDigitalPort:(int)port value:(unsigned short)value
+{
+}
+
+- (void) didReceiveDigitalPin:(int)pin status:(BOOL)status
+{
+    if(pin == [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue])
+    {
+        NSLog(@"Digital Update pin: %d, value:%hhd", pin, status);
+        [pinStatus setText:[[NSString alloc] initWithFormat:@"%i",status] ];
+    }
 }
 
 - (void) didConnect
@@ -81,7 +103,6 @@
 }
 
 
-
 #pragma mark -
 #pragma mark App IO
 /****************************************************************************/
@@ -89,27 +110,55 @@
 /****************************************************************************/
 -(IBAction)toggleMode:(id)sender
 {
-    
+    if([sender isOn])
+    {
+        NSLog(@"Setting Input");
+        [currentFirmata setPinMode:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]
+         mode:1];
+
+    }else
+    {
+        NSLog(@"Setting Output");
+        [currentFirmata setPinMode:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]
+                              mode:1];
+    }
 }
 
 -(IBAction)toggleValue:(id)sender
 {
-
+    if([sender isOn])
+    {
+        NSLog(@"Enabling Pin on port");
+        [currentFirmata digitalMessagePort:[currentFirmata portForPin:
+                                            [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]
+                                      mask:[currentFirmata bitMaskForPin:
+                                            [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]
+                                            ]];
+    }else
+    {
+        NSLog(@"Disabling Pins on port");
+        [currentFirmata digitalMessagePort:[currentFirmata portForPin:
+                                            [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]
+                                      mask:0x00];
+    }
 }
 
 -(IBAction)toggleReporting:(id)sender
 {
     if([sender isOn])
     {
-        NSLog(@"Enabling");
-        [currentFirmata reportAnalog:1 enable:YES];
-        [status setEnabled:YES];
+        NSLog(@"Enabling digital reporting for port");
+        [currentFirmata reportDigital:[currentFirmata portForPin:
+                                            [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]
+                                      enable:YES];
+        [pinStatus setEnabled:YES];
     }else
     {
-        NSLog(@"Disabling");
-        [currentFirmata reportAnalog:1 enable:NO];
-        [status setEnabled:NO];
+        NSLog(@"Disabling Pins on port");
+        [currentFirmata reportDigital:[currentFirmata portForPin:
+                                       [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]
+                               enable:NO];
+        [pinStatus setEnabled:NO];
     }
 }
-
 @end

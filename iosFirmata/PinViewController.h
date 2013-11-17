@@ -11,8 +11,8 @@
 
 @interface PinViewController : UIViewController <FirmataProtocol>
 @property (strong, nonatomic) Firmata                   *currentFirmata;
-@property (strong, nonatomic) IBOutlet UILabel          *currentlyConnectedSensor;
-@property (strong, nonatomic) IBOutlet UILabel          *status;
+@property (strong, nonatomic) IBOutlet UILabel          *deviceLabel;
+@property (strong, nonatomic) IBOutlet UILabel          *pinStatus;
 @property (strong, nonatomic) IBOutlet UILabel          *pinLabel;
 
 @property (strong, nonatomic) NSMutableDictionary       *pinDictionary;

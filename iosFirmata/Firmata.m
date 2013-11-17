@@ -102,20 +102,41 @@
 /****************************************************************************/
 /*				Firmata Parsers                                             */
 /****************************************************************************/
-
+// analog I/O message    0xE0   pin #      LSB(bits 0-6)         MSB(bits 7-13)
 - (void) parseAnalogMessageResponse:(NSData*) data
 {
     const unsigned char *firmataDataBytes = [data bytes];
 
-    [peripheralDelegate didReceiveAnalogPin:(firmataDataBytes[0] & 0x0f) value:(( firmataDataBytes[2]<<8 ) + firmataDataBytes[1] )];
+    int pin =(firmataDataBytes[0] & 0x0f);
+    unsigned short int lsb = firmataDataBytes[1] & 0x3f;
+    unsigned short int msb = firmataDataBytes[2]<<8;
+    
+    [peripheralDelegate didReceiveAnalogPin:pin value:lsb+msb];
 
 }
 
+// digital I/O message   0x90   port       LSB(bits 0-6)         MSB(bits 7-13)
 - (void) parseDigitalMessageResponse:(NSData*) data
 {
     const unsigned char *firmataDataBytes = [data bytes];
+    
+    int port =(firmataDataBytes[0] & 0x0f);
+    unsigned short int lsb = firmataDataBytes[1] & 0x3f;
+    unsigned short int msb = firmataDataBytes[2]<<8;
+    unsigned short int mask = lsb+msb;
+    
+    [peripheralDelegate didReceiveDigitalPort:port value:mask];
+    
+    for(int i = 0; i<8; i++){
+        
+        int pin = (port * 8) + i;
+        BOOL status = ((0x01<<i) & mask)>>i;
+        
+        NSLog(@"Port: %d, Digital Value: %hhd",port, status);
+        [peripheralDelegate didReceiveDigitalPin:pin status:status];
 
-    [peripheralDelegate didReceiveDigitalPin:(firmataDataBytes[0] & 0x0f) value:(( firmataDataBytes[2]<<8 ) + firmataDataBytes[1] )];
+    }
+    
 }
 
 /* Receive Firmware Name and Version (after query)
@@ -336,8 +357,9 @@ The pin "state" is any data written to the pin. For output modes (digital output
     [currentlyDisplayingService write:dataToSend];
 }
 
-/*
- * report digital port   0xD0   port       disable/enable(0/1)   - n/a -
+/* toggle digital port reporting by port (second nibble of byte 0), e.g. 0xD1 is port 1 is pins 8 to 15,
+ * 0  toggle digital port reporting (0xD0-0xDF) (MIDI Aftertouch)
+ * 1  disable(0)/enable(non-zero)
  */
 - (void) reportDigital:(int)port enable:(BOOL)enable
 {
@@ -660,7 +682,7 @@ The pin "state" is any data written to the pin. For output modes (digital output
 }
 
 - (unsigned short int) bitMaskForPin:(int)pin{
-    return pin % 8;
+    return 0x01 << pin % 8;
 }
 
 /** Central Manager reset */

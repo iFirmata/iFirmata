@@ -214,6 +214,8 @@
         [pin setValue:modes forKey:@"modes"];
         //[currentFirmata pinStateQuery:i];
         
+        [pin setValue:[NSNumber numberWithInt:i] forKey:@"firmatapin"];
+        
         [pinsArray addObject:pin];
     }
 
@@ -261,9 +263,6 @@
     int firmataPin = [(NSNumber*)[analogMapping objectForKey:pinString] intValue];
     
     [currentFirmata analogMessagePin:firmataPin value:0xff];
-
-    [currentFirmata digitalMessagePort:[currentFirmata portForPin:11]
-                                  mask:[currentFirmata bitMaskForPin:11]];
 
     
     
