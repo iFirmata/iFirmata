@@ -10,14 +10,14 @@
 #import "Firmata.h"
 
 @interface PinViewController : UIViewController <FirmataProtocol>
-@property (strong, nonatomic) LeDataService             *currentlyDisplayingService;
 @property (strong, nonatomic) Firmata                   *currentFirmata;
 @property (strong, nonatomic) IBOutlet UILabel          *currentlyConnectedSensor;
 @property (strong, nonatomic) IBOutlet UILabel          *status;
-@property (strong, nonatomic) IBOutlet UILabel          *pinNumberLabel;
+@property (strong, nonatomic) IBOutlet UILabel          *pinLabel;
 
-@property (strong, nonatomic) NSDictionary              *pinNumber;
+@property (strong, nonatomic) NSMutableDictionary       *pinDictionary;
 
--(IBAction)toggleOutput:(id)sender;
--(IBAction)toggleStatus:(id)sender;
+-(IBAction)toggleValue:(id)sender;
+-(IBAction)toggleMode:(id)sender;
+-(IBAction)toggleReporting:(id)sender;
 @end

@@ -10,6 +10,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreBluetooth/CoreBluetooth.h>
 #import "LeDataService.h"
+#import "LeDiscovery.h"
 
 #define START_SYSEX                 0xF0
 #define END_SYSEX                   0xF7
@@ -20,8 +21,8 @@
 #define REPORT_FIRMWARE             0x79 // report name and version of the firmware
 
 #define SET_PIN_MODE                0xF4
-#define DIGITAL_MESSAGE             0x90 // send data for a digital pin
-#define ANALOG_MESSAGE              0xE0 //
+#define DIGITAL_MESSAGE             0x90 // data for a digital port
+#define ANALOG_MESSAGE              0xE0 // data for a analog pin
 
 #define RESERVED_COMMAND            0x00 // 2nd SysEx data byte is a chip-specific command (AVR, PIC, TI, etc).
 #define ANALOG_MAPPING_QUERY        0x69 // ask for mapping of analog to pin numbers
@@ -40,6 +41,7 @@
 #define SAMPLING_INTERVAL           0x7A // sampling interval
 #define SYSEX_NON_REALTIME          0x7E // MIDI Reserved for non-realtime messages
 #define SYSEX_REALTIME              0x7F // MIDI Reserved for realtime messages
+#define RESET                       0xFF // 
 
 /****************************************************************************/
 /*								Protocol									*/
@@ -67,27 +69,36 @@ typedef enum {
 
 
 @protocol FirmataProtocol<NSObject>
+
+- (void) didDisconnect;
+- (void) didConnect;
 - (void) didUpdatePin:(int)pin currentMode:(PINMODE)mode value:(unsigned short int)value;
 - (void) didReportFirmware:(NSString*)name major:(unsigned short int)major minor:(unsigned short int)minor;
 - (void) didUpdateCapability:(NSMutableArray*)pins;
+- (void) didReceiveAnalogPin:(int)pin value:(unsigned short int)value;
+- (void) didReceiveDigitalPin:(int)pin value:(unsigned short int)value;
+- (void) didUpdateAnalogMapping:(NSMutableDictionary *)analogMapping;
 @end
 
 
 /****************************************************************************/
 /*						Firmata service.                                    */
 /****************************************************************************/
-@interface Firmata : NSObject  <LeDataProtocol>
+@interface Firmata : NSObject  <LeDataProtocol, LeServiceDelegate>
 
 @property (strong, nonatomic) LeDataService         *currentlyDisplayingService;
 
 @property (strong, nonatomic) NSMutableData         *firmataData;
+@property (strong, nonatomic) NSMutableDictionary   *analogMapping;
+@property (strong, nonatomic) NSMutableArray        *ports;
+@property (strong, nonatomic) NSMutableArray        *pins;
 
 - (id) initWithService:(LeDataService*)service controller:(id<FirmataProtocol>)controller;
 - (void) setController:(id<FirmataProtocol>)controller;
 
 - (NSString*) pinmodeEnumToString:(PINMODE)enumVal;
 
-//- (void) reset;
+- (void) reset;
 //- (void) start;
 
 - (void) pinStateQuery:(int)pin;
@@ -99,11 +110,11 @@ typedef enum {
 - (void) i2cConfig:(unsigned short int)delay data:(NSData *)data;
 - (void) i2cRequest:(I2CMODE)i2cMode address:(unsigned short int)address data:(NSData *)data;
 
-- (void) reportDigital:(int)pin enable:(BOOL)enable;
+- (void) reportDigital:(int)port enable:(BOOL)enable;
 - (void) reportAnalog:(int)pin enable:(BOOL)enable;
 
 - (void) analogMessagePin:(int)pin value:(unsigned short int)value;
-- (void) digitalMessagePin:(int)pin value:(unsigned short int)value;
+- (void) digitalMessagePort:(int)port mask:(unsigned short int)mask;
 
 - (void) setPinMode:(int)pin mode:(PINMODE)mode;
 
@@ -111,5 +122,8 @@ typedef enum {
 - (void) servoConfig:(int)pin minPulse:(unsigned short int)minPulse maxPulse:(unsigned short int)maxPulse;
 
 /* Behave properly when heading into and out of the background */
+
+- (int) portForPin:(int)pin;
+- (unsigned short int) bitMaskForPin:(int)pin;
 
 @end

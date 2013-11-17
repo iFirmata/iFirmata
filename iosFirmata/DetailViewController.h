@@ -12,11 +12,11 @@
 
 @interface DetailViewController : UITableViewController  <FirmataProtocol>
 
-@property (strong, nonatomic) LeDataService             *currentlyDisplayingService;
 @property (strong, nonatomic) Firmata                   *currentFirmata;
 @property (strong, nonatomic) IBOutlet UILabel          *currentlyConnectedSensor;
 @property (strong, nonatomic) IBOutlet UILabel          *firmwareVersion;
-@property (retain, nonatomic) NSMutableArray            *pins;
+@property (retain, nonatomic) NSMutableArray            *pinsArray;
 @property (retain, nonatomic) IBOutlet UITableView      *pinsTable;
+@property (retain, nonatomic) NSMutableDictionary       *analogMapping;
 -(IBAction)send:(id)sender;
 @end

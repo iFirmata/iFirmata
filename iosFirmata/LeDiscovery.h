@@ -26,6 +26,11 @@
 @end
 
 
+@protocol LeServiceDelegate <NSObject>
+- (void) serviceDidReset;
+- (void) serviceDidChangeStatus:(LeDataService*)service;
+@end
+
 
 /****************************************************************************/
 /*							Discovery class									*/
@@ -39,7 +44,7 @@
 /*								UI controls									*/
 /****************************************************************************/
 @property (nonatomic, assign) id<LeDiscoveryDelegate>           discoveryDelegate;
-@property (nonatomic, assign) id<LeDataProtocol>	peripheralDelegate;
+@property (nonatomic, assign) id<LeServiceDelegate>	peripheralDelegate;
 
 
 /****************************************************************************/

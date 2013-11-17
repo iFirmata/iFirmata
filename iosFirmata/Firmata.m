@@ -21,7 +21,9 @@
 
 @synthesize currentlyDisplayingService;
 @synthesize firmataData;
-
+@synthesize analogMapping;
+@synthesize ports;
+@synthesize pins;
 
 // Place this in the .m file, inside the @implementation block
 // A method to convert an enum to string
@@ -41,6 +43,9 @@
 {
     self = [super init];
     if (self) {
+        ports = [[NSMutableArray alloc] init];
+        pins = [[NSMutableArray alloc] init];
+        
         firmataData = [[NSMutableData alloc] init];
         seenStartSysex=false;
         
@@ -97,6 +102,22 @@
 /****************************************************************************/
 /*				Firmata Parsers                                             */
 /****************************************************************************/
+
+- (void) parseAnalogMessageResponse:(NSData*) data
+{
+    const unsigned char *firmataDataBytes = [data bytes];
+
+    [peripheralDelegate didReceiveAnalogPin:(firmataDataBytes[0] & 0x0f) value:(( firmataDataBytes[2]<<8 ) + firmataDataBytes[1] )];
+
+}
+
+- (void) parseDigitalMessageResponse:(NSData*) data
+{
+    const unsigned char *firmataDataBytes = [data bytes];
+
+    [peripheralDelegate didReceiveDigitalPin:(firmataDataBytes[0] & 0x0f) value:(( firmataDataBytes[2]<<8 ) + firmataDataBytes[1] )];
+}
+
 /* Receive Firmware Name and Version (after query)
  * 0  START_SYSEX (0xF0)
  * 1  queryFirmware (0x79)
@@ -132,11 +153,36 @@
  * 6  (optional) pin state, bits 14-20
  ...  additional optional bytes, as many as needed
  * N  END_SYSEX (0xF7)
+The pin "state" is any data written to the pin. For output modes (digital output, PWM, and Servo), the state is any value that has been previously written to the pin. A GUI needs this state to properly initialize any on-screen controls, so their initial settings match whatever the pin is actually doing. For input modes, typically the state is zero. However, for digital inputs, the state is the status of the pullup resistor.
  */
 - (void) parsePinStateResponse:(NSData*)data
 {
     unsigned char *bytePtr = (unsigned char *)[data bytes];
-    [peripheralDelegate didUpdatePin:(int)bytePtr[2] currentMode:(PINMODE)bytePtr[3] value:(unsigned short int)bytePtr[4]];
+
+    int pin = bytePtr[2];
+    int currentMode = bytePtr[3];
+    unsigned short int value = (unsigned short int)bytePtr[4] & 0x3F;
+    int port = pin / 8;
+
+    NSLog(@"Pin: %i, Mode: %i, Value %i", pin, currentMode, value);
+    
+    NSLog(@"Setting Pin %i for port %i", pin, port);
+    
+    //check if if its digital
+    
+    @try {
+        unsigned short int mask = [(NSNumber*)[ports objectAtIndex:port] unsignedShortValue];
+        [ports insertObject:[NSNumber numberWithUnsignedChar:mask & ~(value<<(pin % 8))] atIndex:port];
+
+    }
+    @catch (NSException *exception) {
+    }
+    @finally {
+        [ports insertObject:[NSNumber numberWithUnsignedChar:value<<(pin % 8)] atIndex:port];
+    }
+
+
+    [peripheralDelegate didUpdatePin:pin currentMode:(PINMODE)currentMode value:value];
 }
 
 /* analog mapping response
@@ -151,7 +197,25 @@
  */
 - (void) parseAnalogMappingResponse:(NSData*)data
 {
-    //argue we dont need analog if we have capability
+    analogMapping = [[NSMutableDictionary alloc] init];
+    
+    int j = 0;
+    unsigned char *bytes = (unsigned char *)[data bytes];
+    for (int i = 2; i < [data length]-1; i++)
+    {
+
+        if(bytes[i]!=127){
+            [analogMapping setObject:[NSNumber numberWithUnsignedChar:j]
+                              forKey:[NSNumber numberWithUnsignedChar:bytes[i]]
+             ];
+        }
+        
+        j=j+1;
+    }
+    
+    NSLog(@"Analog Mapping Response %@",analogMapping);
+    
+    [peripheralDelegate didUpdateAnalogMapping:analogMapping];
 }
 
 /* capabilities response
@@ -169,9 +233,7 @@
  */
 - (void) parseCapabilityResponse:(NSData*)data
  {
-     
-     NSMutableArray *pins = [[NSMutableArray alloc] init];
-     
+          
      const char *bytes = [data bytes];
      //start at 2 to ditch start and command byte
      //take end byte off the end
@@ -191,14 +253,10 @@
              
          }
      
-         //end of pin
-         NSMutableDictionary *pin = [[NSMutableDictionary alloc] init];
-         //[pin setObject:0 forKey:@"value"];
-         [pin setObject:modes forKey:@"modes"];
-         [pins addObject:pin];
+         [pins addObject:modes];
      }
-     NSLog(@"%@",pins);
-
+     
+     NSLog(@"Capability Response %@",pins);
      [peripheralDelegate didUpdateCapability:(NSMutableArray*)pins];
  }
 
@@ -208,6 +266,17 @@
 /****************************************************************************/
 /*				Firmata Delegate Methods                                    */
 /****************************************************************************/
+// * system reset
+- (void) reset
+{
+    const unsigned char bytes[] = {START_SYSEX, RESET, END_SYSEX};
+    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+    
+    NSLog(@"reportFirmware bytes in hex: %@", [dataToSend description]);
+    
+    [currentlyDisplayingService write:dataToSend];
+}
+
 /* Query Firmware Name and Version
  * 0  START_SYSEX (0xF0)
  * 1  queryFirmware (0x79)
@@ -229,13 +298,13 @@
  * 1  value lsb
  * 2  value msb
  */
-- (void) analogMessagePin:(int)pin value:(unsigned short int)value
+- (void) analogMesssagePin:(int)pin value:(unsigned short int)value
 {
-    const unsigned char bytes[] = {START_SYSEX, ANALOG_MESSAGE + pin, value, value>>4, END_SYSEX};
+    const unsigned char bytes[] = {ANALOG_MESSAGE + pin, value, value>>7};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
 
     NSLog(@"analogMessagePin bytes in hex: %@", [dataToSend description]);
-    
+
     [currentlyDisplayingService write:dataToSend];
 }
 
@@ -244,22 +313,22 @@
  * 1  digital pins 0-6 bitmask
  * 2  digital pin 7 bitmask
  */
-- (void) digitalMessagePin:(int)pin value:(unsigned short int)value
+- (void) digitalMessagePort:(int)port mask:(unsigned short int)mask
 {
-    const unsigned char bytes[] = {START_SYSEX, DIGITAL_MESSAGE + pin, value , value>>4, END_SYSEX};
+    const unsigned char bytes[] = {DIGITAL_MESSAGE + port, mask & 0x7f, mask>>7};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
-
+    
     NSLog(@"digitalMessagePin bytes in hex: %@", [dataToSend description]);
     
     [currentlyDisplayingService write:dataToSend];
 }
 
-/* request version report
- * 0  request version report (0xF9) (MIDI Undefined)
+/*
+ * report analog pin     0xC0   pin #      disable/enable(0/1)   - n/a -
  */
 - (void) reportAnalog:(int)pin enable:(BOOL)enable
 {
-    const unsigned char bytes[] = {START_SYSEX, REPORT_ANALOG + pin, enable, END_SYSEX};
+    const unsigned char bytes[] = {REPORT_ANALOG + pin, enable};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
 
     NSLog(@"reportAnalog bytes in hex: %@", [dataToSend description]);
@@ -267,13 +336,12 @@
     [currentlyDisplayingService write:dataToSend];
 }
 
-/* toggle digital port reporting by port (second nibble of byte 0), e.g. 0xD1 is port 1 is pins 8 to 15,
- * 0  toggle digital port reporting (0xD0-0xDF) (MIDI Aftertouch)
- * 1  disable(0)/enable(non-zero)
+/*
+ * report digital port   0xD0   port       disable/enable(0/1)   - n/a -
  */
-- (void) reportDigital:(int)pin enable:(BOOL)enable
+- (void) reportDigital:(int)port enable:(BOOL)enable
 {
-    const unsigned char bytes[] = {START_SYSEX, REPORT_DIGITAL + pin, enable, END_SYSEX};
+    const unsigned char bytes[] = {REPORT_DIGITAL + port, enable};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
 
     NSLog(@"reportDigital bytes in hex: %@", [dataToSend description]);
@@ -359,7 +427,7 @@
  */
 - (void) servoConfig:(int)pin minPulse:(unsigned short int)minPulse maxPulse:(unsigned short int)maxPulse
 {
-    const unsigned char bytes[] = {START_SYSEX, SERVO_CONFIG, pin, minPulse, minPulse>>4, maxPulse, maxPulse>>4, END_SYSEX};
+    const unsigned char bytes[] = {START_SYSEX, SERVO_CONFIG, pin, minPulse, minPulse>>8, maxPulse, maxPulse>>8, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
 
     NSLog(@"servoConfig bytes in hex: %@", [dataToSend description]);
@@ -378,7 +446,7 @@
  */
 - (void) i2cConfig:(unsigned short int)delay data:(NSData *)data{
 
-    const unsigned char first[] = {START_SYSEX, I2C_CONFIG, delay, delay>>4};
+    const unsigned char first[] = {START_SYSEX, I2C_CONFIG, delay, delay>>8};
     const unsigned char second[] = {END_SYSEX};
     
     NSMutableData *dataToSend = [[NSMutableData alloc] initWithBytes:first length:sizeof(first)];
@@ -469,7 +537,7 @@
  */
 - (void) samplingInterval:(unsigned short int)intervalMilliseconds
 {
-    const unsigned char bytes[] = {START_SYSEX, SAMPLING_INTERVAL, intervalMilliseconds, intervalMilliseconds>>4, END_SYSEX};
+    const unsigned char bytes[] = {START_SYSEX, SAMPLING_INTERVAL, intervalMilliseconds, intervalMilliseconds>>8, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
 
     NSLog(@"samplingInterval bytes in hex: %@", [dataToSend description]);
@@ -516,7 +584,7 @@
             seenStartSysex=false;
             
             const unsigned char *firmataDataBytes = [firmataData bytes];
-            NSLog(@"Control byte is %02hhx", firmataDataBytes[1]);
+            NSLog(@"Sysex Command byte is %02hhx", firmataDataBytes[1]);
             
             switch ( firmataDataBytes[1] )
             {
@@ -550,10 +618,49 @@
                     NSLog(@"type of message unknown");
                     break;
             }
-        }else{
+            [firmataData setLength:0];
+
+        }else if(seenStartSysex)
+        {
             [firmataData appendBytes:( const void * )&byte length:1];
+
+        }else
+        {
+            [firmataData appendBytes:( const void * )&byte length:1];
+
+            //might be part of analog or digital message, anything else?
+            //how the fuck do I know if its a complete message or if I lost
+            //lets hope only those 2? that means they're always 3 large
+            //some kind of timer or something, but reports are just going to keep coming in so that doesnt help
+            //so just assume every 3 are a decent message, fuck that tough, how do I get back on track if we get off?
+            if([firmataData length]==3)
+            {
+                const unsigned char *firmataDataBytes = [firmataData bytes];
+                NSLog(@"3 bytes received, first byte is %02hhx", firmataDataBytes[0]);
+
+                if( firmataDataBytes[0] >=  ANALOG_MESSAGE && firmataDataBytes[0] <=  ANALOG_MESSAGE +15 )
+                {
+                    NSLog(@"Analog Message");
+                    [self parseAnalogMessageResponse:firmataData];
+                }
+                else if( firmataDataBytes[0] >=  DIGITAL_MESSAGE && firmataDataBytes[0] <=  DIGITAL_MESSAGE +15 )
+                {
+                    NSLog(@"Digital Message");
+                    [self parseDigitalMessageResponse:firmataData];
+                }
+                [firmataData setLength:0];
+
+            }
         }
     }
+}
+
+- (int) portForPin:(int)pin{
+    return pin/8;
+}
+
+- (unsigned short int) bitMaskForPin:(int)pin{
+    return pin % 8;
 }
 
 /** Central Manager reset */
@@ -566,15 +673,17 @@
 /** Peripheral connected or disconnected */
 - (void) serviceDidChangeStatus:(LeDataService*)service
 {
+    NSLog(@"serviceDidChangeStatus in Firmata");
     
     //TODO do something?
     if ( [[service peripheral] isConnected] ) {
         NSLog(@"Service (%@) connected", service.peripheral.name);
+        [peripheralDelegate didConnect];
     }
     
     else {
         NSLog(@"Service (%@) disconnected", service.peripheral.name);
-        
+        [peripheralDelegate didDisconnect];
     }
 }
 

@@ -12,10 +12,10 @@
 @implementation PinViewController
 
 @synthesize currentlyConnectedSensor;
-@synthesize currentlyDisplayingService;
 @synthesize currentFirmata;
-@synthesize pinNumberLabel;
-@synthesize pinNumber;
+@synthesize pinLabel;
+@synthesize pinDictionary;
+@synthesize status;
 
 #pragma mark -
 #pragma mark View lifecycle
@@ -33,11 +33,13 @@
 
 - (void)viewDidLoad
 {
+    
     [super viewDidLoad];
-	
-    [pinNumberLabel setText:@"5"];
+    
     [currentFirmata setController:self];
-    currentlyConnectedSensor.text = [[currentlyDisplayingService peripheral] name];
+
+    [pinLabel setText:[pinDictionary valueForKey:@"name"]];
+    currentlyConnectedSensor.text = [[[currentFirmata currentlyDisplayingService] peripheral] name];
 }
 
 - (void)didReceiveMemoryWarning
@@ -52,15 +54,32 @@
 /****************************************************************************/
 /*                              Firmata Delegates                           */
 /****************************************************************************/
-- (void) didUpdateDigitalPin{
-    NSLog(@"something");
+- (void) didReceiveAnalogPin:(int)pin value:(unsigned short)value
+{
+    
+    //check if this is our pin
+    NSLog(@"pin: %i, value:%i", pin, value);
+    [status setText:[[NSString alloc] initWithFormat:@"%i",value] ];
 }
 
-- (void) didReportFirmware:(NSData*)data{
-    
-    NSLog(@"%@", [[NSString alloc] initWithData:data
-                                       encoding:NSUTF8StringEncoding]);
+- (void) didReceiveDigitalPin:(int)pin value:(unsigned short)value
+{
+    //check if this is our pin
+    NSLog(@"pin: %i, value:%i", pin, value);
+    [status setText:[[NSString alloc] initWithFormat:@"%i",value] ];
+
 }
+
+- (void) didConnect
+{
+    
+}
+
+- (void) didDisconnect
+{
+    [[self navigationController] popToRootViewControllerAnimated:YES];
+}
+
 
 
 #pragma mark -
@@ -68,16 +87,29 @@
 /****************************************************************************/
 /*                              App IO Methods                              */
 /****************************************************************************/
--(IBAction)toggleOutput:(id)sender
+-(IBAction)toggleMode:(id)sender
 {
-    
     
 }
 
--(IBAction)toggleStatus:(id)sender
+-(IBAction)toggleValue:(id)sender
 {
-    
-    
+
+}
+
+-(IBAction)toggleReporting:(id)sender
+{
+    if([sender isOn])
+    {
+        NSLog(@"Enabling");
+        [currentFirmata reportAnalog:1 enable:YES];
+        [status setEnabled:YES];
+    }else
+    {
+        NSLog(@"Disabling");
+        [currentFirmata reportAnalog:1 enable:NO];
+        [status setEnabled:NO];
+    }
 }
 
 @end
