@@ -46,8 +46,6 @@
         
         [currentFirmata analogMappingQuery];
         
-        [currentFirmata capabilityQuery];
-
          currentlyConnectedSensor.text = [[[currentFirmata currentlyDisplayingService] peripheral] name];
     }
     
@@ -188,6 +186,7 @@
 - (void) didUpdateAnalogMapping:(NSMutableDictionary *)analogMapping
 {
     self.analogMapping = analogMapping;
+    [currentFirmata capabilityQuery]
 }
 
 //returns an NSMutablearray of NSDictionary of modes
