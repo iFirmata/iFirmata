@@ -79,7 +79,7 @@
 }
 
 
-- (void) didReceiveDigitalPort:(int)port value:(unsigned short)value
+- (void) didReceiveDigitalPort:(int)port mask:(unsigned short)mask
 {
 }
 

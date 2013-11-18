@@ -111,7 +111,7 @@
 
     int pin =(bytes[0] & 0x0f);
     unsigned short int lsb = bytes[1] & 0x7f;
-    unsigned short int msb = bytes[2]<<7 & 0x7f;
+    unsigned short int msb = (bytes[2] & 0x7f ) <<7 ;
     
     [peripheralDelegate didReceiveAnalogPin:pin value:lsb+msb];
 
@@ -124,10 +124,10 @@
     
     int port =(bytes[0] & 0x0f);
     unsigned short int lsb = bytes[1] & 0x7f;
-    unsigned short int msb = bytes[2]<<7 &0x7f;
+    unsigned short int msb = (bytes[2] & 0x7f) <<7;
     unsigned short int mask = lsb+msb;
-    
-    [peripheralDelegate didReceiveDigitalPort:port value:mask];
+        
+    [peripheralDelegate didReceiveDigitalPort:port mask:mask];
     
     for(int i = 0; i<8; i++){
         
@@ -681,10 +681,13 @@ The pin "state" is any data written to the pin. For output modes (digital output
             
         }else if(seenStartSysex) //In sysex, but were not at the end yet, just store it
         {
+            NSLog(@"In sysex, appending waiting for end sysex %c", byte);
             [firmataData appendBytes:( const void * )&byte length:1];
             
         }else //not in sysex
         {
+            NSLog(@"Nonsysex data");
+
             //really want like 3 byte queue here, if we know what the first byte is, parse it, else remove it
             [nonSysexData addObject:[NSNumber numberWithUnsignedShort:byte]];
             
@@ -706,14 +709,17 @@ The pin "state" is any data written to the pin. For output modes (digital output
                 {
                     NSLog(@"Digital Message");
                     [self parseDigitalMessageResponse:[NSData dataWithBytes:(unsigned char[]){[(NSNumber*)nonSysexData[0] unsignedCharValue],[(NSNumber*)nonSysexData[1] unsignedCharValue],[(NSNumber*)nonSysexData[2] unsignedCharValue]} length:3]];
+                        [nonSysexData removeAllObjects];
                     
                 }
                 else if(byte==REPORT_VERSION){
                     NSLog(@"Report Version");
                     [self parseReportVersionResponse:[NSData dataWithBytes:(unsigned char[]){[(NSNumber*)nonSysexData[0] unsignedCharValue],[(NSNumber*)nonSysexData[1] unsignedCharValue],[(NSNumber*)nonSysexData[2] unsignedCharValue]} length:3]];
+                        [nonSysexData removeAllObjects];
                     
                 }
                 else{
+                    NSLog(@"Don't know, dumping %hu", byte);
                     //dont know!, dump it
                     [nonSysexData removeObjectAtIndex:0 ];
                 }

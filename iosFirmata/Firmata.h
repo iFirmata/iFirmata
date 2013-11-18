@@ -80,7 +80,7 @@ typedef enum {
 - (void) didReportVersionMajor:(unsigned short int)major minor:(unsigned short int)minor;
 - (void) didUpdateCapability:(NSMutableArray*)pins;
 - (void) didReceiveAnalogPin:(int)pin value:(unsigned short int)value;
-- (void) didReceiveDigitalPort:(int)port value:(unsigned short int)value;
+- (void) didReceiveDigitalPort:(int)port mask:(unsigned short int)mask;
 - (void) didReceiveDigitalPin:(int)pin status:(BOOL)status;
 - (void) didUpdateAnalogMapping:(NSMutableDictionary *)analogMapping;
 @end

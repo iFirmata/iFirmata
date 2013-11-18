@@ -231,12 +231,16 @@
     //[self.tableView reloadData];
 }
 
-- (void) didReceiveDigitalMessage:(int)pin value:(unsigned short)value
+- (void) didReceiveDigitalPort:(int)port mask:(unsigned short)mask
 {
-    NSLog(@"pin: %i, value:%i", pin, value);
-    NSDictionary *aPin = pinsArray[pin];
-    [aPin setValue:[NSNumber numberWithInt:value] forKey:@"lastvalue"];
-    //[self.tableView reloadData];
+    NSLog(@"port: %i, mask:%i", port, mask);
+    
+}
+
+- (void) didReceiveDigitalPin:(int)pin status:(BOOL)status
+{
+    NSLog(@"Digital Update pin: %d, value:%hhd", pin, status);
+
 }
 
 - (void) didConnect
@@ -288,6 +292,15 @@
 //    [currentFirmata reportAnalog:0 enable:YES];
     
     
+    //    [currentFirmata samplingInterval:10000]; //optional
+    //    [currentFirmata reportAnalog:0 enable:YES];
+    
+    
+//    [currentFirmata setPinMode:23 mode:INPUT]; //make input
+//    [currentFirmata digitalMessagePort:[currentFirmata portForPin:23]
+//                                  mask:[currentFirmata bitMaskForPin:23]]; //turn on pullups
+//    [currentFirmata reportDigital:[currentFirmata portForPin:23] enable:YES];
+
 
 ////    [currentFirmata setPinMode:2 mode:I2C]; //seemingly not necessary?
 ////    [currentFirmata setPinMode:3 mode:I2C]; //seemingly not necessary?
