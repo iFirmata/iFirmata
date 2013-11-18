@@ -223,12 +223,12 @@
     [self.tableView reloadData];
 }
 
-- (void) didReceiveAnalogMessage:(int)pin value:(unsigned short)value
+- (void) didReceiveAnalogPin:(int)pin value:(unsigned short)value
 {
     NSLog(@"pin: %i, value:%i", pin, value);
     NSDictionary *aPin = pinsArray[pin];
     [aPin setValue:[NSNumber numberWithInt:value] forKey:@"lastvalue"];
-    [self.tableView reloadData];
+    //[self.tableView reloadData];
 }
 
 - (void) didReceiveDigitalMessage:(int)pin value:(unsigned short)value
@@ -236,7 +236,7 @@
     NSLog(@"pin: %i, value:%i", pin, value);
     NSDictionary *aPin = pinsArray[pin];
     [aPin setValue:[NSNumber numberWithInt:value] forKey:@"lastvalue"];
-    [self.tableView reloadData];
+    //[self.tableView reloadData];
 }
 
 - (void) didConnect
@@ -257,12 +257,14 @@
 /****************************************************************************/
 -(IBAction)send:(id)sender
 {
-    
-    
-    NSString *pinString = [[NSString alloc] initWithFormat:@"%i", 1 ];
-    int firmataPin = [(NSNumber*)[analogMapping objectForKey:pinString] intValue];
-    
-    [currentFirmata analogMessagePin:firmataPin value:0xff];
+
+    [currentFirmata reportAnalog:0 enable:YES];
+
+//
+//    NSString *pinString = [[NSString alloc] initWithFormat:@"%i", 1 ];
+//    int firmataPin = [(NSNumber*)[analogMapping objectForKey:pinString] intValue];
+//    
+//    [currentFirmata analogMessagePin:firmataPin value:0xff];
 
     
     

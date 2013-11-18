@@ -21,6 +21,7 @@
 
 @synthesize currentlyDisplayingService;
 @synthesize firmataData;
+@synthesize nonSysexData;
 @synthesize analogMapping;
 @synthesize ports;
 @synthesize pins;
@@ -47,6 +48,7 @@
         pins = [[NSMutableArray alloc] init];
         
         firmataData = [[NSMutableData alloc] init];
+        nonSysexData = [[NSMutableArray alloc] init];
         seenStartSysex=false;
         
         currentlyDisplayingService = service;
@@ -602,25 +604,22 @@ The pin "state" is any data written to the pin. For output modes (digital output
     if (service != currentlyDisplayingService)
         return;
     
-//    unsigned char mockHex[] = {0xf0,0x90,0x20,0x20,0x20,0xf7};
-//    NSData *mock = [NSData dataWithBytes:mockHex length:6];
-    
-    //parse of our (up to) 20 bytes
-    //may or may not be a whole (or a single) command
+    //data may or may not be a whole (or a single) command
+    //unless jumbled, sysex bytes should never occur in data stream
     const unsigned char *bytes = [data bytes];
     for (int i = 0; i < [data length]; i++)
     {
         const unsigned char byte = bytes[i];
         NSLog(@"Processing %02hhx", byte);
         
-        if(!seenStartSysex && byte==START_SYSEX)
+        if(byte==START_SYSEX) //start me up
         {
             NSLog(@"Start sysex received, clear data");
             [firmataData setLength:0];
             [firmataData appendBytes:( const void * )&byte length:1];
             seenStartSysex=true;
             
-        }else if(seenStartSysex && byte==END_SYSEX)
+        }else if(byte==END_SYSEX) //Thats it, parse it
         {
             [firmataData appendBytes:( const void * )&byte length:1];
             
@@ -645,17 +644,9 @@ The pin "state" is any data written to the pin. For output modes (digital output
                     [self parsePinStateResponse:firmataData];
                     break;
                     
-                case ANALOG_MESSAGE:
-                    NSLog(@"type of message is anlog");
-                    break;
-                    
                 case REPORT_FIRMWARE:
                     NSLog(@"type of message is firmware report");
                     [self parseReportFirmwareResponse:firmataData];
-                    break;
-                    
-                case REPORT_VERSION:
-                    NSLog(@"type of message is version report");
                     break;
                     
                 default:
@@ -664,41 +655,49 @@ The pin "state" is any data written to the pin. For output modes (digital output
             }
             [firmataData setLength:0];
             
-        }else if(seenStartSysex)
+        }else if(seenStartSysex) //In sysex, but were not at the end yet, just store it
         {
             [firmataData appendBytes:( const void * )&byte length:1];
             
-        }else
+        }else //not in sysex
         {
-            [firmataData appendBytes:( const void * )&byte length:1];
+            //really want like 3 byte queue here, if we know what the first byte is, parse it, else remove it
+            [nonSysexData addObject:[NSNumber numberWithUnsignedShort:byte]];
             
-            //might be part of analog or digital message, anything else?
-            //how the fuck do I know if its a complete message or if I lost
-            //lets hope only those 2? that means they're always 3 large
-            //some kind of timer or something, but reports are just going to keep coming in so that doesnt help
-            //so just assume every 3 are a decent message, fuck that tough, how do I get back on track if we get off?
-            if([firmataData length]==3)
+            if([nonSysexData count]==3)
             {
-                const unsigned char *firmataDataBytes = [firmataData bytes];
-                NSLog(@"3 bytes received, first byte is %02hhx", firmataDataBytes[0]);
+                const unsigned short byte = [(NSNumber*)[nonSysexData objectAtIndex:0] unsignedShortValue];
                 
-                if( firmataDataBytes[0] >=  ANALOG_MESSAGE && firmataDataBytes[0] <=  ANALOG_MESSAGE +15 )
+                NSLog(@"3 bytes received, first byte is %02hx", byte);
+                
+                if( byte >= ANALOG_MESSAGE && byte <=  ANALOG_MESSAGE +15 )
                 {
                     NSLog(@"Analog Message");
-                    [self parseAnalogMessageResponse:firmataData];
+                    
+                    [self parseAnalogMessageResponse:[NSData dataWithBytes:(unsigned char[]){[(NSNumber*)nonSysexData[0] unsignedCharValue],[(NSNumber*)nonSysexData[1] unsignedCharValue],[(NSNumber*)nonSysexData[2] unsignedCharValue]} length:3]];
+                    [nonSysexData removeAllObjects];
+                    
                 }
-                else if( firmataDataBytes[0] >=  DIGITAL_MESSAGE && firmataDataBytes[0] <=  DIGITAL_MESSAGE +15 )
+                else if( byte >= DIGITAL_MESSAGE && byte <=  DIGITAL_MESSAGE +15 )
                 {
                     NSLog(@"Digital Message");
-                    [self parseDigitalMessageResponse:firmataData];
+                    [self parseDigitalMessageResponse:[NSData dataWithBytes:(unsigned char[]){[(NSNumber*)nonSysexData[0] unsignedCharValue],[(NSNumber*)nonSysexData[1] unsignedCharValue],[(NSNumber*)nonSysexData[2] unsignedCharValue]} length:3]];
+                    
                 }
-                [firmataData setLength:0];
+                else if(byte==REPORT_VERSION){
+                    NSLog(@"Report Version");
+                    [self parseReportVersionResponse:[NSData dataWithBytes:(unsigned char[]){[(NSNumber*)nonSysexData[0] unsignedCharValue],[(NSNumber*)nonSysexData[1] unsignedCharValue],[(NSNumber*)nonSysexData[2] unsignedCharValue]} length:3]];
+                    
+                }
+                else{
+                    //dont know!, dump it
+                    [nonSysexData removeObjectAtIndex:0 ];
+                }
                 
             }
         }
     }
 }
-
 - (int) portForPin:(int)pin{
     return pin/8;
 }

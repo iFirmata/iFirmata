@@ -94,6 +94,7 @@ typedef enum {
 @property (strong, nonatomic) LeDataService         *currentlyDisplayingService;
 
 @property (strong, nonatomic) NSMutableData         *firmataData;
+@property (strong, nonatomic) NSMutableArray        *nonSysexData;
 @property (strong, nonatomic) NSMutableDictionary   *analogMapping;
 @property (strong, nonatomic) NSMutableArray        *ports;
 @property (strong, nonatomic) NSMutableArray        *pins;
