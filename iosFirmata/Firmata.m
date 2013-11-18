@@ -490,14 +490,26 @@ The pin "state" is any data written to the pin. For output modes (digital output
  * ... user defined for special cases, etc
  * n  END_SYSEX (0xF7)
  */
+// default delay time between i2c read request and Wire.requestFrom()
 - (void) i2cConfig:(unsigned short int)delay data:(NSData *)data{
 
     const unsigned char first[] = {START_SYSEX, I2C_CONFIG, delay, delay>>8};
-    const unsigned char second[] = {END_SYSEX};
-    
     NSMutableData *dataToSend = [[NSMutableData alloc] initWithBytes:first length:sizeof(first)];
-    [dataToSend appendData:data];
-    [dataToSend appendBytes:second length:sizeof(second)];
+    
+    // need to split this data into msb and lsb
+    const unsigned char *bytes = [data bytes];
+    
+    for (int i = 0; i < [data length]; i++)
+    {
+        unsigned char lsb = bytes[i] & 0x7f;
+        unsigned char msb = bytes[i] >> 7  & 0x7f;
+        
+        const unsigned char append[] = { lsb, msb };
+        [dataToSend appendBytes:append length:sizeof(append)];
+    }
+    
+    const unsigned char end[] = {END_SYSEX};
+    [dataToSend appendBytes:end length:sizeof(end)];
 
     NSLog(@"i2cConfig bytes in hex: %@", [dataToSend description]);
     
@@ -524,9 +536,21 @@ The pin "state" is any data written to the pin. For output modes (digital output
     
     const unsigned char first[] = {START_SYSEX, I2C_REQUEST, address, i2cMode};
     NSMutableData *dataToSend = [[NSMutableData alloc] initWithBytes:first length:sizeof(first)];
-    [dataToSend appendData:data];
-    const unsigned char second[] = {END_SYSEX};
-    [dataToSend appendBytes:second length:sizeof(second)];
+    
+    // need to split this data into msb and lsb
+    const unsigned char *bytes = [data bytes];
+
+    for (int i = 0; i < [data length]; i++)
+    {
+        unsigned char lsb = bytes[i] & 0x7f;
+        unsigned char msb = bytes[i] >> 7  & 0x7f;
+        
+        const unsigned char append[] = { lsb, msb };
+        [dataToSend appendBytes:append length:sizeof(append)];
+    }
+    
+    const unsigned char end[] = {END_SYSEX};
+    [dataToSend appendBytes:end length:sizeof(end)];
     
     NSLog(@"i2cRequest bytes in hex: %@", [dataToSend description]);
 
@@ -583,7 +607,7 @@ The pin "state" is any data written to the pin. For output modes (digital output
  */
 - (void) samplingInterval:(unsigned short int)intervalMilliseconds
 {
-    const unsigned char bytes[] = {START_SYSEX, SAMPLING_INTERVAL, intervalMilliseconds, intervalMilliseconds>>8, END_SYSEX};
+    const unsigned char bytes[] = {START_SYSEX, SAMPLING_INTERVAL, intervalMilliseconds & 0x7f, (intervalMilliseconds>>7) & 0x7f, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
 
     NSLog(@"samplingInterval bytes in hex: %@", [dataToSend description]);

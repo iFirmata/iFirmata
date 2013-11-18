@@ -256,39 +256,53 @@
 /****************************************************************************/
 -(IBAction)send:(id)sender
 {
-
-    [currentFirmata reportAnalog:0 enable:YES];
-
+//    [currentFirmata setPinMode:16 mode:OUTPUT];
+//    [currentFirmata setPinMode:23 mode:OUTPUT];
 //
-//    NSString *pinString = [[NSString alloc] initWithFormat:@"%i", 1 ];
-//    int firmataPin = [(NSNumber*)[analogMapping objectForKey:pinString] intValue];
+//    [currentFirmata digitalMessagePort:2 mask:0x81];
+    
+//    int motorPin1 = 16;//digital 16
+//    int motorPin2 = 5;//analog 5
 //    
-//    [currentFirmata analogMessagePin:firmataPin value:0xff];
+//    int motorPin2Firmata = [(NSNumber*)[analogMapping objectForKey:[NSNumber numberWithInt:motorPin2]] intValue];
+//    
+//    NSLog(@"firmata lookup %d -> %d",motorPin2, motorPin2Firmata);
+//    
+//    int port1 = [currentFirmata portForPin:motorPin1];
+//    int port2 = [currentFirmata portForPin:motorPin2Firmata];
+//    
+//    unsigned short int mask1 = [currentFirmata bitMaskForPin:motorPin1];
+//    unsigned short int mask2 = [currentFirmata bitMaskForPin:motorPin2Firmata];
+//    unsigned short int mask = [currentFirmata bitMaskForPin:motorPin1] | [currentFirmata bitMaskForPin:motorPin2Firmata];
+//    
+//    NSLog(@"port1: %d mask1: %hu port2: %d mask2: %hu ",port1, mask1, port2, mask2);
+//    
+//    NSLog(@"port: %d mask: %hu",port1, mask);
+//    
+//    [currentFirmata setPinMode:motorPin1 mode:OUTPUT];
+//    [currentFirmata setPinMode:motorPin2Firmata mode:OUTPUT];
+//    [currentFirmata digitalMessagePort:port1 mask:mask];
+    
+//    [currentFirmata samplingInterval:10000]; //optional
+//    [currentFirmata reportAnalog:0 enable:YES];
+    
+    
 
-    
-    
-    // divide pin by 8, if its an in that will work to select port
-    // port can index an array of chars
-    
-    //[currentFirmata digitalWritePin:11 value:YES];
-    //[currentFirmata capabilityQuery];
-
-//    [currentFirmata digitalMessagePin:0 value:0xff];
-//    [currentFirmata digitalMessagePin:1 value:0xff];
-//    [currentFirmata digitalMessagePin:2 value:0xff];
-    
-//#define DISP_CHAR_5X7	0x80
-//#define LEDAddress 0x04
+////    [currentFirmata setPinMode:2 mode:I2C]; //seemingly not necessary?
+////    [currentFirmata setPinMode:3 mode:I2C]; //seemingly not necessary?
 //    
-//    const unsigned char led[] = {DISP_CHAR_5X7, 'a', 0x03, 0xE8};
-//    
-//    NSData *data = [[NSData alloc] initWithBytes:led length:4];
-//    
-//    NSLog(@"i2cRequest bytes in hex: %@", [data description]);
+//    [currentFirmata i2cConfig:0 data:[[NSData alloc]init]];
 //
+//    #define DISP_CHAR_5X7	0x80
+//    #define LEDAddress      0x04
 //    
+//    int time = 10000;
+//    
+//    const unsigned char led[] = {DISP_CHAR_5X7, 'n', time>>8, time & 0xff};
+//    NSData *data = [[NSData alloc] initWithBytes:led length:sizeof(led)];
+//    
+//    [currentFirmata i2cRequest:WRITE address:0 data:[[NSData alloc] init ]];//first call never works?
 //    [currentFirmata i2cRequest:WRITE address:LEDAddress data:data];
-
 
 }
 
