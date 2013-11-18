@@ -186,6 +186,7 @@
 - (void) didUpdateAnalogMapping:(NSMutableDictionary *)analogMapping
 {
     self.analogMapping = analogMapping;
+
     [currentFirmata capabilityQuery];
 }
 
