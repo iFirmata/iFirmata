@@ -105,11 +105,11 @@
 // analog I/O message    0xE0   pin #      LSB(bits 0-6)         MSB(bits 7-13)
 - (void) parseAnalogMessageResponse:(NSData*) data
 {
-    const unsigned char *firmataDataBytes = [data bytes];
+    const unsigned char *bytes = [data bytes];
 
-    int pin =(firmataDataBytes[0] & 0x0f);
-    unsigned short int lsb = firmataDataBytes[1] & 0x3f;
-    unsigned short int msb = firmataDataBytes[2]<<8;
+    int pin =(bytes[0] & 0x0f);
+    unsigned short int lsb = bytes[1] & 0x7f;
+    unsigned short int msb = bytes[2]<<7 & 0x7f;
     
     [peripheralDelegate didReceiveAnalogPin:pin value:lsb+msb];
 
@@ -118,11 +118,11 @@
 // digital I/O message   0x90   port       LSB(bits 0-6)         MSB(bits 7-13)
 - (void) parseDigitalMessageResponse:(NSData*) data
 {
-    const unsigned char *firmataDataBytes = [data bytes];
+    const unsigned char *bytes = [data bytes];
     
-    int port =(firmataDataBytes[0] & 0x0f);
-    unsigned short int lsb = firmataDataBytes[1] & 0x3f;
-    unsigned short int msb = firmataDataBytes[2]<<8;
+    int port =(bytes[0] & 0x0f);
+    unsigned short int lsb = bytes[1] & 0x7f;
+    unsigned short int msb = bytes[2]<<7 &0x7f;
     unsigned short int mask = lsb+msb;
     
     [peripheralDelegate didReceiveDigitalPort:port value:mask];
@@ -163,6 +163,20 @@
     [peripheralDelegate didReportFirmware:name major:(unsigned short int)bytePtr[2] minor:(unsigned short int)bytePtr[3]];
 }
 
+/* version report format
+ * -------------------------------------------------
+ * 0  version report header (0xF9) (MIDI Undefined)
+ * 1  major version (0-127)
+ * 2  minor version (0-127)
+ */
+- (void) parseReportVersionResponse:(NSData*)data
+{
+    unsigned char *bytes = (unsigned char *)[data bytes];
+    
+    [peripheralDelegate didReportVersionMajor:(unsigned short int)bytes[1] minor:(unsigned short int)bytes[2]];
+
+}
+
 /* pin state response
  * -------------------------------
  * 0  START_SYSEX (0xF0) (MIDI System Exclusive)
@@ -182,7 +196,7 @@ The pin "state" is any data written to the pin. For output modes (digital output
 
     int pin = bytePtr[2];
     int currentMode = bytePtr[3];
-    unsigned short int value = (unsigned short int)bytePtr[4] & 0x3F;
+    unsigned short int value = (unsigned short int)bytePtr[4] & 0x7F;
     int port = pin / 8;
 
     NSLog(@"Pin: %i, Mode: %i, Value %i", pin, currentMode, value);
@@ -313,15 +327,23 @@ The pin "state" is any data written to the pin. For output modes (digital output
     [currentlyDisplayingService write:dataToSend];
 }
 
-/* write to servo, servo write is performed if the pins mode is SERVO
- * ------------------------------
- * 0  ANALOG_MESSAGE (0xE0-0xEF)
- * 1  value lsb
- * 2  value msb
+/* request version report
+ * 0  request version report (0xF9) (MIDI Undefined)
  */
-- (void) analogMesssagePin:(int)pin value:(unsigned short int)value
+- (void) reportVersion
 {
-    const unsigned char bytes[] = {ANALOG_MESSAGE + pin, value, value>>7};
+    const unsigned char bytes[] = {REPORT_VERSION};
+    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+    
+    NSLog(@"reportFirmware bytes in hex: %@", [dataToSend description]);
+    
+    [currentlyDisplayingService write:dataToSend];
+}
+
+// analog I/O message    0xE0   pin #      LSB(bits 0-6)         MSB(bits 7-13)
+- (void) analogMessagePin:(int)pin value:(unsigned short int)value
+{
+    const unsigned char bytes[] = {ANALOG_MESSAGE + pin, value & 0x7f, (value>>7) & 0x7f};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
 
     NSLog(@"analogMessagePin bytes in hex: %@", [dataToSend description]);
@@ -336,7 +358,7 @@ The pin "state" is any data written to the pin. For output modes (digital output
  */
 - (void) digitalMessagePort:(int)port mask:(unsigned short int)mask
 {
-    const unsigned char bytes[] = {DIGITAL_MESSAGE + port, mask & 0x7f, mask>>7};
+    const unsigned char bytes[] = {DIGITAL_MESSAGE + port, mask & 0x7f, (mask>>7) & 0x7f};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
     
     NSLog(@"digitalMessagePin bytes in hex: %@", [dataToSend description]);
@@ -378,7 +400,7 @@ The pin "state" is any data written to the pin. For output modes (digital output
  */
 - (void) setPinMode:(int)pin mode:(PINMODE)mode
 {
-    const unsigned char bytes[] = {START_SYSEX, SET_PIN_MODE, pin, mode, END_SYSEX};
+    const unsigned char bytes[] = {SET_PIN_MODE, pin, mode};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
  
     NSLog(@"setPinMode bytes in hex: %@", [dataToSend description]);
@@ -449,7 +471,7 @@ The pin "state" is any data written to the pin. For output modes (digital output
  */
 - (void) servoConfig:(int)pin minPulse:(unsigned short int)minPulse maxPulse:(unsigned short int)maxPulse
 {
-    const unsigned char bytes[] = {START_SYSEX, SERVO_CONFIG, pin, minPulse, minPulse>>8, maxPulse, maxPulse>>8, END_SYSEX};
+    const unsigned char bytes[] = {START_SYSEX, SERVO_CONFIG, pin, minPulse & 0x7f, minPulse>>7 & 0x7f, maxPulse & 0x7f, maxPulse>>7 & 0x7f, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
 
     NSLog(@"servoConfig bytes in hex: %@", [dataToSend description]);
@@ -590,14 +612,14 @@ The pin "state" is any data written to the pin. For output modes (digital output
     {
         const unsigned char byte = bytes[i];
         NSLog(@"Processing %02hhx", byte);
-
+        
         if(!seenStartSysex && byte==START_SYSEX)
         {
             NSLog(@"Start sysex received, clear data");
             [firmataData setLength:0];
             [firmataData appendBytes:( const void * )&byte length:1];
             seenStartSysex=true;
-        
+            
         }else if(seenStartSysex && byte==END_SYSEX)
         {
             [firmataData appendBytes:( const void * )&byte length:1];
@@ -610,11 +632,11 @@ The pin "state" is any data written to the pin. For output modes (digital output
             
             switch ( firmataDataBytes[1] )
             {
-
+                    
                 case ANALOG_MAPPING_RESPONSE:
                     [self parseAnalogMappingResponse:firmataData];
                     break;
-                
+                    
                 case CAPABILITY_RESPONSE:
                     [self parseCapabilityResponse:firmataData];
                     break;
@@ -622,7 +644,7 @@ The pin "state" is any data written to the pin. For output modes (digital output
                 case PIN_STATE_RESPONSE:
                     [self parsePinStateResponse:firmataData];
                     break;
-
+                    
                 case ANALOG_MESSAGE:
                     NSLog(@"type of message is anlog");
                     break;
@@ -641,15 +663,15 @@ The pin "state" is any data written to the pin. For output modes (digital output
                     break;
             }
             [firmataData setLength:0];
-
+            
         }else if(seenStartSysex)
         {
             [firmataData appendBytes:( const void * )&byte length:1];
-
+            
         }else
         {
             [firmataData appendBytes:( const void * )&byte length:1];
-
+            
             //might be part of analog or digital message, anything else?
             //how the fuck do I know if its a complete message or if I lost
             //lets hope only those 2? that means they're always 3 large
@@ -659,7 +681,7 @@ The pin "state" is any data written to the pin. For output modes (digital output
             {
                 const unsigned char *firmataDataBytes = [firmataData bytes];
                 NSLog(@"3 bytes received, first byte is %02hhx", firmataDataBytes[0]);
-
+                
                 if( firmataDataBytes[0] >=  ANALOG_MESSAGE && firmataDataBytes[0] <=  ANALOG_MESSAGE +15 )
                 {
                     NSLog(@"Analog Message");
@@ -671,7 +693,7 @@ The pin "state" is any data written to the pin. For output modes (digital output
                     [self parseDigitalMessageResponse:firmataData];
                 }
                 [firmataData setLength:0];
-
+                
             }
         }
     }

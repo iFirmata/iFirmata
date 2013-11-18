@@ -12,17 +12,21 @@
 #import "LeDataService.h"
 #import "LeDiscovery.h"
 
+// message command bytes (128-255/0x80-0xFF)
 #define START_SYSEX                 0xF0
+#define SET_PIN_MODE                0xF4
+#define RESET                       0xFF
 #define END_SYSEX                   0xF7
+#define REPORT_VERSION              0xF9 // report firmware version
 
+// extended command set using sysex (0-127/0x00-0x7F)
+/* 0x00-0x0F reserved for user-defined commands */
 #define REPORT_ANALOG               0xC0 // query for analog pin
 #define REPORT_DIGITAL              0xD0 // query for digital pin
-#define REPORT_VERSION              0xF9 // report firmware version
-#define REPORT_FIRMWARE             0x79 // report name and version of the firmware
-
-#define SET_PIN_MODE                0xF4
-#define DIGITAL_MESSAGE             0x90 // data for a digital port
 #define ANALOG_MESSAGE              0xE0 // data for a analog pin
+
+#define REPORT_FIRMWARE             0x79 // report name and version of the firmware
+#define DIGITAL_MESSAGE             0x90 // data for a digital port
 
 #define RESERVED_COMMAND            0x00 // 2nd SysEx data byte is a chip-specific command (AVR, PIC, TI, etc).
 #define ANALOG_MAPPING_QUERY        0x69 // ask for mapping of analog to pin numbers
@@ -41,7 +45,6 @@
 #define SAMPLING_INTERVAL           0x7A // sampling interval
 #define SYSEX_NON_REALTIME          0x7E // MIDI Reserved for non-realtime messages
 #define SYSEX_REALTIME              0x7F // MIDI Reserved for realtime messages
-#define RESET                       0xFF // 
 
 /****************************************************************************/
 /*								Protocol									*/
@@ -74,6 +77,7 @@ typedef enum {
 - (void) didConnect;
 - (void) didUpdatePin:(int)pin currentMode:(PINMODE)mode value:(unsigned short int)value;
 - (void) didReportFirmware:(NSString*)name major:(unsigned short int)major minor:(unsigned short int)minor;
+- (void) didReportVersionMajor:(unsigned short int)major minor:(unsigned short int)minor;
 - (void) didUpdateCapability:(NSMutableArray*)pins;
 - (void) didReceiveAnalogPin:(int)pin value:(unsigned short int)value;
 - (void) didReceiveDigitalPort:(int)port value:(unsigned short int)value;
@@ -104,6 +108,7 @@ typedef enum {
 
 - (void) pinStateQuery:(int)pin;
 - (void) reportFirmware;
+- (void) reportVersion;
 
 - (void) analogMappingQuery;
 - (void) capabilityQuery;
