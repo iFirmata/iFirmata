@@ -207,16 +207,16 @@ The pin "state" is any data written to the pin. For output modes (digital output
     
     //check if if its digital
     
-    @try {
-        unsigned short int mask = [(NSNumber*)[ports objectAtIndex:port] unsignedShortValue];
-        [ports insertObject:[NSNumber numberWithUnsignedChar:mask & ~(value<<(pin % 8))] atIndex:port];
-
-    }
-    @catch (NSException *exception) {
-    }
-    @finally {
-        [ports insertObject:[NSNumber numberWithUnsignedChar:value<<(pin % 8)] atIndex:port];
-    }
+//    @try {
+//        unsigned short int mask = [(NSNumber*)[ports objectAtIndex:port] unsignedShortValue];
+//        [ports insertObject:[NSNumber numberWithUnsignedChar:mask & ~(value<<(pin % 8))] atIndex:port];
+//
+//    }
+//    @catch (NSException *exception) {
+//    }
+//    @finally {
+//        [ports insertObject:[NSNumber numberWithUnsignedChar:value<<(pin % 8)] atIndex:port];
+//    }
 
 
     [peripheralDelegate didUpdatePin:pin currentMode:(PINMODE)currentMode value:value];
