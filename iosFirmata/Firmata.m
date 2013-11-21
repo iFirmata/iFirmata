@@ -309,7 +309,7 @@ The pin "state" is any data written to the pin. For output modes (digital output
     const unsigned char bytes[] = {START_SYSEX, RESET, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
     
-    NSLog(@"reportFirmware bytes in hex: %@", [dataToSend description]);
+    NSLog(@"reset bytes in hex: %@", [dataToSend description]);
     
     [currentlyDisplayingService write:dataToSend];
 }
@@ -337,7 +337,7 @@ The pin "state" is any data written to the pin. For output modes (digital output
     const unsigned char bytes[] = {REPORT_VERSION};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
     
-    NSLog(@"reportFirmware bytes in hex: %@", [dataToSend description]);
+    NSLog(@"reportVersion bytes in hex: %@", [dataToSend description]);
     
     [currentlyDisplayingService write:dataToSend];
 }
