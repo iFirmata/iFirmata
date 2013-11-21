@@ -14,9 +14,13 @@
 #import "LeDiscovery.h"
 
 
-NSString *kDataServiceUUIDString = @"FFF0";
-NSString *kWriteCharacteristicUUIDString = @"FFF2";
-NSString *kReadCharacteristicUUIDString = @"FFF1";
+NSString *kDataServiceUUIDString =              @"FFF0";
+NSString *kWriteCharacteristicUUIDString =      @"FFF2";
+NSString *kReadCharacteristicUUIDString =       @"FFF1";
+
+//NSString *kDataServiceUUIDString =            @"713D0000-503E-4C75-BA94-3148F18D941E"; //REDBEAR
+//NSString *kReadCharacteristicUUIDString =     @"713D0002-503E-4C75-BA94-3148F18D941E";
+//NSString *kWriteCharacteristicUUIDString =    @"713D0003-503E-4C75-BA94-3148F18D941E";
 
 NSString *kDataServiceEnteredBackgroundNotification = @"kDataServiceEnteredBackgroundNotification";
 NSString *kDataServiceEnteredForegroundNotification = @"kDataServiceEnteredForegroundNotification";
@@ -203,6 +207,7 @@ NSString *kDataServiceEnteredForegroundNotification = @"kDataServiceEnteredForeg
         return;
     }
 
+    //[servicePeripheral writeValue:data forCharacteristic:writeCharacteristic type:CBCharacteristicWriteWithoutResponse]; //REDBEAR
     [servicePeripheral writeValue:data forCharacteristic:writeCharacteristic type:CBCharacteristicWriteWithResponse];
 }
 
