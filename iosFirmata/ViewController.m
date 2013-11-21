@@ -124,6 +124,16 @@
     }    
 }
 
+#pragma mark -
+#pragma mark LeDataProtocol Delegate Methods
+/****************************************************************************/
+/*				LeDataProtocol Delegate Methods                             */
+/****************************************************************************/
+/** Received data */
+- (void) serviceDidReceiveData:(NSData*)data fromService:(LeDataService*)service
+{
+}
+
 
 #pragma mark -
 #pragma mark LeDiscovery Delegate Methods
