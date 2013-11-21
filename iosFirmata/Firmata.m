@@ -34,6 +34,15 @@
     return [enumArray objectAtIndex:enumVal];
 }
 
+// A method to retrieve the int value from the NSArray of NSStrings
+-(PINMODE) modeStringToEnum:(NSString*)strVal
+{
+    NSArray *enumArray = [[NSArray alloc] initWithObjects:pinmodeArray];
+    NSUInteger n = [enumArray indexOfObject:strVal];
+    if(n < 1) n = INPUT;
+    return (PINMODE) n;
+}
+
 
 #pragma mark -
 #pragma mark Init
@@ -270,7 +279,9 @@ The pin "state" is any data written to the pin. For output modes (digital output
  */
 - (void) parseCapabilityResponse:(NSData*)data
  {
-          
+
+     int j = 0;
+     
      const char *bytes = [data bytes];
      //start at 2 to ditch start and command byte
      //take end byte off the end
@@ -284,12 +295,12 @@ The pin "state" is any data written to the pin. For output modes (digital output
              const char *mode = bytes[i++];
              const char *resolution = bytes[i++];
              
-             NSLog(@"%02hhx,%02hhx", mode, resolution);
+             NSLog(@"Pin %i  Mode: %02hhx Resolution:%02hhx", j, mode, resolution);
              
              [modes setObject:[NSNumber numberWithChar:resolution] forKey:[NSNumber numberWithChar:mode]];
              
          }
-     
+         j=j+1;
          [pins addObject:modes];
      }
      

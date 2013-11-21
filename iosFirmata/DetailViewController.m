@@ -108,40 +108,36 @@
     NSLog(@"Pin at row  %i: %@", indexPath.row, [pinsArray objectAtIndex:indexPath.row]);
     
     NSDictionary *pin = [pinsArray objectAtIndex:indexPath.row];
-    NSString *modesString = [[NSString alloc] init];
+
+    if([pin objectForKey:@"lastvalue"]){
+        NSNumber *value =  [pin objectForKey:@"lastvalue"];
+        NSLog(@"%@",value);
+        NSString *detailTextString = [[NSString alloc] initWithFormat:@"%i", [value integerValue] ];
+        [[cell detailTextLabel] setText:detailTextString];
+    }
+    
+    [[cell textLabel] setText:[pin valueForKey:@"name"]];
+    
+    //no accessory if analog
+    [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
 
     NSMutableDictionary *modesDictionary = [pin objectForKey:@"modes"];
-
-    [[cell textLabel] setText:[pin valueForKey:@"name"]];
-
-    if(modesDictionary){
-        
-        for (NSString* mode in modesDictionary) {
-            NSString *modeString =[currentFirmata pinmodeEnumToString:(PINMODE)[mode intValue]];
-
-            NSLog(@"Adding mode %@",modeString);
-            
-            modesString = [modesString stringByAppendingString:modeString];
-        }
-        
     
-        if([pin objectForKey:@"lastvalue"]){
-            NSNumber *value =  [pin objectForKey:@"lastvalue"];
-            NSLog(@"%@",value);
-            NSString *detailTextString = [[NSString alloc] initWithFormat:@"%@, %i", modesString, [value integerValue] ];
-            [[cell detailTextLabel] setText:detailTextString];
-        }
-        else{
-            [[cell detailTextLabel] setText:modesString];
-        }
-
-        //[[cell detailTextLabel] setText:modesString];
-
-        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+    if(modesDictionary && ([modesDictionary count] > 0)){
+        
+        UIButton *modeButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [modeButton addTarget:self
+                   action:@selector(selectMode:)
+         forControlEvents:UIControlEventTouchDown];
+        NSNumber *currentModeNumber =  [pin objectForKey:@"currentMode"];
+        int currentModeInt = [currentModeNumber intValue];
+        NSString *currentModeString = [currentFirmata pinmodeEnumToString:currentModeInt];
+        [modeButton setTitle:currentModeString forState:UIControlStateNormal];
+        modeButton.frame = CGRectMake(50,10,75,30);
+        modeButton.tag = indexPath.row;
+        [cell.contentView addSubview:modeButton];
         
     }
-
-    
 	return cell;
 }
 
@@ -157,8 +153,39 @@
 
 - (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    //todo, SUPPOSED to this this from IB but fuck if I know how
-    [self performSegueWithIdentifier: @"pinView" sender:self];
+    //check what curent mode is set to and send to appropriate view
+
+    NSDictionary *pin = [pinsArray objectAtIndex:indexPath.row];
+
+    NSNumber *currentModeNumber =  [pin objectForKey:@"currentMode"];
+    
+    PINMODE mode = [currentModeNumber intValue];
+
+    //#define pinmodeArray @"input", @"output", @"analog", @"pwm", @"servo", @"shift", @"i2c", nil
+
+    switch (mode) {
+        case INPUT:
+        case OUTPUT:
+            [self performSegueWithIdentifier: @"digitalPinView" sender:self];
+            break;
+            
+        case SERVO:
+        case PWM:
+            [self performSegueWithIdentifier: @"analogPinView" sender:self];
+            break;
+            
+        case I2C:
+            [self performSegueWithIdentifier: @"pinView" sender:self];
+            break;
+            
+        case SHIFT:
+            [self performSegueWithIdentifier: @"pinView" sender:self];
+            break;
+
+        default:
+            break;
+    }
+    
 }
 
 
@@ -226,9 +253,11 @@
 - (void) didReceiveAnalogPin:(int)pin value:(unsigned short)value
 {
     NSLog(@"pin: %i, value:%i", pin, value);
-    NSDictionary *aPin = pinsArray[pin];
-    [aPin setValue:[NSNumber numberWithInt:value] forKey:@"lastvalue"];
-    //[self.tableView reloadData];
+    if(pinsArray && [pinsArray count]>0){
+        NSDictionary *aPin = pinsArray[pin];
+        [aPin setValue:[NSNumber numberWithInt:value] forKey:@"lastvalue"];
+        [self.tableView reloadData];
+    }
 }
 
 - (void) didReceiveDigitalPort:(int)port mask:(unsigned short)mask
@@ -253,6 +282,50 @@
     [[self navigationController] popToRootViewControllerAnimated:YES];
 }
 
+
+#pragma mark -
+#pragma mark ActionSheet Delegates
+/****************************************************************************/
+/*                          ActionSheet Delegates                           */
+/****************************************************************************/
+-(void) actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
+    
+    if(buttonIndex){
+        NSLog(@"actionsheet index: %@", [actionSheet buttonTitleAtIndex:buttonIndex] );
+
+        NSMutableDictionary *pin =[pinsArray objectAtIndex:actionSheet.tag];
+
+        PINMODE newMode = [currentFirmata modeStringToEnum: [actionSheet buttonTitleAtIndex:buttonIndex]];
+        NSLog(@"new mode: %u", newMode );
+
+        NSNumber *currentModeNumber =  [pin objectForKey:@"currentMode"];
+        NSLog(@"current mode: %d", [currentModeNumber intValue] );
+        PINMODE currentMode = [currentModeNumber intValue];
+
+        //if old mode was analog, make sure to turn off reporting
+        if(currentMode != newMode && newMode == ANALOG) {
+            [currentFirmata reportAnalog:actionSheet.tag enable:NO];
+        }
+
+        [pin setObject:[NSNumber numberWithInt:newMode] forKey:@"currentMode"];
+
+        [currentFirmata setPinMode:actionSheet.tag mode:newMode];
+
+        if(newMode == ANALOG){
+
+            [currentFirmata reportAnalog:actionSheet.tag enable:YES];
+        }
+        
+
+        [self.tableView reloadData];
+    }
+
+}
+
+-(void) actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex{
+    NSLog(@"%ld", (long)buttonIndex);
+    //could do something here
+}
 
 #pragma mark -
 #pragma mark App IO
@@ -320,10 +393,32 @@
 
 }
 
--(void)buttonPressed:(id)sender {
-    UITableViewCell *clickedCell = (UITableViewCell *)[[sender superview] superview];
-    NSIndexPath *clickedButtonPath = [self.tableView indexPathForCell:clickedCell];
-    NSLog(@"%@",clickedButtonPath);
+
+-(void)selectMode:(UIButton*)sender{
     
+    UIActionSheet *actionsheet = [[UIActionSheet alloc] init ];
+    
+    [actionsheet setTitle:@"Choose Mode"];
+    [actionsheet setDelegate:self];
+    
+    [actionsheet addButtonWithTitle:@"Cancel"];
+    [actionsheet setCancelButtonIndex:0];
+
+    NSDictionary *pin = [pinsArray objectAtIndex:sender.tag];
+    NSMutableDictionary *modesDictionary = [pin objectForKey:@"modes"];
+
+    if(modesDictionary && [modesDictionary count] > 0){
+        
+        for (NSString* mode in modesDictionary) {
+            NSString *modeString =[currentFirmata pinmodeEnumToString:(PINMODE)[mode intValue]];
+            
+            [actionsheet addButtonWithTitle:modeString ];
+
+        }
+    }
+
+    actionsheet.tag=sender.tag;
+    [actionsheet showInView:self.view];
 }
+
 @end

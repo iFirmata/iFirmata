@@ -14,6 +14,7 @@
 @property (strong, nonatomic) IBOutlet UILabel          *deviceLabel;
 @property (strong, nonatomic) IBOutlet UILabel          *pinStatus;
 @property (strong, nonatomic) IBOutlet UILabel          *pinLabel;
+@property (strong, nonatomic) IBOutlet UISlider         *pinSlider;
 
 @property (strong, nonatomic) NSMutableDictionary       *pinDictionary;
 

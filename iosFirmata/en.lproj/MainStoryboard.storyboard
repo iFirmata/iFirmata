@@ -82,16 +82,16 @@
                             <nil key="highlightedColor"/>
                         </label>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="Ihu-uU-Zu2">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="detailDisclosureButton" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="Ihu-uU-Zu2">
                                 <rect key="frame" x="0.0" y="130" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Ihu-uU-Zu2" id="uTp-nE-KoY">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="253" height="43"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
-                                <connections>
-                                    <segue destination="u5g-SY-Bhl" kind="push" identifier="pinView" trigger="accessoryAction" id="cmT-PH-Nna"/>
-                                </connections>
+                                <accessibility key="accessibilityConfiguration">
+                                    <accessibilityTraits key="traits" none="YES" updatesFrequently="YES"/>
+                                </accessibility>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -122,47 +122,56 @@
                         <outlet property="currentlyConnectedSensor" destination="1TV-TR-Zha" id="j9g-MF-4hI"/>
                         <outlet property="firmwareVersion" destination="p6u-cV-2uO" id="4F7-jE-Dom"/>
                         <outlet property="pinsTable" destination="Dk7-3f-XyV" id="oeJ-0G-dPO"/>
+                        <segue destination="u5g-SY-Bhl" kind="push" identifier="digitalPinView" id="RIi-Mu-car"/>
+                        <segue destination="ctc-tL-cAn" kind="push" identifier="analogPinView" id="fmm-7R-z0S"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jWu-Pf-1F4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1226" y="292"/>
+            <point key="canvasLocation" x="1205" y="292"/>
         </scene>
-        <!--View Controller-->
+        <!--Pin View Controller - Pin Settings-->
         <scene sceneID="y2P-iT-LV9">
             <objects>
-                <viewController id="ctc-tL-cAn" sceneMemberID="viewController">
+                <viewController id="ctc-tL-cAn" customClass="PinViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="AFl-PT-z4Z">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="7wu-J4-2bn">
-                                <rect key="frame" x="199" y="350" width="51" height="31"/>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="0.0" id="kjI-bL-cIk">
+                                <rect key="frame" x="34" y="167" width="268" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <connections>
-                                    <action selector="toggleReporting:" destination="u5g-SY-Bhl" eventType="valueChanged" id="fxg-OI-KHv"/>
+                                    <action selector="slider:" destination="ctc-tL-cAn" eventType="valueChanged" id="pVv-X0-H75"/>
                                 </connections>
-                            </switch>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Auto Update" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="qgn-yu-K4H">
-                                <rect key="frame" x="36" y="355" width="98" height="21"/>
+                            </slider>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pin: " lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="5Rd-5l-yJC">
+                                <rect key="frame" x="20" y="114" width="42" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="lZm-SX-b8U">
+                                <rect key="frame" x="62" y="114" width="42" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Note: Auto update is not ideal on bluetooth as there are a lot of transactions" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="OGe-LS-ugz">
-                                <rect key="frame" x="36" y="253" width="284" height="94"/>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="fss-i3-D75">
+                                <rect key="frame" x="20" y="85" width="280" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="9Wo-5S-LZJ">
-                                <rect key="frame" x="206" y="229" width="57" height="21"/>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="sMA-ZF-rOZ">
+                                <rect key="frame" x="241" y="114" width="64" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Value" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="OD8-mW-GCm">
-                                <rect key="frame" x="146" y="229" width="42" height="21"/>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Value:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Yyu-lb-r5A">
+                                <rect key="frame" x="186" y="114" width="47" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="highlightedColor"/>
@@ -170,6 +179,15 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
+                    <navigationItem key="navigationItem" title="Pin Settings" id="Ogi-EY-ejP">
+                        <barButtonItem key="backBarButtonItem" title="back" id="RHR-NO-8EA"/>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="deviceLabel" destination="fss-i3-D75" id="bwb-ld-9r1"/>
+                        <outlet property="pinLabel" destination="lZm-SX-b8U" id="5kk-8O-bPF"/>
+                        <outlet property="pinSlider" destination="kjI-bL-cIk" id="z4w-Aj-SBG"/>
+                        <outlet property="pinStatus" destination="sMA-ZF-rOZ" id="b0y-qV-ffc"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SBn-RO-T0O" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

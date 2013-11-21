@@ -103,6 +103,7 @@ typedef enum {
 - (void) setController:(id<FirmataProtocol>)controller;
 
 - (NSString*) pinmodeEnumToString:(PINMODE)enumVal;
+- (PINMODE) modeStringToEnum:(NSString*)strVal;
 
 - (void) reset;
 //- (void) start;

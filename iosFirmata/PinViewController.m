@@ -17,6 +17,7 @@
 @synthesize deviceLabel;
 @synthesize pinLabel;
 @synthesize pinStatus;
+@synthesize pinSlider;
 
 #pragma mark -
 #pragma mark View lifecycle
@@ -48,6 +49,15 @@
     NSLog(@"%@", text);
     NSLog(@"setting pinlable text");
 
+    NSNumber *currentModeNumber =  [pinDictionary objectForKey:@"currentMode"];
+    PINMODE currentMode = [currentModeNumber intValue];
+
+    if(currentMode == PWM){
+        [pinSlider setMaximumValue:255];
+    }else if( currentMode == SERVO)
+    {
+        [pinSlider setMaximumValue:180];
+    }
     
     [pinLabel setText:text];
     
@@ -160,5 +170,13 @@
                                enable:NO];
         [pinStatus setEnabled:NO];
     }
+}
+
+-(IBAction)slider:(id)sender{
+    
+    NSLog(@"%f", pinSlider.value);
+    [pinStatus setText:[[NSString alloc] initWithFormat:@"%d",(int)pinSlider.value] ];
+    [currentFirmata analogMessagePin:[[pinDictionary valueForKey:@"firmatapin"] intValue] value:pinSlider.value];
+
 }
 @end

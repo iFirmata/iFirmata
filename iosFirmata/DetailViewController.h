@@ -10,7 +10,7 @@
 #import "LeDataService.h"
 #import "Firmata.h"
 
-@interface DetailViewController : UITableViewController  <FirmataProtocol>
+@interface DetailViewController : UITableViewController  <FirmataProtocol, UIActionSheetDelegate>
 
 @property (strong, nonatomic) Firmata                   *currentFirmata;
 @property (strong, nonatomic) IBOutlet UILabel          *currentlyConnectedSensor;
