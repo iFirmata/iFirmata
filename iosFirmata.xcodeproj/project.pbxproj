@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B2E1BF018443DBF0055F0EA /* FirmataCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B2E1BEF18443DBF0055F0EA /* FirmataCell.m */; };
 		5B410B0C1832D216000959E7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B410B011832D216000959E7 /* AppDelegate.m */; };
 		5B410B0D1832D216000959E7 /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B410B031832D216000959E7 /* DetailViewController.m */; };
 		5B410B0E1832D216000959E7 /* Firmata.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B410B051832D216000959E7 /* Firmata.m */; };
@@ -26,6 +27,8 @@
 
 /* Begin PBXFileReference section */
 		5B158E8118321E53006EE7C2 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		5B2E1BEE18443DBF0055F0EA /* FirmataCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FirmataCell.h; sourceTree = "<group>"; };
+		5B2E1BEF18443DBF0055F0EA /* FirmataCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FirmataCell.m; sourceTree = "<group>"; };
 		5B410B001832D216000959E7 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		5B410B011832D216000959E7 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		5B410B021832D216000959E7 /* DetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailViewController.h; sourceTree = "<group>"; };
@@ -91,6 +94,8 @@
 				5B410B0B1832D216000959E7 /* ViewController.m */,
 				5B410B021832D216000959E7 /* DetailViewController.h */,
 				5B410B031832D216000959E7 /* DetailViewController.m */,
+				5B2E1BEE18443DBF0055F0EA /* FirmataCell.h */,
+				5B2E1BEF18443DBF0055F0EA /* FirmataCell.m */,
 				5BB9F50D18332C80007BE0E2 /* PinViewController.h */,
 				5BB9F50E18332C80007BE0E2 /* PinViewController.m */,
 				5B410B041832D216000959E7 /* Firmata.h */,
@@ -216,6 +221,7 @@
 				5B410B101832D216000959E7 /* LeDiscovery.m in Sources */,
 				5B4B0C8A1832D12A003800ED /* main.m in Sources */,
 				5B410B0D1832D216000959E7 /* DetailViewController.m in Sources */,
+				5B2E1BF018443DBF0055F0EA /* FirmataCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -101,20 +101,9 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Firmata" id="ShO-zL-Kc2">
                         <barButtonItem key="backBarButtonItem" title="back" id="E5m-DL-HQt"/>
-                        <barButtonItem key="rightBarButtonItem" style="plain" id="alh-SZ-Bt0">
-                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="fIk-eb-gTl">
-                                <rect key="frame" x="233" y="5" width="71" height="33"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                <state key="normal" title="Send">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="send:" destination="62h-Kv-0ar" eventType="touchUpInside" id="9XU-W3-VYj"/>
-                                </connections>
-                            </button>
+                        <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="OL3-z3-YpW">
                             <connections>
-                                <action selector="send:" destination="62h-Kv-0ar" id="pIi-qb-7O8"/>
+                                <action selector="refresh:" destination="62h-Kv-0ar" id="8ys-eL-eYq"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -124,13 +113,15 @@
                         <outlet property="pinsTable" destination="Dk7-3f-XyV" id="oeJ-0G-dPO"/>
                         <segue destination="u5g-SY-Bhl" kind="push" identifier="digitalPinView" id="RIi-Mu-car"/>
                         <segue destination="ctc-tL-cAn" kind="push" identifier="analogPinView" id="fmm-7R-z0S"/>
+                        <segue destination="8d9-7T-q1U" kind="push" identifier="shiftPinView" id="ZJb-N5-EVg"/>
+                        <segue destination="ixu-mv-Snl" kind="push" identifier="i2cPinView" id="em0-9U-nj6"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jWu-Pf-1F4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1205" y="292"/>
+            <point key="canvasLocation" x="1189" y="292"/>
         </scene>
-        <!--Pin View Controller - Pin Settings-->
+        <!--Pin View Controller - Servo/PWM settings-->
         <scene sceneID="y2P-iT-LV9">
             <objects>
                 <viewController id="ctc-tL-cAn" customClass="PinViewController" sceneMemberID="viewController">
@@ -142,7 +133,7 @@
                                 <rect key="frame" x="34" y="167" width="268" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <connections>
-                                    <action selector="slider:" destination="ctc-tL-cAn" eventType="valueChanged" id="pVv-X0-H75"/>
+                                    <action selector="slider:" destination="ctc-tL-cAn" eventType="touchUpInside" id="hnY-fp-vcC"/>
                                 </connections>
                             </slider>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pin: " lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="5Rd-5l-yJC">
@@ -179,19 +170,86 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Pin Settings" id="Ogi-EY-ejP">
-                        <barButtonItem key="backBarButtonItem" title="back" id="RHR-NO-8EA"/>
+                    <navigationItem key="navigationItem" title="Servo/PWM settings" id="Ogi-EY-ejP">
+                        <barButtonItem key="leftBarButtonItem" title="back" id="go6-wr-aNk">
+                            <connections>
+                                <segue destination="qrL-iI-aTO" kind="unwind" unwindAction="reset:" id="kko-Jn-PGc"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="mfg-7N-n03">
+                            <connections>
+                                <action selector="refresh:" destination="ctc-tL-cAn" id="wmx-Ig-TcU"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="deviceLabel" destination="fss-i3-D75" id="bwb-ld-9r1"/>
                         <outlet property="pinLabel" destination="lZm-SX-b8U" id="5kk-8O-bPF"/>
                         <outlet property="pinSlider" destination="kjI-bL-cIk" id="z4w-Aj-SBG"/>
                         <outlet property="pinStatus" destination="sMA-ZF-rOZ" id="b0y-qV-ffc"/>
+                        <segue destination="qrL-iI-aTO" kind="unwind" unwindAction="reset:" id="JgE-wI-zKa"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SBn-RO-T0O" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="qrL-iI-aTO" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="1642" y="-277"/>
+        </scene>
+        <!--Pin View Controller - Shift Settings-->
+        <scene sceneID="kJy-AR-aIE">
+            <objects>
+                <viewController id="8d9-7T-q1U" customClass="PinViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="e3l-Ow-nEa">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pin: " lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="dBI-0G-l8t">
+                                <rect key="frame" x="20" y="113" width="42" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="eE3-FD-BPq">
+                                <rect key="frame" x="70" y="113" width="42" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="90C-q4-V45">
+                                <rect key="frame" x="20" y="84" width="280" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="input" minimumFontSize="17" id="LhI-dB-Fui">
+                                <rect key="frame" x="40" y="174" width="235" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="Zk9-KB-trp">
+                                <rect key="frame" x="40" y="229" width="240" height="128"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Shift Settings" id="2h4-hy-EA7">
+                        <barButtonItem key="backBarButtonItem" title="back" id="ZlR-9i-Xfe"/>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="deviceLabel" destination="90C-q4-V45" id="TwB-YT-64p"/>
+                        <outlet property="pinLabel" destination="eE3-FD-BPq" id="NAf-AR-v3x"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="aKW-O7-ZWh" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2045" y="-277"/>
         </scene>
         <!--Pin View Controller - Pin Settings-->
         <scene sceneID="Cd9-G0-Vx7">
@@ -281,17 +339,102 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <navigationItem key="navigationItem" title="Pin Settings" id="vO8-LF-dKG">
-                        <barButtonItem key="backBarButtonItem" title="back" id="SEL-sY-l0X"/>
+                        <barButtonItem key="leftBarButtonItem" title="back" id="HeE-lc-NKj">
+                            <connections>
+                                <segue destination="jUF-0w-xWn" kind="unwind" unwindAction="reset:" id="lYO-ND-6Qn"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="XiG-Kt-lJ7">
+                            <connections>
+                                <action selector="refresh:" destination="u5g-SY-Bhl" id="FYU-Hi-8lO"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="deviceLabel" destination="n0D-Nv-kTp" id="YZQ-9k-MEI"/>
                         <outlet property="pinLabel" destination="pbv-5N-9XB" id="9LR-17-pZ8"/>
                         <outlet property="pinStatus" destination="fsm-lj-BrD" id="0AO-vY-tdq"/>
+                        <segue destination="jUF-0w-xWn" kind="unwind" unwindAction="reset:" id="rRV-cl-3PA"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="nIv-0U-RvX" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="jUF-0w-xWn" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="1648" y="292"/>
+        </scene>
+        <!--Pin View Controller - i2C Settings-->
+        <scene sceneID="HYH-Ba-KyY">
+            <objects>
+                <viewController id="ixu-mv-Snl" customClass="PinViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="ofb-MK-ksg">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pin: " lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="gjP-El-nVd">
+                                <rect key="frame" x="20" y="107" width="42" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ubz-6S-KTI">
+                                <rect key="frame" x="70" y="107" width="42" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="oYh-SL-Lz2">
+                                <rect key="frame" x="20" y="78" width="280" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="bytes in hex, 2 digits per 00010203" minimumFontSize="17" id="FuR-lh-nCz">
+                                <rect key="frame" x="20" y="141" width="280" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Result" id="4Nh-iN-N8B">
+                                <rect key="frame" x="40" y="265" width="240" height="128"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="DUa-7O-Bbg">
+                                <rect key="frame" x="245" y="179" width="55" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Send">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="sendi2c:" destination="ixu-mv-Snl" eventType="touchUpInside" id="Y3Y-yg-ZmS"/>
+                                </connections>
+                            </button>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="address" minimumFontSize="17" id="vz5-MT-MTG">
+                                <rect key="frame" x="20" y="179" width="98" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="i2C Settings" id="2PL-Y5-tdJ">
+                        <barButtonItem key="backBarButtonItem" title="back" id="XmP-L2-z4J"/>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="deviceLabel" destination="oYh-SL-Lz2" id="mZ9-tF-MZd"/>
+                        <outlet property="i2cAddressTextField" destination="vz5-MT-MTG" id="9vW-MY-sYv"/>
+                        <outlet property="i2cPayloadTextField" destination="FuR-lh-nCz" id="WMn-2i-of9"/>
+                        <outlet property="i2cResultTextView" destination="4Nh-iN-N8B" id="4kV-RB-1SP"/>
+                        <outlet property="pinLabel" destination="ubz-6S-KTI" id="ane-Q8-fEp"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xR0-FK-h0l" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2045" y="292"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="VAe-Yh-RBj">

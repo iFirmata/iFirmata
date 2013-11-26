@@ -7,7 +7,7 @@
 //
 
 #import "PinViewController.h"
-
+#import "DetailViewController.h"
 
 @implementation PinViewController
 
@@ -18,6 +18,9 @@
 @synthesize pinLabel;
 @synthesize pinStatus;
 @synthesize pinSlider;
+@synthesize i2cAddressTextField;
+@synthesize i2cPayloadTextField;
+@synthesize i2cResultTextView;
 
 #pragma mark -
 #pragma mark View lifecycle
@@ -54,9 +57,26 @@
 
     if(currentMode == PWM){
         [pinSlider setMaximumValue:255];
-    }else if( currentMode == SERVO)
+    }
+    else if( currentMode == SERVO)
     {
         [pinSlider setMaximumValue:180];
+    }
+    else if (currentMode == I2C){
+        
+        //create segmentedui -- fill with I2CMODE enums
+        NSArray *itemArray = [NSArray arrayWithObjects: @"One", @"Two", @"Three", nil];
+        UISegmentedControl *segmentedControl = [[UISegmentedControl alloc] initWithItems:itemArray];
+        segmentedControl.frame = CGRectMake(20, 225, 280, 30);
+        segmentedControl.segmentedControlStyle = UISegmentedControlStylePlain;
+        segmentedControl.selectedSegmentIndex = 1;
+        [segmentedControl addTarget:nil
+                              action:nil
+                    forControlEvents:UIControlEventValueChanged];
+        [self.view addSubview:segmentedControl];
+        [i2cPayloadTextField setDelegate:self];
+        [i2cAddressTextField setDelegate:self];
+
     }
     
     [pinLabel setText:text];
@@ -64,6 +84,9 @@
     NSLog(@"setting device label text");
 
     deviceLabel.text = [[[currentFirmata currentlyDisplayingService] peripheral] name];
+    
+    [currentFirmata pinStateQuery:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]];
+
     NSLog(@"View done loading");
 }
 
@@ -112,6 +135,54 @@
     [[self navigationController] popToRootViewControllerAnimated:YES];
 }
 
+-(void) didUpdatePin:(int)pin currentMode:(PINMODE)mode value:(unsigned short)value
+{
+    if(pin ==  [(NSNumber *)[pinDictionary objectForKey:@"firmatapin"] intValue]){
+        NSNumber *currentModeNumber =  [pinDictionary objectForKey:@"currentMode"];
+        PINMODE currentMode = [currentModeNumber intValue];
+        
+        if(currentMode == PWM || currentMode == SERVO){
+            [pinSlider setValue:value];
+        }
+        
+        [pinStatus setText:[[NSString alloc] initWithFormat:@"%i",value] ];
+        [pinDictionary setObject:[NSNumber numberWithInt:value] forKey:@"lastvalue"];
+
+    }
+}
+
+-(void) didReportVersionMajor:(unsigned short)major minor:(unsigned short)minor
+{
+    
+}
+
+-(void)didReportFirmware:(NSString *)name major:(unsigned short)major minor:(unsigned short)minor
+{
+    
+}
+
+-(void) didUpdateCapability:(NSMutableArray *)pins
+{
+    
+}
+
+-(void) didUpdateAnalogMapping:(NSMutableDictionary *)analogMapping
+{
+    
+}
+
+
+#pragma mark -
+#pragma mark UI Text Field Delegates
+/****************************************************************************/
+/*                        UI Text Field Delegates                           */
+/****************************************************************************/
+-(BOOL) textFieldShouldReturn:(UITextField *)textField{
+    
+    [i2cAddressTextField resignFirstResponder];
+    [i2cPayloadTextField resignFirstResponder];
+    return YES;
+}
 
 #pragma mark -
 #pragma mark App IO
@@ -179,4 +250,40 @@
     [currentFirmata analogMessagePin:[[pinDictionary valueForKey:@"firmatapin"] intValue] value:pinSlider.value];
 
 }
+
+-(IBAction)sendi2c:(id)sender
+{
+
+//    const unsigned char led[] = {DISP_CHAR_5X7, 'n', time>>8, time & 0xff};
+//    NSData *data = [[NSData alloc] initWithBytes:led length:sizeof(led)];
+
+//    [currentFirmata i2cRequest:WRITE    address:[self bytesStringToData:[i2cAddressTextField text]]
+//                                        data:   [self bytesStringToData:[i2cPayloadTextField text]]
+//     ];
+    
+}
+
+//+(NSData*)bytesStringToData:(NSString*)bytesString
+//{
+//    for(int i = [bytesString count] - 1; i > 0; i--){
+//        
+//        NSString *sub = substringWithRange:NSMakeRange(i, 2)];
+//        NSLog(@"%@", sub);
+//    }
+//
+//
+//    NSScanner* pScanner = [NSScanner scannerWithString: pString];
+//    
+//    unsigned long long iValue2;
+//    [pScanner scanHexLongLong: &iValue2];
+//    
+//    NSLog(@"iValue2 = %lld", iValue2);
+//    
+//}
+
+-(IBAction)refresh:(id)sender
+{
+    [currentFirmata pinStateQuery:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]];
+}
+
 @end

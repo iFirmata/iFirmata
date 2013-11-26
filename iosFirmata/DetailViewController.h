@@ -18,5 +18,9 @@
 @property (retain, nonatomic) NSMutableArray            *pinsArray;
 @property (retain, nonatomic) IBOutlet UITableView      *pinsTable;
 @property (retain, nonatomic) NSMutableDictionary       *analogMapping;
--(IBAction)send:(id)sender;
+@property (retain, nonatomic) NSTimer                   *tableUpdate;
+@property BOOL                                          REFRESH;
+-(IBAction)refresh:(id)sender;
+-(IBAction)reset:(UIStoryboardSegue *)segue;
+
 @end

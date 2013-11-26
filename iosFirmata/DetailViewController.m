@@ -9,6 +9,7 @@
 #import "DetailViewController.h"
 #import "PinViewController.h"
 #import "LeDataService.h"
+#import "FirmataCell.h"
 
 @implementation DetailViewController
 
@@ -18,6 +19,8 @@
 @synthesize pinsArray;
 @synthesize pinsTable;
 @synthesize analogMapping;
+@synthesize tableUpdate;
+
 
 #pragma mark -
 #pragma mark View lifecycle
@@ -42,18 +45,20 @@
     if(!pinsArray){
         pinsArray = [[NSMutableArray alloc] init];
         
-        [currentFirmata reset];
-        
         [currentFirmata analogMappingQuery];
         
          currentlyConnectedSensor.text = [[[currentFirmata currentlyDisplayingService] peripheral] name];
     }
-    
-    
+
+    [self reset:nil];
+
 }
 
 - (void) viewDidUnload
 {
+    [tableUpdate invalidate];
+    tableUpdate = nil;
+    
     [self setPinsArray:nil];
     [self setCurrentlyConnectedSensor:nil];
     [self setPinsTable:nil];
@@ -78,6 +83,32 @@
     dest.currentFirmata = currentFirmata;
     dest.pinDictionary = [pinsArray objectAtIndex:indexPath.row];
     
+    [tableUpdate invalidate];
+    
+}
+
+- (void)refreshTable:(NSTimer*)theTimer
+{
+    if(_REFRESH)
+    {
+        [self.tableView reloadData];
+        _REFRESH = NO;
+    }
+    
+}
+
+
+-(IBAction)reset:(UIStoryboardSegue *)segue {
+
+    [currentFirmata setController:self];
+
+    tableUpdate = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                   target:self
+                                                 selector:@selector(refreshTable:)
+                                                 userInfo:nil
+                                                  repeats:YES];
+    _REFRESH = YES;
+
 }
 
 
@@ -97,48 +128,55 @@
 //
 - (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"PinList"];
-    if (cell == nil) {
-        
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"PinList"];
-        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
-
-    }
     
-    NSLog(@"Pin at row  %i: %@", indexPath.row, [pinsArray objectAtIndex:indexPath.row]);
+    NSLog(@"Pin at row %i: %@", indexPath.row, [pinsArray objectAtIndex:indexPath.row]);
     
     NSDictionary *pin = [pinsArray objectAtIndex:indexPath.row];
 
-    if([pin objectForKey:@"lastvalue"]){
-        NSNumber *value =  [pin objectForKey:@"lastvalue"];
-        NSLog(@"%@",value);
-        NSString *detailTextString = [[NSString alloc] initWithFormat:@"%i", [value integerValue] ];
-        [[cell detailTextLabel] setText:detailTextString];
-    }
-    
-    [[cell textLabel] setText:[pin valueForKey:@"name"]];
-    
-    //no accessory if analog
-    [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+    NSNumber *currentModeNumber =  [pin objectForKey:@"currentMode"];
+    NSString *currentModeString = [currentFirmata pinmodeEnumToString:[currentModeNumber intValue]];
 
-    NSMutableDictionary *modesDictionary = [pin objectForKey:@"modes"];
-    
-    if(modesDictionary && ([modesDictionary count] > 0)){
+    NSString *cellIdentifier = [NSString stringWithFormat:@"PinList %i",indexPath.row];
+    FirmataCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    if (cell == nil) {
         
+        cell = [[FirmataCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:cellIdentifier];
+        
+        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+        
+        //set value detail text
+        if([pin objectForKey:@"lastvalue"]){
+            [[cell detailTextLabel] setText:[(NSNumber*)[pin objectForKey:@"lastvalue"] stringValue]];
+        }else{
+            [[cell detailTextLabel] setText:@""];
+        }
+        
+        //set name
+        [[cell textLabel] setText:[pin valueForKey:@"name"]];
+        
+        //no accessory if analog?
+        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+        
+        //set mode button
         UIButton *modeButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [modeButton addTarget:self
-                   action:@selector(selectMode:)
-         forControlEvents:UIControlEventTouchDown];
-        NSNumber *currentModeNumber =  [pin objectForKey:@"currentMode"];
-        int currentModeInt = [currentModeNumber intValue];
-        NSString *currentModeString = [currentFirmata pinmodeEnumToString:currentModeInt];
-        [modeButton setTitle:currentModeString forState:UIControlStateNormal];
-        modeButton.frame = CGRectMake(50,10,75,30);
-        modeButton.tag = indexPath.row;
-        [cell.contentView addSubview:modeButton];
-        
+        [modeButton addTarget:self action:@selector(selectMode:) forControlEvents:UIControlEventTouchDown];
+        [modeButton setFrame:CGRectMake(50,10,75,30)];
+        [modeButton setTag:indexPath.row];
+        [cell setButton:modeButton];
+
     }
-	return cell;
+
+    //set value detail text
+    if([pin objectForKey:@"lastvalue"]){
+        [[cell detailTextLabel] setText:[(NSNumber*)[pin objectForKey:@"lastvalue"] stringValue]];
+    }else{
+        [[cell detailTextLabel] setText:@""];
+    }
+    
+    //in mode changed, change the button text
+    [cell setButtonTitle:currentModeString];
+    
+    return cell;
 }
 
 - (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
@@ -175,11 +213,11 @@
             break;
             
         case I2C:
-            [self performSegueWithIdentifier: @"pinView" sender:self];
+            [self performSegueWithIdentifier: @"i2cPinView" sender:self];
             break;
             
         case SHIFT:
-            [self performSegueWithIdentifier: @"pinView" sender:self];
+            [self performSegueWithIdentifier: @"shiftPinView" sender:self];
             break;
 
         default:
@@ -194,19 +232,24 @@
 /****************************************************************************/
 /*                              Firmata Delegates                           */
 /****************************************************************************/
-- (void) didUpdatePin:(int)pin currentMode:(PINMODE)mode value:(unsigned short int)value
+- (void) didUpdatePin:(int)pin currentMode:(PINMODE)mode value:(unsigned short)value
 {
+    NSLog(@"Did update pin: %d mode:%u value:%hu", pin, mode, value);
      NSMutableDictionary *pinObject =[pinsArray objectAtIndex:pin];
-    [pinObject setObject:[NSNumber numberWithInt:value] forKey:@"lastvalue"];
-    [pinObject setObject:[NSNumber numberWithInt:mode] forKey:@"currentMode"];
-    //[self.tableView reloadData];
-    
+    [pinObject setValue:[NSNumber numberWithInt:value] forKey:@"lastvalue"];
+    [pinObject setValue:[NSNumber numberWithInt:mode] forKey:@"currentMode"];
+    _REFRESH = YES;
 }
 
 - (void) didReportFirmware:(NSString*)name major:(unsigned short int)major minor:(unsigned short int)minor
 {
     firmwareVersion.text = [NSString stringWithFormat:@"%@ %ld.%ld",
                             name, (long)major, (long)minor];
+}
+
+- (void) didReportVersionMajor:(unsigned short)major minor:(unsigned short)minor
+{
+    NSLog(@"%hu, %hu", major, minor);
 }
 
 //returns NSDictionary set of analog int 0.. NSnumber keys for
@@ -220,9 +263,9 @@
 //returns an NSMutablearray of NSDictionary of modes
 - (void) didUpdateCapability:(NSMutableArray*)incomingPins
 {
-    int totalPins = [incomingPins count];      //29
-    int totalAnalog = [analogMapping count];   //11
-    int totalDigital = totalPins-totalAnalog;  //18
+    int totalPins = [incomingPins count];
+    int totalAnalog = [analogMapping count];
+    int totalDigital = totalPins-totalAnalog;
     
     int k = 0;
     for (int i = 0; i < [incomingPins count]; i++)
@@ -239,7 +282,6 @@
         }
 
         [pin setValue:modes forKey:@"modes"];
-        //[currentFirmata pinStateQuery:i];
         
         [pin setValue:[NSNumber numberWithInt:i] forKey:@"firmatapin"];
         
@@ -247,16 +289,18 @@
     }
 
     NSLog(@"Local Pins declaration %@",pinsArray);
-    [self.tableView reloadData];
+    _REFRESH = YES;
 }
 
 - (void) didReceiveAnalogPin:(int)pin value:(unsigned short)value
 {
     NSLog(@"pin: %i, value:%i", pin, value);
-    if(pinsArray && [pinsArray count]>0){
-        NSDictionary *aPin = pinsArray[pin];
+    if(pinsArray && [pinsArray count]>0 && pin<[pinsArray count] && analogMapping && [analogMapping count]>0){
+
+        int translatedPin = [(NSNumber*)[analogMapping objectForKey:[NSNumber numberWithInt:pin]] intValue];
+        NSDictionary *aPin = pinsArray[translatedPin];
         [aPin setValue:[NSNumber numberWithInt:value] forKey:@"lastvalue"];
-        [self.tableView reloadData];
+        _REFRESH = YES;
     }
 }
 
@@ -269,6 +313,11 @@
 - (void) didReceiveDigitalPin:(int)pin status:(BOOL)status
 {
     NSLog(@"Digital Update pin: %d, value:%hhd", pin, status);
+    if(pinsArray && [pinsArray count]>0 && pin<[pinsArray count] ){
+        NSDictionary *aPin = pinsArray[pin];
+        [aPin setValue:[NSNumber numberWithInt:status] forKey:@"lastvalue"];
+        _REFRESH = YES;
+    }
 
 }
 
@@ -307,17 +356,28 @@
             [currentFirmata reportAnalog:actionSheet.tag enable:NO];
         }
 
-        [pin setObject:[NSNumber numberWithInt:newMode] forKey:@"currentMode"];
+        [pin setValue:[NSNumber numberWithInt:newMode] forKey:@"currentMode"];
 
         [currentFirmata setPinMode:actionSheet.tag mode:newMode];
 
         if(newMode == ANALOG){
 
             [currentFirmata reportAnalog:actionSheet.tag enable:YES];
+            [currentFirmata samplingInterval:1000]; //bluetooth really can't support more
+
+            
+        }else if (newMode == I2C){
+            
+            [currentFirmata i2cConfig:0 data:[[NSData alloc]init]];
+            
+            //issue first call never works?
+            //https://github.com/firmata/arduino/issues/101
+            [currentFirmata i2cRequest:WRITE address:0 data:nil];
+
         }
         
-
-        [self.tableView reloadData];
+        [pin removeObjectForKey:@"lastvalue"];
+        _REFRESH = YES;
     }
 
 }
@@ -332,67 +392,15 @@
 /****************************************************************************/
 /*                              App IO Methods                              */
 /****************************************************************************/
--(IBAction)send:(id)sender
+-(IBAction)refresh:(id)sender
 {
-//    [currentFirmata setPinMode:16 mode:OUTPUT];
-//    [currentFirmata setPinMode:23 mode:OUTPUT];
-//
-//    [currentFirmata digitalMessagePort:2 mask:0x81];
-    
-//    int motorPin1 = 16;//digital 16
-//    int motorPin2 = 5;//analog 5
-//    
-//    int motorPin2Firmata = [(NSNumber*)[analogMapping objectForKey:[NSNumber numberWithInt:motorPin2]] intValue];
-//    
-//    NSLog(@"firmata lookup %d -> %d",motorPin2, motorPin2Firmata);
-//    
-//    int port1 = [currentFirmata portForPin:motorPin1];
-//    int port2 = [currentFirmata portForPin:motorPin2Firmata];
-//    
-//    unsigned short int mask1 = [currentFirmata bitMaskForPin:motorPin1];
-//    unsigned short int mask2 = [currentFirmata bitMaskForPin:motorPin2Firmata];
-//    unsigned short int mask = [currentFirmata bitMaskForPin:motorPin1] | [currentFirmata bitMaskForPin:motorPin2Firmata];
-//    
-//    NSLog(@"port1: %d mask1: %hu port2: %d mask2: %hu ",port1, mask1, port2, mask2);
-//    
-//    NSLog(@"port: %d mask: %hu",port1, mask);
-//    
-//    [currentFirmata setPinMode:motorPin1 mode:OUTPUT];
-//    [currentFirmata setPinMode:motorPin2Firmata mode:OUTPUT];
-//    [currentFirmata digitalMessagePort:port1 mask:mask];
-    
-//    [currentFirmata samplingInterval:10000]; //optional
-//    [currentFirmata reportAnalog:0 enable:YES];
-    
-    
-    //    [currentFirmata samplingInterval:10000]; //optional
-    //    [currentFirmata reportAnalog:0 enable:YES];
-    
-    
-//    [currentFirmata setPinMode:23 mode:INPUT]; //make input
-//    [currentFirmata digitalMessagePort:[currentFirmata portForPin:23]
-//                                  mask:[currentFirmata bitMaskForPin:23]]; //turn on pullups
-//    [currentFirmata reportDigital:[currentFirmata portForPin:23] enable:YES];
-
-
-////    [currentFirmata setPinMode:2 mode:I2C]; //seemingly not necessary?
-////    [currentFirmata setPinMode:3 mode:I2C]; //seemingly not necessary?
-//    
-//    [currentFirmata i2cConfig:0 data:[[NSData alloc]init]];
-//
-//    #define DISP_CHAR_5X7	0x80
-//    #define LEDAddress      0x04
-//    
-//    int time = 10000;
-//    
-//    const unsigned char led[] = {DISP_CHAR_5X7, 'n', time>>8, time & 0xff};
-//    NSData *data = [[NSData alloc] initWithBytes:led length:sizeof(led)];
-//    
-//    [currentFirmata i2cRequest:WRITE address:0 data:[[NSData alloc] init ]];//first call never works?
-//    [currentFirmata i2cRequest:WRITE address:LEDAddress data:data];
+    for(int i=0; i<[pinsArray count]; i++)
+    {
+        [currentFirmata pinStateQuery:i];
+        [NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow: 0.1 ]];
+    }
 
 }
-
 
 -(void)selectMode:(UIButton*)sender{
     
