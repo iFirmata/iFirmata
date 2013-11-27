@@ -21,6 +21,9 @@
 @synthesize i2cAddressTextField;
 @synthesize i2cPayloadTextField;
 @synthesize i2cResultTextView;
+@synthesize modeSwitch;
+@synthesize statusSwitch;
+@synthesize reportSwitch;
 
 #pragma mark -
 #pragma mark View lifecycle
@@ -55,7 +58,15 @@
     NSNumber *currentModeNumber =  [pinDictionary objectForKey:@"currentMode"];
     PINMODE currentMode = [currentModeNumber intValue];
 
-    if(currentMode == PWM){
+    if(currentMode == INPUT){
+        [modeSwitch setOn:YES];
+        [statusSwitch setOn:[(NSNumber*)[pinDictionary valueForKey:@"lastvalue"]boolValue]];
+    }
+    else if(currentMode == OUTPUT){
+        [modeSwitch setOn:NO];
+        [statusSwitch setOn:[(NSNumber*)[pinDictionary valueForKey:@"lastvalue"]boolValue]];
+    }
+    else if(currentMode == PWM){
         [pinSlider setMaximumValue:255];
     }
     else if( currentMode == SERVO)
@@ -120,8 +131,13 @@
 {
     if(pin == [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue])
     {
+        [pinDictionary setObject:[NSNumber numberWithInt:status] forKey:@"lastvalue"];
+
         NSLog(@"Digital Update pin: %d, value:%hhd", pin, status);
-        [pinStatus setText:[[NSString alloc] initWithFormat:@"%i",status] ];
+        [pinStatus setText:[[NSNumber numberWithBool:status] stringValue]];
+        [statusSwitch setOn:status];
+        [reportSwitch setOn:YES]; //were getting status from it, must be on?
+
     }
 }
 
@@ -138,15 +154,21 @@
 -(void) didUpdatePin:(int)pin currentMode:(PINMODE)mode value:(unsigned short)value
 {
     if(pin ==  [(NSNumber *)[pinDictionary objectForKey:@"firmatapin"] intValue]){
-        NSNumber *currentModeNumber =  [pinDictionary objectForKey:@"currentMode"];
-        PINMODE currentMode = [currentModeNumber intValue];
-        
-        if(currentMode == PWM || currentMode == SERVO){
+
+        [pinDictionary setObject:[NSNumber numberWithInt:value] forKey:@"lastvalue"];
+
+        if(mode == PWM || mode == SERVO){
             [pinSlider setValue:value];
+        }else if(mode == INPUT){
+            [modeSwitch setOn:YES];
+            [statusSwitch setOn:[(NSNumber*)[pinDictionary valueForKey:@"lastvalue"]boolValue]];
+        }
+        else if(mode == OUTPUT){
+            [modeSwitch setOn:NO];
+            [statusSwitch setOn:[(NSNumber*)[pinDictionary valueForKey:@"lastvalue"]boolValue]];
         }
         
         [pinStatus setText:[[NSString alloc] initWithFormat:@"%i",value] ];
-        [pinDictionary setObject:[NSNumber numberWithInt:value] forKey:@"lastvalue"];
 
     }
 }
@@ -195,13 +217,13 @@
     {
         NSLog(@"Setting Input");
         [currentFirmata setPinMode:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]
-         mode:1];
+         mode:INPUT];
 
     }else
     {
         NSLog(@"Setting Output");
         [currentFirmata setPinMode:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]
-                              mode:1];
+                              mode:OUTPUT];
     }
 }
 
@@ -228,6 +250,7 @@
 {
     if([sender isOn])
     {
+        [currentFirmata samplingInterval:1000]; //bluetooth really can't support more
         NSLog(@"Enabling digital reporting for port");
         [currentFirmata reportDigital:[currentFirmata portForPin:
                                             [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]

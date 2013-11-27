@@ -352,8 +352,11 @@
                     </navigationItem>
                     <connections>
                         <outlet property="deviceLabel" destination="n0D-Nv-kTp" id="YZQ-9k-MEI"/>
+                        <outlet property="modeSwitch" destination="3gO-AG-AQ1" id="p4n-fw-Sm3"/>
                         <outlet property="pinLabel" destination="pbv-5N-9XB" id="9LR-17-pZ8"/>
                         <outlet property="pinStatus" destination="fsm-lj-BrD" id="0AO-vY-tdq"/>
+                        <outlet property="reportSwitch" destination="Ufk-6I-kIQ" id="03p-ei-oub"/>
+                        <outlet property="statusSwitch" destination="QUk-u5-8V1" id="fRD-7z-5ok"/>
                         <segue destination="jUF-0w-xWn" kind="unwind" unwindAction="reset:" id="rRV-cl-3PA"/>
                     </connections>
                 </viewController>

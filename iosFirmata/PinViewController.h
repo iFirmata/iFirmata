@@ -15,6 +15,9 @@
 @property (strong, nonatomic) IBOutlet UILabel          *pinStatus;
 @property (strong, nonatomic) IBOutlet UILabel          *pinLabel;
 @property (strong, nonatomic) IBOutlet UISlider         *pinSlider;
+@property (strong, nonatomic) IBOutlet UISwitch         *modeSwitch;
+@property (strong, nonatomic) IBOutlet UISwitch         *statusSwitch;
+@property (strong, nonatomic) IBOutlet UISwitch         *reportSwitch;
 @property (strong, nonatomic) IBOutlet UITextField      *i2cAddressTextField;
 @property (strong, nonatomic) IBOutlet UITextField      *i2cPayloadTextField;
 @property (strong, nonatomic) IBOutlet UITextView       *i2cResultTextView;
