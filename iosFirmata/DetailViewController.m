@@ -159,6 +159,7 @@
         
         //set mode button
         UIButton *modeButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [modeButton setTitle:@"unknown" forState:UIControlStateNormal];
         [modeButton addTarget:self action:@selector(selectMode:) forControlEvents:UIControlEventTouchDown];
         [modeButton setFrame:CGRectMake(50,10,75,30)];
         [modeButton setTag:indexPath.row];
@@ -174,7 +175,9 @@
     }
     
     //in mode changed, change the button text
-    [cell setButtonTitle:currentModeString];
+    if(currentModeNumber){
+        [cell setButtonTitle:currentModeString];
+    }
     
     return cell;
 }
@@ -417,8 +420,9 @@
 
     if(modesDictionary && [modesDictionary count] > 0){
         
-        for (NSString* mode in modesDictionary) {
-            NSString *modeString =[currentFirmata pinmodeEnumToString:(PINMODE)[mode intValue]];
+        for (NSNumber* modeNumber in modesDictionary) {
+            NSString *modeString =[currentFirmata pinmodeEnumToString:(PINMODE)[modeNumber intValue]];
+            
             
             [actionsheet addButtonWithTitle:modeString ];
 

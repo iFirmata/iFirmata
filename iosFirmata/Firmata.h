@@ -60,7 +60,6 @@ typedef enum {
 #define i2cArray @"write", @"read", @"read_continuously", @"stop", nil
 
 typedef enum {
-    UNKNOWN = -1,
     INPUT   =  0,
     OUTPUT  =  1,
     ANALOG  =  2,
@@ -69,7 +68,7 @@ typedef enum {
     SHIFT   =  5,
     I2C     =  6,
 } PINMODE;
-#define pinmodeArray @"unknown", @"input", @"output", @"analog", @"pwm", @"servo", @"shift", @"i2c", nil
+#define pinmodeArray @"input", @"output", @"analog", @"pwm", @"servo", @"shift", @"i2c", nil
 
 
 
