@@ -397,12 +397,17 @@
 /****************************************************************************/
 -(IBAction)refresh:(id)sender
 {
-    for(int i=0; i<[pinsArray count]; i++)
-    {
-        [currentFirmata pinStateQuery:i];
-        [NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow: 0.1 ]];
-    }
-
+    //blocking delay because some devices can't handle spammed commands
+    //since blocking, lets put it in background
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,
+                                             (unsigned long)NULL), ^(void) {
+        for(int i=0; i<[pinsArray count]; i++)
+        {
+            [currentFirmata pinStateQuery:i];
+            [NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow: 0.4 ]];
+        }
+        
+    });
 }
 
 -(void)selectMode:(UIButton*)sender{
