@@ -13,15 +13,15 @@
 #import "LeDataService.h"
 #import "LeDiscovery.h"
 
-NSString *XadowPeripheralUUIDString =               @"";
+NSString *XadowPeripheralUUIDString =               @"CA31847D-1539-9D7F-76C5-4256512D1E4F";
 NSString *XadowDataServiceUUIDString =              @"FFF0";
 NSString *XadowWriteCharacteristicUUIDString =      @"FFF2";
 NSString *XadowReadCharacteristicUUIDString =       @"FFF1";
 
 NSString *RedbearPeripheralUUIDString =             @"6431A341-ACA2-DB75-7AAB-6E7AD9D82E63";
 NSString *RedbearDataServiceUUIDString =            @"713D0000-503E-4C75-BA94-3148F18D941E";
-NSString *RedbearWriteCharacteristicUUIDString =    @"713D0002-503E-4C75-BA94-3148F18D941E";
-NSString *RedbearReadCharacteristicUUIDString =     @"713D0003-503E-4C75-BA94-3148F18D941E";
+NSString *RedbearWriteCharacteristicUUIDString =    @"713D0003-503E-4C75-BA94-3148F18D941E";
+NSString *RedbearReadCharacteristicUUIDString =     @"713D0002-503E-4C75-BA94-3148F18D941E";
 
 NSString *kDataServiceEnteredBackgroundNotification = @"kDataServiceEnteredBackgroundNotification";
 NSString *kDataServiceEnteredForegroundNotification = @"kDataServiceEnteredForegroundNotification";
@@ -73,8 +73,8 @@ NSString *kDataServiceEnteredForegroundNotification = @"kDataServiceEnteredForeg
         if([kPeripheralUUIDString isEqual:RedbearPeripheralUUIDString]){
             kWriteCharacteristicUUIDString = RedbearWriteCharacteristicUUIDString;
             kDataServiceUUIDString = RedbearDataServiceUUIDString;
-            writeUUID	= [CBUUID UUIDWithString:RedbearReadCharacteristicUUIDString] ;
-            readUUID	= [CBUUID UUIDWithString:RedbearWriteCharacteristicUUIDString] ;
+            writeUUID	= [CBUUID UUIDWithString:RedbearWriteCharacteristicUUIDString] ;
+            readUUID	= [CBUUID UUIDWithString:RedbearReadCharacteristicUUIDString] ;
         }else
         {
             kWriteCharacteristicUUIDString = XadowWriteCharacteristicUUIDString;
