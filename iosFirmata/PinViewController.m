@@ -166,7 +166,7 @@
     if(pin ==  [(NSNumber *)[pinDictionary objectForKey:@"firmatapin"] intValue]){
 
         [pinDictionary setObject:[NSNumber numberWithInt:value] forKey:@"lastvalue"];
-
+        [pinDictionary setValue:[NSNumber numberWithInt:mode] forKey:@"currentMode"];
         if(mode == PWM || mode == SERVO){
             [pinSlider setValue:value];
         }else if(mode == INPUT){
@@ -228,12 +228,13 @@
         NSLog(@"Setting Input");
         [currentFirmata setPinMode:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]
          mode:INPUT];
-
+        [self refresh:nil]; //wasteful but lets call and get true status
     }else
     {
         NSLog(@"Setting Output");
         [currentFirmata setPinMode:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]
                               mode:OUTPUT];
+        [self refresh:nil]; //wasteful but lets call and get true status
     }
 }
 
@@ -247,12 +248,15 @@
                                       mask:[currentFirmata bitMaskForPin:
                                             [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]
                                             ]];
+        [self refresh:nil]; //wasteful but lets call and get true status
+
     }else
     {
         NSLog(@"Disabling Pins on port");
         [currentFirmata digitalMessagePort:[currentFirmata portForPin:
                                             [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]
                                       mask:0x00];
+        [self refresh:nil]; //wasteful but lets call and get true status
     }
 }
 
@@ -265,14 +269,14 @@
         [currentFirmata reportDigital:[currentFirmata portForPin:
                                             [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]
                                       enable:YES];
-        [pinStatus setEnabled:YES];
+        //[pinStatus setEnabled:YES];
     }else
     {
         NSLog(@"Disabling Pins on port");
         [currentFirmata reportDigital:[currentFirmata portForPin:
                                        [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]
                                enable:NO];
-        [pinStatus setEnabled:NO];
+        //[pinStatus setEnabled:NO];
     }
 }
 

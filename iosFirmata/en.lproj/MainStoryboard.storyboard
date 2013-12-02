@@ -61,33 +61,6 @@
             </objects>
             <point key="canvasLocation" x="779" y="292"/>
         </scene>
-        <!--View Controller-->
-        <scene sceneID="caB-NL-Bdy">
-            <objects>
-                <viewController id="Uw6-II-ayk" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="kCB-3S-YoP">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="2C7-Tv-UW4">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                <subviews>
-                                    <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="5Ji-vL-SfI">
-                                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
-                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    </tableView>
-                                </subviews>
-                            </scrollView>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="M9R-wL-aU3" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1155" y="-277"/>
-        </scene>
         <!--Detail View Controller-->
         <scene sceneID="LJz-iz-BHh">
             <objects>
@@ -282,11 +255,11 @@
             </objects>
             <point key="canvasLocation" x="2045" y="-277"/>
         </scene>
-        <!--Pin View Controller - Pin Settings-->
+        <!--Pin View Controller - Digital Settings-->
         <scene sceneID="Cd9-G0-Vx7">
             <objects>
                 <viewController id="u5g-SY-Bhl" customClass="PinViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="hHZ-13-6WR">
+                    <view key="view" contentMode="scaleToFill" id="hHZ-13-6WR" customClass="UIScrollView">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
@@ -323,33 +296,14 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="QUk-u5-8V1">
-                                <rect key="frame" x="183" y="194" width="51" height="31"/>
+                                <rect key="frame" x="183" y="187" width="51" height="31"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <connections>
                                     <action selector="toggleValue:" destination="u5g-SY-Bhl" eventType="valueChanged" id="nNc-zc-cDa"/>
                                 </connections>
                             </switch>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="High/Low" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="09O-u6-vwD">
-                                <rect key="frame" x="20" y="199" width="74" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="Ufk-6I-kIQ">
-                                <rect key="frame" x="183" y="393" width="51" height="31"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <connections>
-                                    <action selector="toggleReporting:" destination="u5g-SY-Bhl" eventType="valueChanged" id="AUR-cv-LB4"/>
-                                </connections>
-                            </switch>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Auto Update" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="SdI-rb-jUK">
-                                <rect key="frame" x="20" y="398" width="98" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Note: Auto update is not ideal on bluetooth as there are a lot of transactions" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="noj-Ud-NHS">
-                                <rect key="frame" x="20" y="296" width="284" height="94"/>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Low/High" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="09O-u6-vwD">
+                                <rect key="frame" x="20" y="192" width="74" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="highlightedColor"/>
@@ -369,15 +323,10 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Pin Settings" id="vO8-LF-dKG">
+                    <navigationItem key="navigationItem" title="Digital Settings" id="vO8-LF-dKG">
                         <barButtonItem key="leftBarButtonItem" title="back" id="HeE-lc-NKj">
                             <connections>
                                 <segue destination="jUF-0w-xWn" kind="unwind" unwindAction="reset:" id="lYO-ND-6Qn"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="XiG-Kt-lJ7">
-                            <connections>
-                                <action selector="refresh:" destination="u5g-SY-Bhl" id="FYU-Hi-8lO"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -386,7 +335,6 @@
                         <outlet property="modeSwitch" destination="3gO-AG-AQ1" id="p4n-fw-Sm3"/>
                         <outlet property="pinLabel" destination="pbv-5N-9XB" id="9LR-17-pZ8"/>
                         <outlet property="pinStatus" destination="fsm-lj-BrD" id="0AO-vY-tdq"/>
-                        <outlet property="reportSwitch" destination="Ufk-6I-kIQ" id="03p-ei-oub"/>
                         <outlet property="statusSwitch" destination="QUk-u5-8V1" id="fRD-7z-5ok"/>
                         <segue destination="jUF-0w-xWn" kind="unwind" unwindAction="reset:" id="rRV-cl-3PA"/>
                     </connections>
