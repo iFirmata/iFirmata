@@ -1,8 +1,8 @@
 /*
-
+ 
  File: LeDiscovery.h
  
- Abstract: Scan for and discover nearby LE peripherals with the 
+ Abstract: Scan for and discover nearby LE peripherals with the
  matching service UUID.
  
  
