@@ -235,6 +235,14 @@
 /****************************************************************************/
 /*                              Firmata Delegates                           */
 /****************************************************************************/
+- (void) didReceiveStringData:(NSString *)string
+{
+    UIAlertView *alert = [[UIAlertView alloc]
+                          initWithTitle:@"String Data Recieved" message:string delegate:nil
+                          cancelButtonTitle:nil otherButtonTitles:@"OK", nil];
+    [alert show];
+}
+
 - (void) didUpdatePin:(int)pin currentMode:(PINMODE)mode value:(unsigned short)value
 {
     NSLog(@"Did update pin: %d mode:%u value:%hu", pin, mode, value);

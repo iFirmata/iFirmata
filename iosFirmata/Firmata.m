@@ -152,6 +152,31 @@
 
 /* Receive Firmware Name and Version (after query)
  * 0  START_SYSEX (0xF0)
+ * 1  STRING_DATA (0x71)
+ * 2  first character LSB (0-6)
+ * 3  first character MSB (7-13)
+ * x  ...for as many bytes as it needs)
+ * 4  END_SYSEX (0xF7)
+ */
+- (void) parseStringData:(NSData*)data
+{
+    //location 0+1 to ditch start sysex, +1 command byte
+    //length = -1 to kill end sysex, -1 start sysex, -1 command byte
+    unsigned char *bytes = (unsigned char *)[data bytes];
+
+    NSMutableString *returnString = [[NSMutableString alloc] init];
+    
+    for (int i = 2; i < [data length] - 1; i=i+2){
+        unsigned short int lsb = bytes[i] & 0x7f;
+        unsigned short int msb = (bytes[i+1] & 0x7f ) <<7 ;
+        [returnString appendFormat:@"%c", lsb+msb];
+    }
+
+    [peripheralDelegate didReceiveStringData:returnString];
+}
+
+/* Receive Firmware Name and Version (after query)
+ * 0  START_SYSEX (0xF0)
  * 1  queryFirmware (0x79)
  * 2  major version (0-127)
  * 3  minor version (0-127)
@@ -588,15 +613,32 @@ The pin "state" is any data written to the pin. For output modes (digital output
 //    [currentlyDisplayingService write:dataToSend];
 //}
 
-//- (void) stringData:(NSString)string{
-//    const unsigned char bytes[] = {START_SYSEX, STRING_DATA, pin, END_SYSEX};
-//    NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
+- (void) stringData:(NSString*)string{
+    
+    const unsigned char first[] = {START_SYSEX, STRING_DATA};
+        
+    NSMutableData *dataToSend = [[NSMutableData alloc] initWithBytes:first length:sizeof(first)];
+    
+    NSData *data = [string dataUsingEncoding:NSASCIIStringEncoding];
 
-//    NSLog(@"stringData bytes in hex: %@", [dataToSend description]);
+    const unsigned char *bytes = [data bytes];
+    
+    for (int i = 0; i < [data length]; i++)
+    {
+        unsigned char lsb = bytes[i] & 0x7f;
+        unsigned char msb = bytes[i] >> 7  & 0x7f;
+        
+        const unsigned char append[] = { lsb, msb };
+        [dataToSend appendBytes:append length:sizeof(append)];
+    }
+    
+    const unsigned char end[] = {END_SYSEX};
+    [dataToSend appendBytes:end length:sizeof(end)];
+    
+    NSLog(@"stringData bytes in hex: %@", [dataToSend description]);
 
-//
-//    [currentlyDisplayingService write:dataToSend];
-//}
+    [currentlyDisplayingService write:dataToSend];
+}
 
 //- (void) shiftData:(int)high{
 //    const unsigned char bytes[] = {START_SYSEX, SHIFT_DATA, pin, END_SYSEX};
@@ -682,6 +724,9 @@ The pin "state" is any data written to the pin. For output modes (digital output
                 case REPORT_FIRMWARE:
                     NSLog(@"type of message is firmware report");
                     [self parseReportFirmwareResponse:firmataData];
+                    break;
+                case STRING_DATA:
+                    [self parseStringData:firmataData];
                     break;
                     
                 default:

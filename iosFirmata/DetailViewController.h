@@ -21,6 +21,7 @@
 @property (retain, nonatomic) NSTimer                   *tableUpdate;
 @property BOOL                                          REFRESH;
 -(IBAction)refresh:(id)sender;
+-(IBAction)sendString:(id)sender;
 -(IBAction)reset:(UIStoryboardSegue *)segue;
 
 @end

@@ -84,6 +84,7 @@ typedef enum {
 - (void) didReceiveDigitalPort:(int)port mask:(unsigned short int)mask;
 - (void) didReceiveDigitalPin:(int)pin status:(BOOL)status;
 - (void) didUpdateAnalogMapping:(NSMutableDictionary *)analogMapping;
+- (void) didReceiveStringData:(NSString*)string;
 @end
 
 
@@ -129,6 +130,8 @@ typedef enum {
 
 - (void) samplingInterval:(unsigned short int)intervalMilliseconds;
 - (void) servoConfig:(int)pin minPulse:(unsigned short int)minPulse maxPulse:(unsigned short int)maxPulse;
+
+- (void) stringData:(NSString*)string;
 
 /* Behave properly when heading into and out of the background */
 

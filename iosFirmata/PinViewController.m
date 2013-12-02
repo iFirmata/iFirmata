@@ -113,6 +113,16 @@
 /****************************************************************************/
 /*                              Firmata Delegates                           */
 /****************************************************************************/
+- (void) didReceiveStringData:(NSString *)string
+{
+    UIAlertView *alert = [[UIAlertView alloc]
+                          initWithTitle:@"String Data Recieved" message:string delegate:nil
+                          cancelButtonTitle:nil otherButtonTitles:@"OK", nil];
+    [alert show];
+    
+    
+}
+
 - (void) didReceiveAnalogPin:(int)pin value:(unsigned short)value
 {
     if(pin == [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue])
