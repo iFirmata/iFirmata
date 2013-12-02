@@ -14,7 +14,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="y4s-ER-bmq">
-                                <rect key="frame" x="1" y="0.0" width="320" height="480"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
@@ -45,7 +45,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="779" y="292"/>
+            <point key="canvasLocation" x="777" y="292"/>
         </scene>
         <!--Detail View Controller-->
         <scene sceneID="LJz-iz-BHh">
@@ -75,9 +75,9 @@
                     </tableView>
                     <navigationItem key="navigationItem" id="ShO-zL-Kc2">
                         <nil key="title"/>
-                        <barButtonItem key="backBarButtonItem" title="back" id="E5m-DL-HQt"/>
+                        <barButtonItem key="leftBarButtonItem" title="back" id="dqw-zS-SnQ"/>
                         <textField key="titleView" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="Cej-WQ-40m">
-                            <rect key="frame" x="8" y="7" width="261" height="30"/>
+                            <rect key="frame" x="52" y="7" width="217" height="30"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                             <textInputTraits key="textInputTraits"/>
@@ -158,7 +158,7 @@
                     <navigationItem key="navigationItem" title="Servo/PWM settings" id="Ogi-EY-ejP">
                         <barButtonItem key="leftBarButtonItem" title="back" id="go6-wr-aNk">
                             <connections>
-                                <segue destination="qrL-iI-aTO" kind="unwind" unwindAction="reset:" id="kko-Jn-PGc"/>
+                                <segue destination="qrL-iI-aTO" kind="unwind" unwindAction="reset:" id="Chj-HD-Rv3"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="mfg-7N-n03">
@@ -230,7 +230,11 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <navigationItem key="navigationItem" title="Shift Settings" id="2h4-hy-EA7">
-                        <barButtonItem key="backBarButtonItem" title="back" id="ZlR-9i-Xfe"/>
+                        <barButtonItem key="leftBarButtonItem" title="back" id="pNu-5Y-mWM">
+                            <connections>
+                                <segue destination="l7X-PY-CO4" kind="unwind" unwindAction="reset:" id="108-aZ-Cn9"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="deviceLabel" destination="90C-q4-V45" id="TwB-YT-64p"/>
@@ -238,6 +242,7 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aKW-O7-ZWh" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="l7X-PY-CO4" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="2045" y="-277"/>
         </scene>
@@ -312,7 +317,7 @@
                     <navigationItem key="navigationItem" title="Digital Settings" id="vO8-LF-dKG">
                         <barButtonItem key="leftBarButtonItem" title="back" id="HeE-lc-NKj">
                             <connections>
-                                <segue destination="jUF-0w-xWn" kind="unwind" unwindAction="reset:" id="lYO-ND-6Qn"/>
+                                <segue destination="jUF-0w-xWn" kind="unwind" unwindAction="reset:" id="XaT-A8-jVg"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -390,7 +395,11 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <navigationItem key="navigationItem" title="i2C Settings" id="2PL-Y5-tdJ">
-                        <barButtonItem key="backBarButtonItem" title="back" id="XmP-L2-z4J"/>
+                        <barButtonItem key="leftBarButtonItem" title="back" id="NkS-7z-Rqa">
+                            <connections>
+                                <segue destination="yg9-9Q-Cih" kind="unwind" unwindAction="reset:" id="sbc-ll-JqP"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="deviceLabel" destination="oYh-SL-Lz2" id="mZ9-tF-MZd"/>
@@ -401,6 +410,7 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xR0-FK-h0l" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="yg9-9Q-Cih" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="2045" y="292"/>
         </scene>

@@ -26,7 +26,6 @@
 -(IBAction)refresh:(id)sender;
 -(IBAction)sendString:(id)sender;
 -(IBAction)dismissKeyboard:(id)sender;
-
--(void)reset:(UIStoryboardSegue *)segue;
+-(IBAction)reset:(UIStoryboardSegue *)segue;
 
 @end

@@ -97,8 +97,7 @@
     
 }
 
-
--(void)reset:(UIStoryboardSegue *)segue {
+-(IBAction)reset:(UIStoryboardSegue *)segue {
 
     [currentFirmata setController:self];
 
