@@ -632,7 +632,8 @@ The pin "state" is any data written to the pin. For output modes (digital output
         [dataToSend appendBytes:append length:sizeof(append)];
     }
     
-    const unsigned char end[] = {END_SYSEX};
+    //issue #72 and #50 on firmata, will be fixed in 2.4
+    const unsigned char end[] = {0, 0, END_SYSEX};
     [dataToSend appendBytes:end length:sizeof(end)];
     
     NSLog(@"stringData bytes in hex: %@", [dataToSend description]);
