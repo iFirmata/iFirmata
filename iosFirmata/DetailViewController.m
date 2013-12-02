@@ -98,7 +98,7 @@
 }
 
 
--(IBAction)reset:(UIStoryboardSegue *)segue {
+-(void)reset:(UIStoryboardSegue *)segue {
 
     [currentFirmata setController:self];
 
@@ -134,6 +134,8 @@
     NSDictionary *pin = [pinsArray objectAtIndex:indexPath.row];
 
     NSNumber *currentModeNumber =  [pin objectForKey:@"currentMode"];
+    PINMODE currentMode = [currentModeNumber intValue];
+    
     NSString *currentModeString = [currentFirmata pinmodeEnumToString:[currentModeNumber intValue]];
 
     NSString *cellIdentifier = [NSString stringWithFormat:@"PinList %i",indexPath.row];
@@ -153,9 +155,6 @@
         
         //set name
         [[cell textLabel] setText:[pin valueForKey:@"name"]];
-        
-        //no accessory if analog?
-        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
         
         //set mode button
         UIButton *modeButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
@@ -178,6 +177,11 @@
     if(currentModeNumber){
         [cell setButtonTitle:currentModeString];
     }
+    
+    //no accessory if analog or unknown
+    if(currentModeNumber>0 && currentMode!=ANALOG )
+    [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+    
     
     return cell;
 }
