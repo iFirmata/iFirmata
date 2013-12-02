@@ -446,4 +446,18 @@
     [actionsheet showInView:self.view];
 }
 
+-(IBAction)sendString:(id)sender
+{
+    UITextField *input = (UITextField*)sender;
+    [sender resignFirstResponder];
+    NSLog(@"Sending ascii: %@", [input text]);
+
+    [currentFirmata stringData:[input text]];
+}
+
+-(IBAction)dismissKeyboard:(id)sender
+{
+    [sender resignFirstResponder];
+}
+
 @end

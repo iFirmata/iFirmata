@@ -14,14 +14,19 @@
 
 @property (strong, nonatomic) Firmata                   *currentFirmata;
 @property (strong, nonatomic) IBOutlet UILabel          *currentlyConnectedSensor;
-@property (strong, nonatomic) IBOutlet UILabel          *firmwareVersion;
-@property (retain, nonatomic) NSMutableArray            *pinsArray;
 @property (retain, nonatomic) IBOutlet UITableView      *pinsTable;
+@property (strong, nonatomic) IBOutlet UILabel          *firmwareVersion;
+
+@property (retain, nonatomic) NSMutableArray            *pinsArray;
 @property (retain, nonatomic) NSMutableDictionary       *analogMapping;
 @property (retain, nonatomic) NSTimer                   *tableUpdate;
+
 @property BOOL                                          REFRESH;
+
 -(IBAction)refresh:(id)sender;
 -(IBAction)sendString:(id)sender;
--(IBAction)reset:(UIStoryboardSegue *)segue;
+-(IBAction)dismissKeyboard:(id)sender;
+
+-(void)reset:(UIStoryboardSegue *)segue;
 
 @end

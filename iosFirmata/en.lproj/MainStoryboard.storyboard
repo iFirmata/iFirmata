@@ -61,7 +61,34 @@
             </objects>
             <point key="canvasLocation" x="779" y="292"/>
         </scene>
-        <!--Detail View Controller - Firmata-->
+        <!--View Controller-->
+        <scene sceneID="caB-NL-Bdy">
+            <objects>
+                <viewController id="Uw6-II-ayk" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="kCB-3S-YoP">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="2C7-Tv-UW4">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <subviews>
+                                    <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="5Ji-vL-SfI">
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    </tableView>
+                                </subviews>
+                            </scrollView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="M9R-wL-aU3" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1155" y="-277"/>
+        </scene>
+        <!--Detail View Controller-->
         <scene sceneID="LJz-iz-BHh">
             <objects>
                 <tableViewController id="62h-Kv-0ar" customClass="DetailViewController" sceneMemberID="viewController">
@@ -69,38 +96,37 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <label key="tableHeaderView" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="1TV-TR-Zha">
+                        <label key="tableHeaderView" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Device Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="1TV-TR-Zha">
                             <rect key="frame" x="0.0" y="64" width="320" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <label key="tableFooterView" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="p6u-cV-2uO">
-                            <rect key="frame" x="0.0" y="174" width="320" height="44"/>
+                        <label key="tableFooterView" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Firmware Version" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="NTw-NO-OV2">
+                            <rect key="frame" x="0.0" y="108" width="320" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="detailDisclosureButton" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="Ihu-uU-Zu2">
-                                <rect key="frame" x="0.0" y="130" width="320" height="44"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Ihu-uU-Zu2" id="uTp-nE-KoY">
-                                    <rect key="frame" x="0.0" y="0.0" width="253" height="43"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </tableViewCellContentView>
-                                <accessibility key="accessibilityConfiguration">
-                                    <accessibilityTraits key="traits" none="YES" updatesFrequently="YES"/>
-                                </accessibility>
-                            </tableViewCell>
-                        </prototypes>
                         <connections>
                             <outlet property="dataSource" destination="62h-Kv-0ar" id="JIL-ZC-l7G"/>
                             <outlet property="delegate" destination="62h-Kv-0ar" id="VzB-T4-wQo"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Firmata" id="ShO-zL-Kc2">
+                    <navigationItem key="navigationItem" id="ShO-zL-Kc2">
+                        <nil key="title"/>
                         <barButtonItem key="backBarButtonItem" title="back" id="E5m-DL-HQt"/>
+                        <textField key="titleView" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="Cej-WQ-40m">
+                            <rect key="frame" x="8" y="7" width="261" height="30"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <textInputTraits key="textInputTraits"/>
+                            <connections>
+                                <action selector="dismissKeyboard:" destination="62h-Kv-0ar" eventType="touchDown" id="WTD-gF-lGw"/>
+                                <action selector="sendString:" destination="62h-Kv-0ar" eventType="editingDidEndOnExit" id="MSE-26-Vvi"/>
+                            </connections>
+                        </textField>
                         <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="OL3-z3-YpW">
                             <connections>
                                 <action selector="refresh:" destination="62h-Kv-0ar" id="8ys-eL-eYq"/>
@@ -109,7 +135,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="currentlyConnectedSensor" destination="1TV-TR-Zha" id="j9g-MF-4hI"/>
-                        <outlet property="firmwareVersion" destination="p6u-cV-2uO" id="4F7-jE-Dom"/>
+                        <outlet property="firmwareVersion" destination="NTw-NO-OV2" id="we2-Xr-wWW"/>
                         <outlet property="pinsTable" destination="Dk7-3f-XyV" id="oeJ-0G-dPO"/>
                         <segue destination="u5g-SY-Bhl" kind="push" identifier="digitalPinView" id="RIi-Mu-car"/>
                         <segue destination="ctc-tL-cAn" kind="push" identifier="analogPinView" id="fmm-7R-z0S"/>
