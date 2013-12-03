@@ -176,6 +176,13 @@
 /****************************************************************************/
 /*				LeDiscovery Delegate Methods                                */
 /****************************************************************************/
+- (void) serviceDidReceiveCharacteristicsFromService:(LeDataService*)service
+{
+    if(currentlyDisplayingService == service){
+        [self performSegueWithIdentifier: @"deviceView" sender:self];
+    }
+}
+
 /** Peripheral connected or disconnected */
 - (void) serviceDidChangeStatus:(LeDataService*)service
 {
