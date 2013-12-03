@@ -42,15 +42,14 @@
 {
     [super viewDidLoad];
     
+    currentlyConnectedSensor.text = [[[currentFirmata currentlyDisplayingService] peripheral] name];
+
+    [self reset:nil]; //currentFirmata firmata so must come before any firmata calls in setup
+
     if(!pinsArray){
         pinsArray = [[NSMutableArray alloc] init];
-        
         [currentFirmata analogMappingQuery];
-        
-         currentlyConnectedSensor.text = [[[currentFirmata currentlyDisplayingService] peripheral] name];
     }
-
-    [self reset:nil];
 
 }
 
@@ -74,16 +73,20 @@
 
 - (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     
-    NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-    
-    NSLog(@"%ld", (long)indexPath.row);
-    NSLog(@"%@", [pinsArray objectAtIndex:indexPath.row] );
-    
-    PinViewController *dest =[segue destinationViewController];
-    dest.currentFirmata = currentFirmata;
-    dest.pinDictionary = [pinsArray objectAtIndex:indexPath.row];
-    
-    [tableUpdate invalidate];
+    if([sender isKindOfClass:[UIBarButtonItem class]]){
+
+    }else{
+        NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
+        
+        NSLog(@"%ld", (long)indexPath.row);
+        NSLog(@"%@", [pinsArray objectAtIndex:indexPath.row] );
+        
+        PinViewController *dest =[segue destinationViewController];
+        dest.currentFirmata = currentFirmata;
+        dest.pinDictionary = [pinsArray objectAtIndex:indexPath.row];
+        
+        [tableUpdate invalidate];
+    }
     
 }
 

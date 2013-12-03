@@ -20,6 +20,10 @@
 @property (retain, nonatomic) LeDataService             *currentlyDisplayingService;
 @property (retain, nonatomic) NSMutableArray            *connectedServices;
 @property (retain, nonatomic) IBOutlet UITableView      *sensorsTable;
+
+@property (retain, nonatomic) IBOutlet UIRefreshControl *refreshControl;
+-(IBAction)refresh:(id)sender;
+-(IBAction)reset:(UIStoryboardSegue *)segue;
 @end
 
 @implementation ViewController
@@ -27,12 +31,22 @@
 @synthesize currentlyDisplayingService;
 @synthesize connectedServices;
 @synthesize sensorsTable;
+@synthesize refreshControl;
 
 #pragma mark -
 #pragma mark View lifecycle
 /****************************************************************************/
 /*								View Lifecycle                              */
 /****************************************************************************/
+- (id)initWithStyle:(UITableViewStyle)style
+{
+    self = [super initWithStyle:style];
+    if (self) {
+        // Custom initialization
+    }
+    return self;
+}
+
 - (void) viewDidLoad
 {
     [super viewDidLoad];
@@ -41,14 +55,13 @@
     
 	[[LeDiscovery sharedInstance] setDiscoveryDelegate:self];
     [[LeDiscovery sharedInstance] setPeripheralDelegate:self];
-    [[LeDiscovery sharedInstance] startScanningForUUIDString:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterBackgroundNotification:) name:kDataServiceEnteredBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterForegroundNotification:) name:kDataServiceEnteredForegroundNotification object:nil];
     
-    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-    [refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
-    [self.sensorsTable addSubview:refreshControl];
+    [self.refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
+    
+    [self refresh:nil];
     
 }
 
@@ -58,7 +71,9 @@
     [self setSensorsTable:nil];
 
     [self setConnectedServices:nil];
-    
+
+    [self setCurrentlyDisplayingService:nil];
+
     [[LeDiscovery sharedInstance] stopScanning];
     
     [super viewDidUnload];
@@ -79,18 +94,37 @@
     
     DetailViewController *dest =[segue destinationViewController];
     
-    NSIndexPath *indexPath = [self.sensorsTable indexPathForSelectedRow];
-    
-    NSArray *devices = [[LeDiscovery sharedInstance] connectedServices];
-    
-    LeDataService *dataService = (LeDataService*)[devices objectAtIndex:indexPath.row];
-    
     //create new firmata to manage peripheral, and tell it to report to new page
-    dest.currentFirmata = [[Firmata alloc] initWithService:dataService controller:dest];
+    dest.currentFirmata = [[Firmata alloc] initWithService:currentlyDisplayingService controller:dest];
     
     //tell Discovery to that it should report to firmata when its peripheral changes status
     [[LeDiscovery sharedInstance] setPeripheralDelegate:dest.currentFirmata];
     
+    [[LeDiscovery sharedInstance] stopScanning];
+    
+}
+
+- (IBAction)refresh:(id)sender {
+    [[LeDiscovery sharedInstance] startScanningForUUIDString:nil];
+    
+    [self.refreshControl beginRefreshing];
+    
+    if (self.tableView.contentOffset.y == 0) {
+        
+        [UIView animateWithDuration:0.25 delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations:^(void){
+            
+            self.tableView.contentOffset = CGPointMake(0, -self.refreshControl.frame.size.height);
+            
+        } completion:^(BOOL finished){
+            
+        }];
+        
+    }
+}
+
+- (IBAction)reset:(id)sender {
+    [[LeDiscovery sharedInstance] setPeripheralDelegate:self];
+    [self refresh:nil];
 }
 
 
@@ -151,7 +185,6 @@
         NSLog(@"Service (%@) connected", service.peripheral.name);
         if (![connectedServices containsObject:service]) {
             [connectedServices addObject:service];
-            [self performSegueWithIdentifier: @"deviceView" sender:self];
         }
     }
     
@@ -278,9 +311,5 @@
 /*                              App IO Methods                              */
 /****************************************************************************/
 
-- (void)refresh:(id)sender
-{
-    [[LeDiscovery sharedInstance] startScanningForUUIDString:nil];
 
-}
 @end
