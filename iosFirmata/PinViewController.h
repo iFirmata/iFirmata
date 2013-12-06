@@ -22,10 +22,14 @@
 @property (strong, nonatomic) IBOutlet UITextField      *i2cPayloadTextField;
 @property (strong, nonatomic) IBOutlet UITextView       *i2cResultTextView;
 @property (strong, nonatomic) NSMutableDictionary       *pinDictionary;
+@property (strong, nonatomic) IBOutlet UIScrollView     *scrollView;
+@property (strong, nonatomic) UITextField               *activeField;
 
 -(IBAction)sendi2c:(id)sender;
 -(IBAction)toggleValue:(id)sender;
 -(IBAction)toggleMode:(id)sender;
 -(IBAction)toggleReporting:(id)sender;
 -(IBAction)refresh:(id)sender;
+-(IBAction)textFieldDidBeginEditing:(UITextField *)textField;
+-(IBAction)textFieldDidEndEditing:(UITextField *)textField;
 @end

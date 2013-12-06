@@ -24,6 +24,8 @@
 @synthesize modeSwitch;
 @synthesize statusSwitch;
 @synthesize reportSwitch;
+@synthesize scrollView;
+@synthesize activeField;
 
 #pragma mark -
 #pragma mark View lifecycle
@@ -44,17 +46,11 @@
     
     [super viewDidLoad];
     
-    NSLog(@"Setting controller");
     
     [currentFirmata setController:self];
 
-    NSLog(@"getting pinlable text");
-
     NSString *text = [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"]stringValue];
     
-    NSLog(@"%@", text);
-    NSLog(@"setting pinlable text");
-
     NSNumber *currentModeNumber =  [pinDictionary objectForKey:@"currentMode"];
     PINMODE currentMode = [currentModeNumber intValue];
 
@@ -75,6 +71,8 @@
     }
     else if (currentMode == I2C){
         
+        [self registerForKeyboardNotifications];
+        
         //create segmentedui -- fill with I2CMODE enums
         NSArray *itemArray = [NSArray arrayWithObjects: @"One", @"Two", @"Three", nil];
         UISegmentedControl *segmentedControl = [[UISegmentedControl alloc] initWithItems:itemArray];
@@ -92,13 +90,40 @@
     
     [pinLabel setText:text];
     
-    NSLog(@"setting device label text");
-
     deviceLabel.text = [[[currentFirmata currentlyDisplayingService] peripheral] name];
     
     [currentFirmata pinStateQuery:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]];
 
-    NSLog(@"View done loading");
+    //fix for uiscrollview
+    //http://stackoverflow.com/questions/8528134/uiscrollview-not-scrolling-when-keyboard-covers-active-uitextfield-using-apple
+    CGRect applicationFrame = [[UIScreen mainScreen] applicationFrame];
+    CGRect navigationFrame = [[self.navigationController navigationBar] frame];
+    CGFloat height = applicationFrame.size.height - navigationFrame.size.height;
+    CGSize newContentSize = CGSizeMake(applicationFrame.size.width, height);
+    
+    scrollView.contentSize = newContentSize;
+    //end
+    
+}
+
+- (void) viewDidUnload
+{
+    [self setCurrentFirmata:nil];
+    [self setPinDictionary:nil];
+    [self setDeviceLabel:nil];
+    [self setPinLabel:nil];
+    [self setPinStatus:nil];
+    [self setPinSlider:nil];
+    [self setI2cAddressTextField:nil];
+    [self setI2cPayloadTextField:nil];
+    [self setI2cResultTextView:nil];
+    [self setModeSwitch:nil];
+    [self setStatusSwitch:nil];
+    [self setReportSwitch:nil];
+    [self setScrollView:nil];
+
+    [super viewDidUnload];
+
 }
 
 - (void)didReceiveMemoryWarning
@@ -207,7 +232,7 @@
 #pragma mark -
 #pragma mark UI Text Field Delegates
 /****************************************************************************/
-/*                        UI Text Field Delegates                           */
+/*                        UI Text Field Methods                             */
 /****************************************************************************/
 -(BOOL) textFieldShouldReturn:(UITextField *)textField{
     
@@ -215,6 +240,62 @@
     [i2cPayloadTextField resignFirstResponder];
     return YES;
 }
+
+// Call this method somewhere in your view controller setup code.
+- (void)registerForKeyboardNotifications
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWasShown:)
+                                                 name:UIKeyboardDidShowNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillBeHidden:)
+                                                 name:UIKeyboardWillHideNotification object:nil];
+    
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
+                                   initWithTarget:self
+                                   action:@selector(textFieldShouldReturn:)];
+    [self.view addGestureRecognizer:tap];
+    
+}
+
+// Called when the UIKeyboardDidShowNotification is sent.
+- (void)keyboardWasShown:(NSNotification*)aNotification
+{
+    NSDictionary* info = [aNotification userInfo];
+    CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+    
+    UIEdgeInsets contentInsets = UIEdgeInsetsMake(0.0, 0.0, kbSize.height, 0.0);
+    scrollView.contentInset = contentInsets;
+    scrollView.scrollIndicatorInsets = contentInsets;
+    
+    // If active text field is hidden by keyboard, scroll it so it's visible
+    // Your app might not need or want this behavior.
+    CGRect aRect = self.view.frame;
+    aRect.size.height -= kbSize.height;
+    if (!CGRectContainsPoint(aRect, activeField.frame.origin) ) {
+        [self.scrollView scrollRectToVisible:activeField.frame animated:YES];
+    }
+}
+
+// Called when the UIKeyboardWillHideNotification is sent
+- (void)keyboardWillBeHidden:(NSNotification*)aNotification
+{
+    UIEdgeInsets contentInsets = UIEdgeInsetsZero;
+    scrollView.contentInset = contentInsets;
+    scrollView.scrollIndicatorInsets = contentInsets;
+}
+
+- (IBAction)textFieldDidBeginEditing:(UITextField *)textField
+{
+    activeField = textField;
+}
+
+- (IBAction)textFieldDidEndEditing:(UITextField *)textField
+{
+    activeField = nil;
+}
+
 
 #pragma mark -
 #pragma mark App IO
@@ -290,37 +371,41 @@
 
 -(IBAction)sendi2c:(id)sender
 {
+    NSString *input;
 
-//    const unsigned char led[] = {DISP_CHAR_5X7, 'n', time>>8, time & 0xff};
-//    NSData *data = [[NSData alloc] initWithBytes:led length:sizeof(led)];
+    if([[i2cPayloadTextField text] length] > 0 && [[i2cAddressTextField text] length] > 0 ){
+        
+        
+        //pad to even if need be
+        if([[i2cPayloadTextField text] length] % 2 !=0 )
+        {
+            input = [[NSString alloc] initWithFormat:@"0%@", [i2cPayloadTextField text]];
+        }
+        else
+        {
+            input = [[NSString alloc] initWithString:[i2cPayloadTextField text]];
+        }
 
-//    [currentFirmata i2cRequest:WRITE    address:[self bytesStringToData:[i2cAddressTextField text]]
-//                                        data:   [self bytesStringToData:[i2cPayloadTextField text]]
-//     ];
-    
+        const char *chars = [input UTF8String];
+        int i = 0, len = input.length;
+        
+        NSMutableData *data = [NSMutableData dataWithCapacity:len / 2];
+        char byteChars[3] = {'\0','\0','\0'};
+        unsigned long wholeByte;
+        
+        while (i < len) {
+            byteChars[0] = chars[i++];
+            byteChars[1] = chars[i++];
+            wholeByte = strtoul(byteChars, NULL, 16);
+            [data appendBytes:&wholeByte length:1];
+        }
+        NSLog(@"%@", data);
+        [currentFirmata i2cRequest:WRITE address:[[i2cAddressTextField text] intValue ] data:data];
+    }
 }
-
-//+(NSData*)bytesStringToData:(NSString*)bytesString
-//{
-//    for(int i = [bytesString count] - 1; i > 0; i--){
-//        
-//        NSString *sub = substringWithRange:NSMakeRange(i, 2)];
-//        NSLog(@"%@", sub);
-//    }
-//
-//
-//    NSScanner* pScanner = [NSScanner scannerWithString: pString];
-//    
-//    unsigned long long iValue2;
-//    [pScanner scanHexLongLong: &iValue2];
-//    
-//    NSLog(@"iValue2 = %lld", iValue2);
-//    
-//}
 
 -(IBAction)refresh:(id)sender
 {
     [currentFirmata pinStateQuery:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]];
 }
-
 @end
