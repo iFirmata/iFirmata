@@ -16,6 +16,7 @@
 @property (strong, nonatomic) IBOutlet UILabel          *currentlyConnectedSensor;
 @property (retain, nonatomic) IBOutlet UITableView      *pinsTable;
 @property (strong, nonatomic) IBOutlet UILabel          *firmwareVersion;
+@property (strong, nonatomic) IBOutlet UITextField      *stringToSend;
 
 @property (retain, nonatomic) NSMutableArray            *pinsArray;
 @property (retain, nonatomic) NSMutableDictionary       *analogMapping;
@@ -25,7 +26,7 @@
 
 -(IBAction)refresh:(id)sender;
 -(IBAction)sendString:(id)sender;
--(IBAction)dismissKeyboard:(id)sender;
 -(IBAction)reset:(UIStoryboardSegue *)segue;
-
+- (IBAction)textFieldDidBeginEditing:(UITextField *)textField;
+- (IBAction)textFieldDidEndEditing:(UITextField *)textField;
 @end

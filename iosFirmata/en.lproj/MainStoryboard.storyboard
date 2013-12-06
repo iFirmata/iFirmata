@@ -99,8 +99,9 @@
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                             <textInputTraits key="textInputTraits"/>
                             <connections>
-                                <action selector="dismissKeyboard:" destination="62h-Kv-0ar" eventType="touchDown" id="WTD-gF-lGw"/>
                                 <action selector="sendString:" destination="62h-Kv-0ar" eventType="editingDidEndOnExit" id="MSE-26-Vvi"/>
+                                <action selector="textFieldDidBeginEditing:" destination="62h-Kv-0ar" eventType="editingDidBegin" id="T3e-JC-YRO"/>
+                                <action selector="textFieldDidEndEditing:" destination="62h-Kv-0ar" eventType="editingDidEnd" id="ZWn-S6-Fvy"/>
                             </connections>
                         </textField>
                         <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="OL3-z3-YpW">
@@ -113,6 +114,7 @@
                         <outlet property="currentlyConnectedSensor" destination="1TV-TR-Zha" id="j9g-MF-4hI"/>
                         <outlet property="firmwareVersion" destination="NTw-NO-OV2" id="we2-Xr-wWW"/>
                         <outlet property="pinsTable" destination="Dk7-3f-XyV" id="oeJ-0G-dPO"/>
+                        <outlet property="stringToSend" destination="Cej-WQ-40m" id="eD7-eq-TdY"/>
                         <segue destination="u5g-SY-Bhl" kind="push" identifier="digitalPinView" id="RIi-Mu-car"/>
                         <segue destination="ctc-tL-cAn" kind="push" identifier="analogPinView" id="fmm-7R-z0S"/>
                         <segue destination="8d9-7T-q1U" kind="push" identifier="shiftPinView" id="ZJb-N5-EVg"/>

@@ -20,7 +20,9 @@
 @synthesize pinsTable;
 @synthesize analogMapping;
 @synthesize tableUpdate;
+@synthesize stringToSend;
 
+UITapGestureRecognizer *_tap;
 
 #pragma mark -
 #pragma mark View lifecycle
@@ -50,6 +52,10 @@
         pinsArray = [[NSMutableArray alloc] init];
         [currentFirmata analogMappingQuery];
     }
+    
+    _tap = [[UITapGestureRecognizer alloc]
+            initWithTarget:self
+            action:@selector(textFieldShouldReturn:)];
 
 }
 
@@ -57,11 +63,12 @@
 {
     [tableUpdate invalidate];
     tableUpdate = nil;
-    
+    _tap = nil;
+
     [self setPinsArray:nil];
     [self setCurrentlyConnectedSensor:nil];
     [self setPinsTable:nil];
-
+    
     [super viewDidUnload];
 }
 
@@ -404,6 +411,29 @@
     //could do something here
 }
 
+
+#pragma mark -
+#pragma mark App IO
+/****************************************************************************/
+/*                              UI Text Field Methods                       */
+/****************************************************************************/
+
+-(BOOL) textFieldShouldReturn:(UITextField *)textField{
+    
+    [stringToSend resignFirstResponder];
+    return YES;
+}
+
+- (IBAction)textFieldDidBeginEditing:(UITextField *)textField
+{
+    [self.view addGestureRecognizer:_tap];
+}
+
+- (IBAction)textFieldDidEndEditing:(UITextField *)textField
+{
+    [self.view removeGestureRecognizer:_tap];
+}
+
 #pragma mark -
 #pragma mark App IO
 /****************************************************************************/
@@ -461,9 +491,5 @@
     [currentFirmata stringData:[input text]];
 }
 
--(IBAction)dismissKeyboard:(id)sender
-{
-    [sender resignFirstResponder];
-}
 
 @end

@@ -408,4 +408,6 @@
 {
     [currentFirmata pinStateQuery:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]];
 }
+
+
 @end
