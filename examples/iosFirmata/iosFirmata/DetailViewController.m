@@ -147,44 +147,24 @@ UITapGestureRecognizer *_tap;
     
     NSString *currentModeString = [currentFirmata pinmodeEnumToString:[currentModeNumber intValue]];
 
-    NSString *cellIdentifier = [NSString stringWithFormat:@"PinList %i",indexPath.row];
+    static NSString *cellIdentifier = @"firmataCell";
     FirmataCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    if (cell == nil) {
-        
-        cell = [[FirmataCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:cellIdentifier];
-        
-        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
-        
-        //set value detail text
-        if([pin objectForKey:@"lastvalue"]){
-            [[cell detailTextLabel] setText:[(NSNumber*)[pin objectForKey:@"lastvalue"] stringValue]];
-        }else{
-            [[cell detailTextLabel] setText:@""];
-        }
-        
-        //set name
-        [[cell textLabel] setText:[pin valueForKey:@"name"]];
-        
-        //set mode button
-        UIButton *modeButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [modeButton setTitle:@"unknown" forState:UIControlStateNormal];
-        [modeButton addTarget:self action:@selector(selectMode:) forControlEvents:UIControlEventTouchDown];
-        [modeButton setFrame:CGRectMake(50,10,75,30)];
-        [modeButton setTag:indexPath.row];
-        [cell setButton:modeButton];
+    
+    
+    [cell.modeButton setTag:indexPath.row];
 
-    }
+    [cell.name setText:[pin valueForKey:@"name"]];
 
     //set value detail text
     if([pin objectForKey:@"lastvalue"]){
-        [[cell detailTextLabel] setText:[(NSNumber*)[pin objectForKey:@"lastvalue"] stringValue]];
+        [cell.value setText:[(NSNumber*)[pin objectForKey:@"lastvalue"] stringValue]];
     }else{
-        [[cell detailTextLabel] setText:@""];
+        [cell.value setText:@""];
     }
     
     //in mode changed, change the button text
     if(currentModeNumber){
-        [cell setButtonTitle:currentModeString];
+        [cell.modeButton setTitle:currentModeString forState:UIControlStateNormal ];
     }
     
     //no accessory if analog or unknown
@@ -454,8 +434,8 @@ UITapGestureRecognizer *_tap;
     });
 }
 
--(void)selectMode:(UIButton*)sender{
-    
+- (IBAction)selectMode:(UIButton*)sender {
+
     UIActionSheet *actionsheet = [[UIActionSheet alloc] init ];
     
     [actionsheet setTitle:@"Choose Mode"];

@@ -26,20 +26,11 @@
     // Configure the view for the selected state
 }
 
-- (void)setButton:(UIButton*)button
+- (void) prepareForReuse
 {
-    _modeButton = button;
-    [super.contentView addSubview:_modeButton];
-}
-
-- (void)setButtonTitle:(NSString*)title
-{
-    [_modeButton setTitle:title forState:UIControlStateNormal];
-}
-
-- (void) prepareForReuse{
-    [[super detailTextLabel] setText:nil];
-
+    _modeButton=nil;
+    _name.text=@"";
+    _value.text=@"";
 }
 
 @end

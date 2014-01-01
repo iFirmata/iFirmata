@@ -10,10 +10,8 @@
 
 @interface FirmataCell : UITableViewCell
 
-@property (strong, nonatomic) UIButton* modeButton;
-@property (strong, nonatomic) UILabel* value;
-
-- (void)setButton:(UIButton*)button;
-- (void)setButtonTitle:(NSString*)title;
+@property (strong, nonatomic) IBOutlet UIButton* modeButton;
+@property (strong, nonatomic) IBOutlet UILabel* value;
+@property (strong, nonatomic) IBOutlet UILabel* name;
 
 @end
