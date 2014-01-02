@@ -28,7 +28,7 @@
 
 - (void) prepareForReuse
 {
-    _modeButton=nil;
+    [_modeButton setTitle:@"unknown" forState:UIControlStateNormal];
     _name.text=@"";
     _value.text=@"";
 }

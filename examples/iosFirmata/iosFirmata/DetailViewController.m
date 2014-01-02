@@ -150,7 +150,6 @@ UITapGestureRecognizer *_tap;
     static NSString *cellIdentifier = @"firmataCell";
     FirmataCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     
-    
     [cell.modeButton setTag:indexPath.row];
 
     [cell.name setText:[pin valueForKey:@"name"]];
@@ -168,9 +167,11 @@ UITapGestureRecognizer *_tap;
     }
     
     //no accessory if analog or unknown
-    if(currentModeNumber>0 && currentMode!=ANALOG )
-    [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-    
+    if(currentModeNumber>0 && currentMode!=ANALOG ){
+        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+    }else{
+        [cell setAccessoryType:UITableViewCellAccessoryNone];
+    }
     
     return cell;
 }

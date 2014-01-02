@@ -10,7 +10,7 @@
 
 @interface FirmataCell : UITableViewCell
 
-@property (strong, nonatomic) IBOutlet UIButton* modeButton;
+@property (weak, nonatomic) IBOutlet UIButton *modeButton;
 @property (strong, nonatomic) IBOutlet UILabel* value;
 @property (strong, nonatomic) IBOutlet UILabel* name;
 
