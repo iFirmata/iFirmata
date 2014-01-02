@@ -112,7 +112,6 @@
                                     <outlet property="modeButton" destination="Xea-4r-Bze" id="tQo-HS-oqH"/>
                                     <outlet property="name" destination="VVs-pN-q8P" id="iYM-Uw-Pu7"/>
                                     <outlet property="value" destination="8Mb-st-har" id="lTq-ro-doR"/>
-                                    <segue destination="eMm-iL-zH1" kind="push" identifier="i2cPinView" id="8DP-rH-XX7"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -153,12 +152,13 @@
                         <segue destination="u5g-SY-Bhl" kind="push" identifier="digitalPinView" id="RIi-Mu-car"/>
                         <segue destination="ctc-tL-cAn" kind="push" identifier="analogPinView" id="fmm-7R-z0S"/>
                         <segue destination="8d9-7T-q1U" kind="push" identifier="shiftPinView" id="ZJb-N5-EVg"/>
+                        <segue destination="eMm-iL-zH1" kind="push" identifier="i2cPinView" id="7BL-Xz-MrO"/>
                     </connections>
                 </tableViewController>
                 <exit id="LLQ-Tm-DQJ" userLabel="Exit" sceneMemberID="exit"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jWu-Pf-1F4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1189" y="292"/>
+            <point key="canvasLocation" x="1279" y="292"/>
         </scene>
         <!--Pin View Controller - Servo/PWM settings-->
         <scene sceneID="y2P-iT-LV9">
@@ -212,7 +212,7 @@
                     <navigationItem key="navigationItem" title="Servo/PWM settings" id="Ogi-EY-ejP">
                         <barButtonItem key="leftBarButtonItem" title="back" id="go6-wr-aNk">
                             <connections>
-                                <segue destination="qrL-iI-aTO" kind="unwind" unwindAction="reset:" id="Chj-HD-Rv3"/>
+                                <segue destination="qrL-iI-aTO" kind="unwind" unwindAction="reset:" id="sBS-BA-7pG"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="mfg-7N-n03">
@@ -286,7 +286,7 @@
                     <navigationItem key="navigationItem" title="Shift Settings" id="2h4-hy-EA7">
                         <barButtonItem key="leftBarButtonItem" title="back" id="pNu-5Y-mWM">
                             <connections>
-                                <segue destination="l7X-PY-CO4" kind="unwind" unwindAction="reset:" id="108-aZ-Cn9"/>
+                                <segue destination="l7X-PY-CO4" kind="unwind" unwindAction="reset:" id="l5k-Rq-ix8"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -371,7 +371,7 @@
                     <navigationItem key="navigationItem" title="Digital Settings" id="vO8-LF-dKG">
                         <barButtonItem key="leftBarButtonItem" title="back" id="HeE-lc-NKj">
                             <connections>
-                                <segue destination="jUF-0w-xWn" kind="unwind" unwindAction="reset:" id="XaT-A8-jVg"/>
+                                <segue destination="jUF-0w-xWn" kind="unwind" unwindAction="reset:" id="fcG-RJ-L8F"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -473,7 +473,7 @@
                     <navigationItem key="navigationItem" title="i2C Settings" id="BAV-id-fKr">
                         <barButtonItem key="leftBarButtonItem" title="back" id="5w5-Ze-CRX">
                             <connections>
-                                <segue destination="m2t-Pr-bsk" kind="unwind" unwindAction="reset:" id="2d5-M0-6Pb"/>
+                                <segue destination="m2t-Pr-bsk" kind="unwind" unwindAction="reset:" id="j6F-hP-3nH"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
