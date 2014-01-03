@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
 
   s.author       = { "Jacob Rosenthal" => "jakerosenthal@gmail.com" }
 
-  s.platform     = :ios, '5.0'
+  s.platform     = :ios, '6.0'
 
   s.source       = { :git => "https://github.com/iFirmata/iFirmata.git", :tag => s.version.to_s }
 
