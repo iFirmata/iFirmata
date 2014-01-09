@@ -54,15 +54,18 @@
     connectedServices = [NSMutableArray new];
     
 	[[LeDiscovery sharedInstance] setDiscoveryDelegate:self];
-    [[LeDiscovery sharedInstance] setPeripheralDelegate:self];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterBackgroundNotification:) name:kDataServiceEnteredBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterForegroundNotification:) name:kDataServiceEnteredForegroundNotification object:nil];
     
     [self.refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
     
-    [self refresh:nil];
+}
+
+-(void)viewWillAppear:(BOOL)animated
+{
     
+    [self reset:nil];
 }
 
 - (void) viewDidUnload
@@ -101,6 +104,7 @@
     [[LeDiscovery sharedInstance] setPeripheralDelegate:dest.currentFirmata];
     
     [[LeDiscovery sharedInstance] stopScanning];
+    [self.refreshControl endRefreshing];
     
 }
 
