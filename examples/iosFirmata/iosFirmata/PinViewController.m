@@ -66,26 +66,16 @@
         [statusSwitch setOn:[(NSNumber*)[pinDictionary valueForKey:@"lastvalue"]boolValue]];
     }
     else if(currentMode == PWM){
-        [pinSlider setMaximumValue:255];
+        [pinSlider setMaximumValue:127];
     }
     else if( currentMode == SERVO)
     {
-        [pinSlider setMaximumValue:180];
+        [pinSlider setMaximumValue:127];
     }
     else if (currentMode == I2C){
         
         [self registerForKeyboardNotifications];
         
-        //create segmentedui -- fill with I2CMODE enums
-        NSArray *itemArray = [NSArray arrayWithObjects: @"One", @"Two", @"Three", nil];
-        UISegmentedControl *segmentedControl = [[UISegmentedControl alloc] initWithItems:itemArray];
-        segmentedControl.frame = CGRectMake(20, 225, 280, 30);
-        segmentedControl.segmentedControlStyle = UISegmentedControlStylePlain;
-        segmentedControl.selectedSegmentIndex = 1;
-        [segmentedControl addTarget:nil
-                              action:nil
-                    forControlEvents:UIControlEventValueChanged];
-        [self.view addSubview:segmentedControl];
         [i2cPayloadTextField setDelegate:self];
         [i2cAddressTextField setDelegate:self];
 
