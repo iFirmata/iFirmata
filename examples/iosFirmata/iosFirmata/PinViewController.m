@@ -26,6 +26,8 @@
 @synthesize reportSwitch;
 @synthesize scrollView;
 @synthesize activeField;
+@synthesize pinsArray;
+@synthesize pinNumber;
 
 #pragma mark -
 #pragma mark View lifecycle
@@ -46,6 +48,7 @@
     
     [super viewDidLoad];
     
+    pinDictionary = [pinsArray objectAtIndex:pinNumber];
     
     [currentFirmata setController:self];
 
@@ -321,24 +324,38 @@
 
 -(IBAction)toggleValue:(id)sender
 {
+    
+    int port = [currentFirmata portForPin:
+                [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]];
+    
+    int mask = 0;
+    //build a mask from first pin of this port, to last pin of this port
+    for(int x = port * 8; x< port * 8 +7; x++){
+        
+        int value = [(NSNumber*)[[pinsArray objectAtIndex:x] valueForKey:@"lastvalue"] intValue] ;
+        int shiftedpin = value << (x % 8);
+        mask = mask + shiftedpin;
+        
+    }
+    
     if([sender isOn])
     {
         NSLog(@"Enabling Pin on port");
-        [currentFirmata digitalMessagePort:[currentFirmata portForPin:
-                                            [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]
-                                      mask:[currentFirmata bitMaskForPin:
-                                            [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]
-                                            ]];
-        [self refresh:nil]; //wasteful but lets call and get true status
+        
+        //set our pins bit on
+        mask |= ( 1<< (pinNumber % 8) );
 
     }else
     {
         NSLog(@"Disabling Pins on port");
-        [currentFirmata digitalMessagePort:[currentFirmata portForPin:
-                                            [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]
-                                      mask:0x00];
-        [self refresh:nil]; //wasteful but lets call and get true status
+
+        //set our pins bit off
+        mask &= ~( 1<< (pinNumber % 8) );
     }
+    
+    [currentFirmata digitalMessagePort:port mask:mask];
+    
+    [self refresh:nil]; //wasteful but lets call and get true status
 }
 
 -(IBAction)toggleReporting:(id)sender

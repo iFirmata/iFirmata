@@ -90,8 +90,8 @@ UITapGestureRecognizer *_tap;
         
         PinViewController *dest =[segue destinationViewController];
         dest.currentFirmata = currentFirmata;
-        dest.pinDictionary = [pinsArray objectAtIndex:indexPath.row];
-        
+        dest.pinsArray = pinsArray;
+        dest.pinNumber = indexPath.row;
         [tableUpdate invalidate];
     }
     

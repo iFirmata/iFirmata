@@ -24,6 +24,8 @@
 @property (strong, nonatomic) NSMutableDictionary       *pinDictionary;
 @property (strong, nonatomic) IBOutlet UIScrollView     *scrollView;
 @property (strong, nonatomic) UITextField               *activeField;
+@property (strong, nonatomic) NSMutableArray            *pinsArray;
+@property                     int                       pinNumber;
 
 -(IBAction)sendi2c:(id)sender;
 -(IBAction)toggleValue:(id)sender;
