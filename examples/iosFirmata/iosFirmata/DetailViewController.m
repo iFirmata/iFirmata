@@ -198,27 +198,30 @@ UITapGestureRecognizer *_tap;
 
     //#define pinmodeArray @"input", @"output", @"analog", @"pwm", @"servo", @"shift", @"i2c", nil
 
-    switch (mode) {
-        case INPUT:
-        case OUTPUT:
-            [self performSegueWithIdentifier: @"digitalPinView" sender:self];
-            break;
-            
-        case SERVO:
-        case PWM:
-            [self performSegueWithIdentifier: @"analogPinView" sender:self];
-            break;
-            
-        case I2C:
-            [self performSegueWithIdentifier: @"i2cPinView" sender:self];
-            break;
-            
-        case SHIFT:
-            [self performSegueWithIdentifier: @"shiftPinView" sender:self];
-            break;
+    if(currentModeNumber)
+    {
+        switch (mode) {
+            case INPUT:
+            case OUTPUT:
+                [self performSegueWithIdentifier: @"digitalPinView" sender:self];
+                break;
+                
+            case SERVO:
+            case PWM:
+                [self performSegueWithIdentifier: @"analogPinView" sender:self];
+                break;
+                
+            case I2C:
+                [self performSegueWithIdentifier: @"i2cPinView" sender:self];
+                break;
+                
+            case SHIFT:
+                [self performSegueWithIdentifier: @"shiftPinView" sender:self];
+                break;
 
-        default:
-            break;
+            default:
+                break;
+        }
     }
     
 }
@@ -305,6 +308,8 @@ UITapGestureRecognizer *_tap;
         int translatedPin = [(NSNumber*)[analogMapping objectForKey:[NSNumber numberWithInt:pin]] intValue];
         NSDictionary *aPin = pinsArray[translatedPin];
         [aPin setValue:[NSNumber numberWithInt:value] forKey:@"lastvalue"];
+        [aPin setValue:[NSNumber numberWithInt:ANALOG] forKey:@"currentMode"];
+
         _REFRESH = YES;
     }
 }
@@ -321,6 +326,7 @@ UITapGestureRecognizer *_tap;
     if(pinsArray && [pinsArray count]>0 && pin<[pinsArray count] ){
         NSDictionary *aPin = pinsArray[pin];
         [aPin setValue:[NSNumber numberWithInt:status] forKey:@"lastvalue"];
+        [aPin setValue:[NSNumber numberWithInt:INPUT] forKey:@"currentMode"];
         _REFRESH = YES;
     }
 
@@ -352,25 +358,10 @@ UITapGestureRecognizer *_tap;
         PINMODE newMode = [currentFirmata modeStringToEnum: [actionSheet buttonTitleAtIndex:buttonIndex]];
         NSLog(@"new mode: %u", newMode );
 
-        NSNumber *currentModeNumber =  [pin objectForKey:@"currentMode"];
-        NSLog(@"current mode: %d", [currentModeNumber intValue] );
-        PINMODE currentMode = [currentModeNumber intValue];
-
-        //if old mode was analog, make sure to turn off reporting
-        if(currentMode != newMode && newMode == ANALOG) {
-            [currentFirmata reportAnalog:actionSheet.tag enable:NO];
-        }
-
-        [pin setValue:[NSNumber numberWithInt:newMode] forKey:@"currentMode"];
-
-        [currentFirmata setPinMode:actionSheet.tag mode:newMode];
-
-        if(newMode == ANALOG){
-
-            [currentFirmata reportAnalog:actionSheet.tag enable:YES];
+        if(newMode == ANALOG)
+        {
             [currentFirmata samplingInterval:1000]; //bluetooth really can't support more
-
-            
+        
         }else if (newMode == I2C){
             
             [currentFirmata i2cConfig:0 data:[[NSData alloc]init]];
@@ -382,6 +373,8 @@ UITapGestureRecognizer *_tap;
         }
         
         [pin removeObjectForKey:@"lastvalue"];
+        [currentFirmata setPinMode:actionSheet.tag mode:newMode];
+        [pin setValue:[NSNumber numberWithInt:newMode] forKey:@"currentMode"];
         _REFRESH = YES;
     }
 
