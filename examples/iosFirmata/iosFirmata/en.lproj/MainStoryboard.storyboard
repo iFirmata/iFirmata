@@ -138,6 +138,7 @@
                         <segue destination="ctc-tL-cAn" kind="push" identifier="analogPinView" id="fmm-7R-z0S"/>
                         <segue destination="8d9-7T-q1U" kind="push" identifier="shiftPinView" id="ZJb-N5-EVg"/>
                         <segue destination="eMm-iL-zH1" kind="push" identifier="i2cPinView" id="7BL-Xz-MrO"/>
+                        <segue destination="jSJ-QS-3Q1" kind="push" identifier="analogInView" id="SAu-Vc-1e0"/>
                     </connections>
                 </tableViewController>
                 <exit id="LLQ-Tm-DQJ" userLabel="Exit" sceneMemberID="exit"/>
@@ -359,6 +360,11 @@
                                 <segue destination="jUF-0w-xWn" kind="unwind" unwindAction="reset:" id="fcG-RJ-L8F"/>
                             </connections>
                         </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="YT2-EG-JfZ">
+                            <connections>
+                                <action selector="refresh:" destination="u5g-SY-Bhl" id="qAK-S0-Kh2"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="deviceLabel" destination="n0D-Nv-kTp" id="YZQ-9k-MEI"/>
@@ -475,6 +481,85 @@
                 <exit id="m2t-Pr-bsk" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="2038" y="292"/>
+        </scene>
+        <!--Pin View Controller - Analog Settings-->
+        <scene sceneID="bT8-L7-xI7">
+            <objects>
+                <viewController id="jSJ-QS-3Q1" customClass="PinViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Ndc-MW-XIV">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pin: " lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="JMd-3V-2Yg">
+                                <rect key="frame" x="20" y="105" width="42" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="06h-2A-0eA">
+                                <rect key="frame" x="183" y="150" width="51" height="31"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <connections>
+                                    <action selector="toggleReporting:" destination="jSJ-QS-3Q1" eventType="valueChanged" id="zp0-2P-DIy"/>
+                                </connections>
+                            </switch>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reporting" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="s2k-sy-SDD">
+                                <rect key="frame" x="20" y="155" width="76" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="KQY-Hg-WFi">
+                                <rect key="frame" x="70" y="105" width="42" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Wkb-a3-mub">
+                                <rect key="frame" x="20" y="76" width="280" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="xvk-FU-DrN">
+                                <rect key="frame" x="243" y="105" width="57" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Value:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="tl9-dA-fuq">
+                                <rect key="frame" x="183" y="105" width="47" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Analog Settings" id="hyG-00-AgE">
+                        <barButtonItem key="leftBarButtonItem" title="back" id="0Mn-gV-Yba">
+                            <connections>
+                                <segue destination="bfN-Cb-pHa" kind="unwind" unwindAction="reset:" id="FiY-Ut-w6C"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="lum-BI-bbp">
+                            <connections>
+                                <action selector="refresh:" destination="jSJ-QS-3Q1" id="MAy-GX-EIe"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="deviceLabel" destination="Wkb-a3-mub" id="Qcy-oI-1Wp"/>
+                        <outlet property="pinLabel" destination="KQY-Hg-WFi" id="FDc-cV-QiA"/>
+                        <outlet property="pinStatus" destination="xvk-FU-DrN" id="JWy-Jf-2ji"/>
+                        <outlet property="reportSwitch" destination="06h-2A-0eA" id="MXy-X3-llr"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="SSH-c9-P80" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="bfN-Cb-pHa" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="2442" y="292"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="LPe-i7-pMG">

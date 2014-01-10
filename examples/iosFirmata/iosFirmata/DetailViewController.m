@@ -92,6 +92,7 @@ UITapGestureRecognizer *_tap;
         dest.currentFirmata = currentFirmata;
         dest.pinsArray = pinsArray;
         dest.pinNumber = indexPath.row;
+        dest.analogMapping = analogMapping;
         [tableUpdate invalidate];
     }
     
@@ -166,8 +167,8 @@ UITapGestureRecognizer *_tap;
         [cell.modeButton setTitle:currentModeString forState:UIControlStateNormal ];
     }
     
-    //no accessory if analog or unknown
-    if(currentModeNumber>0 && currentMode!=ANALOG ){
+    //no accessory if unknown
+    if(currentModeNumber>0 ){
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
     }else{
         [cell setAccessoryType:UITableViewCellAccessoryNone];
@@ -193,13 +194,11 @@ UITapGestureRecognizer *_tap;
     NSDictionary *pin = [pinsArray objectAtIndex:indexPath.row];
 
     NSNumber *currentModeNumber =  [pin objectForKey:@"currentMode"];
-    
-    PINMODE mode = [currentModeNumber intValue];
 
-    //#define pinmodeArray @"input", @"output", @"analog", @"pwm", @"servo", @"shift", @"i2c", nil
+    if(currentModeNumber){
+        
+        PINMODE mode = [currentModeNumber intValue];
 
-    if(currentModeNumber)
-    {
         switch (mode) {
             case INPUT:
             case OUTPUT:
@@ -217,6 +216,10 @@ UITapGestureRecognizer *_tap;
                 
             case SHIFT:
                 [self performSegueWithIdentifier: @"shiftPinView" sender:self];
+                break;
+                
+            case ANALOG:
+                [self performSegueWithIdentifier: @"analogInView" sender:self];
                 break;
 
             default:
@@ -327,6 +330,7 @@ UITapGestureRecognizer *_tap;
         NSDictionary *aPin = pinsArray[pin];
         [aPin setValue:[NSNumber numberWithInt:status] forKey:@"lastvalue"];
         [aPin setValue:[NSNumber numberWithInt:INPUT] forKey:@"currentMode"];
+
         _REFRESH = YES;
     }
 
@@ -362,7 +366,8 @@ UITapGestureRecognizer *_tap;
         {
             [currentFirmata samplingInterval:1000]; //bluetooth really can't support more
         
-        }else if (newMode == I2C){
+        }else if (newMode == I2C)
+        {
             
             [currentFirmata i2cConfig:0 data:[[NSData alloc]init]];
             
@@ -375,6 +380,7 @@ UITapGestureRecognizer *_tap;
         [pin removeObjectForKey:@"lastvalue"];
         [currentFirmata setPinMode:actionSheet.tag mode:newMode];
         [pin setValue:[NSNumber numberWithInt:newMode] forKey:@"currentMode"];
+
         _REFRESH = YES;
     }
 

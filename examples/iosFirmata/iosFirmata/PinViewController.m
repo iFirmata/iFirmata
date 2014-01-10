@@ -28,6 +28,9 @@
 @synthesize activeField;
 @synthesize pinsArray;
 @synthesize pinNumber;
+@synthesize analogMapping;
+@synthesize ignoreReporting;
+@synthesize ignoreTimer;
 
 #pragma mark -
 #pragma mark View lifecycle
@@ -143,10 +146,13 @@
 
 - (void) didReceiveAnalogPin:(int)pin value:(unsigned short)value
 {
-    if(pin == [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue])
+    int translatedPin = [(NSNumber*)[analogMapping objectForKey:[NSNumber numberWithInt:pin]] intValue];
+
+    if( translatedPin == [[pinDictionary valueForKey:@"firmatapin"] intValue] && !ignoreReporting)
     {
         NSLog(@"Analog update pin: %i, value:%i", pin, value);
         [pinStatus setText:[[NSString alloc] initWithFormat:@"%i",value] ];
+        [reportSwitch setOn:YES]; //were getting status from it, must be on?
     }
 }
 
@@ -157,7 +163,7 @@
 
 - (void) didReceiveDigitalPin:(int)pin status:(BOOL)status
 {
-    if(pin == [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue])
+    if(pin == [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue] && ignoreReporting)
     {
         [pinDictionary setObject:[NSNumber numberWithInt:status] forKey:@"lastvalue"];
 
@@ -350,23 +356,60 @@
 
 -(IBAction)toggleReporting:(id)sender
 {
+    
+    NSNumber *currentModeNumber =  [pinDictionary objectForKey:@"currentMode"];
+    PINMODE currentMode = [currentModeNumber intValue];
+    
     if([sender isOn])
     {
-        [currentFirmata samplingInterval:1000]; //bluetooth really can't support more
-        NSLog(@"Enabling digital reporting for port");
-        [currentFirmata reportDigital:[currentFirmata portForPin:
-                                            [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]
-                                      enable:YES];
-        //[pinStatus setEnabled:YES];
+        if(currentMode == ANALOG)
+        {
+            NSLog(@"Enabling analog pin reporting");
+            [currentFirmata samplingInterval:1000]; //bluetooth really can't support more
+            [currentFirmata reportAnalog:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]
+                                          enable:YES];
+        }else{
+            
+            NSLog(@"Enabling digital reporting for port");
+            [currentFirmata reportDigital:[currentFirmata portForPin:
+                                           [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]
+                                   enable:YES];
+        }
+        
     }else
     {
-        NSLog(@"Disabling Pins on port");
-        [currentFirmata reportDigital:[currentFirmata portForPin:
-                                       [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]
-                               enable:NO];
-        //[pinStatus setEnabled:NO];
+        if(currentMode == ANALOG)
+        {
+            NSLog(@"Disabling analog reporting");
+            
+            NSArray *pins = [analogMapping allKeysForObject:[NSNumber numberWithInt: [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]];
+
+            [currentFirmata reportAnalog:[(NSNumber*)[pins lastObject] intValue]
+                                   enable:NO];
+            //ignore the next second or so of calls
+            ignoreReporting = YES;
+            ignoreTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                           target:self
+                                                         selector:@selector(disableIgnore)
+                                                         userInfo:nil
+                                                          repeats:NO];
+            
+            
+        }else
+        {
+            NSLog(@"Disabling digital reporting for port");
+            [currentFirmata reportDigital:[currentFirmata portForPin:
+                                           [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]
+                                   enable:NO];
+        }
+
     }
 }
+
+-(void)disableIgnore{
+    ignoreReporting = NO;
+}
+
 
 -(IBAction)slider:(id)sender{
     

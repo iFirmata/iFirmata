@@ -25,6 +25,9 @@
 @property (strong, nonatomic) IBOutlet UIScrollView     *scrollView;
 @property (strong, nonatomic) UITextField               *activeField;
 @property (strong, nonatomic) NSMutableArray            *pinsArray;
+@property (retain, nonatomic) NSMutableDictionary       *analogMapping;
+@property (retain, nonatomic) NSTimer                   *ignoreTimer;
+@property                     bool                      ignoreReporting;
 @property                     int                       pinNumber;
 
 -(IBAction)sendi2c:(id)sender;
