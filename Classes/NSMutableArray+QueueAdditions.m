@@ -14,7 +14,6 @@
     // if ([self count] == 0) return nil; // to avoid raising exception (Quinn)
     id headObject = [self objectAtIndex:0];
     if (headObject != nil) {
-        [[headObject retain] autorelease]; // so it isn't dealloc'ed on remove
         [self removeObjectAtIndex:0];
     }
     return headObject;
