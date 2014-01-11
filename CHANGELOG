@@ -1,0 +1,12 @@
+# Changelog
+
+## Version 0.1.0
+
+*Bump to ios 6 as in truth we actually were io6 becuase of refresh
+*Require openble 0.0.3 for didwrite callback
+*Update all firmata calls to take a callback
+*Made example use new async callback style
+
+## Version 0.0.1
+
+*FIRST
