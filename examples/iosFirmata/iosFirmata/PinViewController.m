@@ -88,7 +88,7 @@
     
     deviceLabel.text = [[[currentFirmata currentlyDisplayingService] peripheral] name];
     
-    [currentFirmata pinStateQuery:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]];
+    [currentFirmata pinStateQuery:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue] selector:@selector(alertError:)];
 
     //fix for uiscrollview
     //http://stackoverflow.com/questions/8528134/uiscrollview-not-scrolling-when-keyboard-covers-active-uitextfield-using-apple
@@ -156,11 +156,6 @@
     }
 }
 
-
-- (void) didReceiveDigitalPort:(int)port mask:(unsigned short)mask
-{
-}
-
 - (void) didReceiveDigitalPin:(int)pin status:(BOOL)status
 {
     if(pin == [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue] && ignoreReporting)
@@ -173,11 +168,6 @@
         [reportSwitch setOn:YES]; //were getting status from it, must be on?
 
     }
-}
-
-- (void) didConnect
-{
-    
 }
 
 - (void) didDisconnect
@@ -205,26 +195,6 @@
         [pinStatus setText:[[NSString alloc] initWithFormat:@"%i",value] ];
 
     }
-}
-
--(void) didReportVersionMajor:(unsigned short)major minor:(unsigned short)minor
-{
-    
-}
-
--(void)didReportFirmware:(NSString *)name major:(unsigned short)major minor:(unsigned short)minor
-{
-    
-}
-
--(void) didUpdateCapability:(NSMutableArray *)pins
-{
-    
-}
-
--(void) didUpdateAnalogMapping:(NSMutableDictionary *)analogMapping
-{
-    
 }
 
 
@@ -303,19 +273,22 @@
 /****************************************************************************/
 -(IBAction)toggleMode:(id)sender
 {
+    PINMODE modeToSend;
+    
     if([sender isOn])
     {
+        modeToSend = INPUT;
         NSLog(@"Setting Input");
-        [currentFirmata setPinMode:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]
-         mode:INPUT];
-        [self refresh:nil]; //wasteful but lets call and get true status
     }else
     {
+        modeToSend = OUTPUT;
         NSLog(@"Setting Output");
-        [currentFirmata setPinMode:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]
-                              mode:OUTPUT];
-        [self refresh:nil]; //wasteful but lets call and get true status
     }
+    
+    //wasteful but when it completes, lets call and get true status
+    [currentFirmata setPinMode:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]
+                          mode:modeToSend selector:@selector(refresh:)];
+
 }
 
 -(IBAction)toggleValue:(id)sender
@@ -349,9 +322,8 @@
         mask &= ~( 1<< (pinNumber % 8) );
     }
     
-    [currentFirmata digitalMessagePort:port mask:mask];
-    
-    [self refresh:nil]; //wasteful but lets call and get true status
+    //wasteful but when it completes, lets call and get true status
+    [currentFirmata digitalMessagePort:port mask:mask selector:@selector(refresh:)];
 }
 
 -(IBAction)toggleReporting:(id)sender
@@ -365,15 +337,15 @@
         if(currentMode == ANALOG)
         {
             NSLog(@"Enabling analog pin reporting");
-            [currentFirmata samplingInterval:1000]; //bluetooth really can't support more
+            [currentFirmata samplingInterval:1000 selector:@selector(alertError:)]; //bluetooth really can't support more
             [currentFirmata reportAnalog:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]
-                                          enable:YES];
+                                          enable:YES selector:@selector(alertError:)];
         }else{
             
             NSLog(@"Enabling digital reporting for port");
             [currentFirmata reportDigital:[currentFirmata portForPin:
                                            [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]
-                                   enable:YES];
+                                   enable:YES selector:@selector(alertError:)];
         }
         
     }else
@@ -385,7 +357,7 @@
             NSArray *pins = [analogMapping allKeysForObject:[NSNumber numberWithInt: [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]];
 
             [currentFirmata reportAnalog:[(NSNumber*)[pins lastObject] intValue]
-                                   enable:NO];
+                                   enable:NO selector:@selector(alertError:)];
             //ignore the next second or so of calls
             ignoreReporting = YES;
             ignoreTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
@@ -400,7 +372,7 @@
             NSLog(@"Disabling digital reporting for port");
             [currentFirmata reportDigital:[currentFirmata portForPin:
                                            [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]
-                                   enable:NO];
+                                   enable:NO selector:@selector(alertError:)];
         }
 
     }
@@ -415,7 +387,9 @@
     
     NSLog(@"%f", pinSlider.value);
     [pinStatus setText:[[NSString alloc] initWithFormat:@"%d",(int)pinSlider.value] ];
-    [currentFirmata analogMessagePin:[[pinDictionary valueForKey:@"firmatapin"] intValue] value:pinSlider.value];
+
+    //wasteful but when it completes, lets call and get true status
+    [currentFirmata analogMessagePin:[[pinDictionary valueForKey:@"firmatapin"] intValue] value:pinSlider.value selector:@selector(refresh:)];
 
 }
 
@@ -424,7 +398,6 @@
     NSString *input;
 
     if([[i2cPayloadTextField text] length] > 0 && [[i2cAddressTextField text] length] > 0 ){
-        
         
         //pad to even if need be
         if([[i2cPayloadTextField text] length] % 2 !=0 )
@@ -450,14 +423,24 @@
             [data appendBytes:&wholeByte length:1];
         }
         NSLog(@"%@", data);
-        [currentFirmata i2cRequest:WRITE address:[[i2cAddressTextField text] intValue ] data:data];
+        [currentFirmata i2cRequest:WRITE address:[[i2cAddressTextField text] intValue ] data:data selector:@selector(alertError:)];
     }
 }
 
 -(IBAction)refresh:(id)sender
 {
-    [currentFirmata pinStateQuery:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]];
+    [currentFirmata pinStateQuery:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue] selector:@selector(alertError:)];
 }
 
+-(void) alertError:(NSError*)error{
+    if(error){
+        UIAlertView *alert = [[UIAlertView alloc]
+                              initWithTitle:@"Send Failed" message:@"Send to device failed. Try again or reset the device" delegate:nil
+                              cancelButtonTitle:nil otherButtonTitles:@"OK", nil];
+        [alert show];
+        
+    }
+    
+}
 
 @end

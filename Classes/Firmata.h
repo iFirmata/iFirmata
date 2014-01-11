@@ -1,6 +1,6 @@
 //
 //  Firmata.h
-//  TemperatureSensor
+//  
 //
 //  Created by Jacob on 11/11/13.
 //  Copyright (c) 2013 Apple Inc. All rights reserved.
@@ -74,6 +74,7 @@ typedef enum {
 
 @protocol FirmataProtocol<NSObject>
 
+@optional
 - (void) didDisconnect;
 - (void) didConnect;
 - (void) didUpdatePin:(int)pin currentMode:(PINMODE)mode value:(unsigned short int)value;
@@ -85,6 +86,7 @@ typedef enum {
 - (void) didReceiveDigitalPin:(int)pin status:(BOOL)status;
 - (void) didUpdateAnalogMapping:(NSMutableDictionary *)analogMapping;
 - (void) didReceiveStringData:(NSString*)string;
+
 @end
 
 
@@ -100,6 +102,7 @@ typedef enum {
 @property (strong, nonatomic) NSMutableDictionary   *analogMapping;
 @property (strong, nonatomic) NSMutableArray        *ports;
 @property (strong, nonatomic) NSMutableArray        *pins;
+@property (strong, nonatomic) NSMutableArray        *selectorQueue;
 
 - (id) initWithService:(LeDataService*)service controller:(id<FirmataProtocol>)controller;
 - (void) setController:(id<FirmataProtocol>)controller;
@@ -107,32 +110,31 @@ typedef enum {
 - (NSString*) pinmodeEnumToString:(PINMODE)enumVal;
 - (PINMODE) modeStringToEnum:(NSString*)strVal;
 
-- (void) reset;
+- (void) reset:(SEL)aSelector;
 //- (void) start;
 
-- (void) pinStateQuery:(int)pin;
-- (void) reportFirmware;
-- (void) reportVersion;
+- (void) pinStateQuery:(int)pin selector:(SEL)aSelector;
+- (void) reportFirmware:(SEL)aSelector;
+- (void) reportVersion:(SEL)aSelector;
 
-- (void) analogMappingQuery;
-- (void) capabilityQuery;
+- (void) analogMappingQuery:(SEL)aSelector;
+- (void) capabilityQuery:(SEL)aSelector;
 
-- (void) i2cConfig:(unsigned short int)delay data:(NSData *)data;
-- (void) i2cRequest:(I2CMODE)i2cMode address:(unsigned short int)address data:(NSData *)data;
+- (void) i2cConfig:(unsigned short int)delay data:(NSData *)data selector:(SEL)aSelector;
+- (void) i2cRequest:(I2CMODE)i2cMode address:(unsigned short int)address data:(NSData *)data selector:(SEL)aSelector;
 
-- (void) reportDigital:(int)port enable:(BOOL)enable;
-- (void) reportAnalog:(int)pin enable:(BOOL)enable;
+- (void) reportDigital:(int)port enable:(BOOL)enable selector:(SEL)aSelector;
+- (void) reportAnalog:(int)pin enable:(BOOL)enable selector:(SEL)aSelector;
 
-- (void) analogMessagePin:(int)pin value:(unsigned short int)value;
-- (void) digitalMessagePort:(int)port mask:(unsigned short int)mask;
+- (void) analogMessagePin:(int)pin value:(unsigned short int)value selector:(SEL)aSelector;
+- (void) digitalMessagePort:(int)port mask:(unsigned short int)mask selector:(SEL)aSelector;
 
-- (void) setPinMode:(int)pin mode:(PINMODE)mode;
+- (void) setPinMode:(int)pin mode:(PINMODE)mode selector:(SEL)aSelector;
 
-- (void) samplingInterval:(unsigned short int)intervalMilliseconds;
-- (void) servoConfig:(int)pin minPulse:(unsigned short int)minPulse maxPulse:(unsigned short int)maxPulse;
+- (void) samplingInterval:(unsigned short int)intervalMilliseconds selector:(SEL)aSelector;
+- (void) servoConfig:(int)pin minPulse:(unsigned short int)minPulse maxPulse:(unsigned short int)maxPulse selector:(SEL)aSelector;
 
-- (void) stringData:(NSString*)string;
-
+- (void) stringData:(NSString*)string selector:(SEL)aSelector;
 /* Behave properly when heading into and out of the background */
 
 - (int) portForPin:(int)pin;

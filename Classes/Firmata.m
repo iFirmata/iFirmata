@@ -1,6 +1,6 @@
 //
 //  Firmata.m
-//  TemperatureSensor
+//  
 //
 //  Created by Jacob on 11/11/13.
 //  Copyright (c) 2013 Apple Inc. All rights reserved.
@@ -8,6 +8,7 @@
 
 #import "Firmata.h"
 #import "LeDataService.h"
+#import "NSMutableArray+QueueAdditions.h"
 
 @interface Firmata()  <LeDataProtocol>{
 @private
@@ -25,6 +26,7 @@
 @synthesize analogMapping;
 @synthesize ports;
 @synthesize pins;
+@synthesize selectorQueue;
 
 // Place this in the .m file, inside the @implementation block
 // A method to convert an enum to string
@@ -65,6 +67,7 @@
         
         peripheralDelegate = controller;
         
+        selectorQueue = [[NSMutableArray alloc] init];
 	}
     return self;
 }
@@ -340,13 +343,17 @@ The pin "state" is any data written to the pin. For output modes (digital output
 /*				Firmata Delegate Methods                                    */
 /****************************************************************************/
 // * system reset
-- (void) reset
+- (void) reset:(SEL)aSelector
 {
     const unsigned char bytes[] = {START_SYSEX, RESET, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
     
     NSLog(@"reset bytes in hex: %@", [dataToSend description]);
     
+    if(aSelector)
+        [selectorQueue enqueue:NSStringFromSelector(aSelector)];
+    else
+        [selectorQueue enqueue:[[NSString alloc] init]];
     [currentlyDisplayingService write:dataToSend];
 }
 
@@ -355,37 +362,49 @@ The pin "state" is any data written to the pin. For output modes (digital output
  * 1  queryFirmware (0x79)
  * 2  END_SYSEX (0xF7)
  */
-- (void) reportFirmware
+- (void) reportFirmware:(SEL)aSelector
 {
     const unsigned char bytes[] = {START_SYSEX, REPORT_FIRMWARE, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
 
     NSLog(@"reportFirmware bytes in hex: %@", [dataToSend description]);
     
+    if(aSelector)
+        [selectorQueue enqueue:NSStringFromSelector(aSelector)];
+    else
+        [selectorQueue enqueue:[[NSString alloc] init]];
     [currentlyDisplayingService write:dataToSend];
 }
 
 /* request version report
  * 0  request version report (0xF9) (MIDI Undefined)
  */
-- (void) reportVersion
+- (void) reportVersion:(SEL)aSelector
 {
     const unsigned char bytes[] = {REPORT_VERSION};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
     
     NSLog(@"reportVersion bytes in hex: %@", [dataToSend description]);
     
+    if(aSelector)
+        [selectorQueue enqueue:NSStringFromSelector(aSelector)];
+    else
+        [selectorQueue enqueue:[[NSString alloc] init]];
     [currentlyDisplayingService write:dataToSend];
 }
 
 // analog I/O message    0xE0   pin #      LSB(bits 0-6)         MSB(bits 7-13)
-- (void) analogMessagePin:(int)pin value:(unsigned short int)value
+- (void) analogMessagePin:(int)pin value:(unsigned short int)value selector:(SEL)aSelector
 {
     const unsigned char bytes[] = {ANALOG_MESSAGE + pin, value & 0x7f, (value>>7) & 0x7f};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
 
     NSLog(@"analogMessagePin bytes in hex: %@", [dataToSend description]);
 
+    if(aSelector)
+        [selectorQueue enqueue:NSStringFromSelector(aSelector)];
+    else
+        [selectorQueue enqueue:[[NSString alloc] init]];
     [currentlyDisplayingService write:dataToSend];
 }
 
@@ -394,26 +413,34 @@ The pin "state" is any data written to the pin. For output modes (digital output
  * 1  digital pins 0-6 bitmask
  * 2  digital pin 7 bitmask
  */
-- (void) digitalMessagePort:(int)port mask:(unsigned short int)mask
+- (void) digitalMessagePort:(int)port mask:(unsigned short int)mask selector:(SEL)aSelector
 {
     const unsigned char bytes[] = {DIGITAL_MESSAGE + port, mask & 0x7f, (mask>>7) & 0x7f};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
     
     NSLog(@"digitalMessagePin bytes in hex: %@", [dataToSend description]);
     
+    if(aSelector)
+        [selectorQueue enqueue:NSStringFromSelector(aSelector)];
+    else
+        [selectorQueue enqueue:[[NSString alloc] init]];
     [currentlyDisplayingService write:dataToSend];
 }
 
 /*
  * report analog pin     0xC0   pin #      disable/enable(0/1)   - n/a -
  */
-- (void) reportAnalog:(int)pin enable:(BOOL)enable
+- (void) reportAnalog:(int)pin enable:(BOOL)enable selector:(SEL)aSelector
 {
     const unsigned char bytes[] = {REPORT_ANALOG + pin, enable};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
 
     NSLog(@"reportAnalog bytes in hex: %@", [dataToSend description]);
     
+    if(aSelector)
+        [selectorQueue enqueue:NSStringFromSelector(aSelector)];
+    else
+        [selectorQueue enqueue:[[NSString alloc] init]];
     [currentlyDisplayingService write:dataToSend];
 }
 
@@ -421,13 +448,17 @@ The pin "state" is any data written to the pin. For output modes (digital output
  * 0  toggle digital port reporting (0xD0-0xDF) (MIDI Aftertouch)
  * 1  disable(0)/enable(non-zero)
  */
-- (void) reportDigital:(int)port enable:(BOOL)enable
+- (void) reportDigital:(int)port enable:(BOOL)enable selector:(SEL)aSelector
 {
     const unsigned char bytes[] = {REPORT_DIGITAL + port, enable};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
 
     NSLog(@"reportDigital bytes in hex: %@", [dataToSend description]);
     
+    if(aSelector)
+        [selectorQueue enqueue:NSStringFromSelector(aSelector)];
+    else
+        [selectorQueue enqueue:[[NSString alloc] init]];
     [currentlyDisplayingService write:dataToSend];
 }
 
@@ -436,13 +467,17 @@ The pin "state" is any data written to the pin. For output modes (digital output
  * 2  pin number (0-127)
  * 3  state (INPUT/OUTPUT/ANALOG/PWM/SERVO, 0/1/2/3/4)
  */
-- (void) setPinMode:(int)pin mode:(PINMODE)mode
+- (void) setPinMode:(int)pin mode:(PINMODE)mode selector:(SEL)aSelector
 {
     const unsigned char bytes[] = {SET_PIN_MODE, pin, mode};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
  
     NSLog(@"setPinMode bytes in hex: %@", [dataToSend description]);
 
+    if(aSelector)
+        [selectorQueue enqueue:NSStringFromSelector(aSelector)];
+    else
+        [selectorQueue enqueue:[[NSString alloc] init]];
     [currentlyDisplayingService write:dataToSend];
 }
 
@@ -452,12 +487,17 @@ The pin "state" is any data written to the pin. For output modes (digital output
  * 1  analog mapping query (0x69)
  * 2  END_SYSEX (0xF7) (MIDI End of SysEx - EOX)
  */
-- (void) analogMappingQuery
+- (void) analogMappingQuery:(SEL)aSelector
 {
     const unsigned char bytes[] = {START_SYSEX, ANALOG_MAPPING_QUERY, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
 
     NSLog(@"analogMappingQuery bytes in hex: %@", [dataToSend description]);
+    
+    if(aSelector)
+        [selectorQueue enqueue:NSStringFromSelector(aSelector)];
+    else
+        [selectorQueue enqueue:[[NSString alloc] init]];
     
     [currentlyDisplayingService write:dataToSend];
 }
@@ -468,13 +508,17 @@ The pin "state" is any data written to the pin. For output modes (digital output
  * 1  capabilities query (0x6B)
  * 2  END_SYSEX (0xF7) (MIDI End of SysEx - EOX)
  */
-- (void) capabilityQuery
+- (void) capabilityQuery:(SEL)aSelector
 {
     const unsigned char bytes[] = {START_SYSEX, CAPABILITY_QUERY, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
 
     NSLog(@"capabilityQuery bytes in hex: %@", [dataToSend description]);
 
+    if(aSelector)
+        [selectorQueue enqueue:NSStringFromSelector(aSelector)];
+    else
+        [selectorQueue enqueue:[[NSString alloc] init]];
     [currentlyDisplayingService write:dataToSend];
 }
 
@@ -485,13 +529,17 @@ The pin "state" is any data written to the pin. For output modes (digital output
  * 2  pin (0 to 127)
  * 3  END_SYSEX (0xF7) (MIDI End of SysEx - EOX)
  */
-- (void) pinStateQuery:(int)pin
+- (void) pinStateQuery:(int)pin selector:(SEL)aSelector
 {
     const unsigned char bytes[] = {START_SYSEX, PIN_STATE_QUERY, pin, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
 
     NSLog(@"pinStateQuery bytes in hex: %@", [dataToSend description]);
     
+    if(aSelector)
+        [selectorQueue enqueue:NSStringFromSelector(aSelector)];
+    else
+        [selectorQueue enqueue:[[NSString alloc] init]];
     [currentlyDisplayingService write:dataToSend];
 
 }
@@ -507,13 +555,17 @@ The pin "state" is any data written to the pin. For output modes (digital output
  * 6  maxPulse MSB (7-13)
  * 7  END_SYSEX (0xF7)
  */
-- (void) servoConfig:(int)pin minPulse:(unsigned short int)minPulse maxPulse:(unsigned short int)maxPulse
+- (void) servoConfig:(int)pin minPulse:(unsigned short int)minPulse maxPulse:(unsigned short int)maxPulse selector:(SEL)aSelector
 {
     const unsigned char bytes[] = {START_SYSEX, SERVO_CONFIG, pin, minPulse & 0x7f, minPulse>>7 & 0x7f, maxPulse & 0x7f, maxPulse>>7 & 0x7f, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
 
     NSLog(@"servoConfig bytes in hex: %@", [dataToSend description]);
     
+    if(aSelector)
+        [selectorQueue enqueue:NSStringFromSelector(aSelector)];
+    else
+        [selectorQueue enqueue:[[NSString alloc] init]];
     [currentlyDisplayingService write:dataToSend];
 }
 
@@ -527,7 +579,8 @@ The pin "state" is any data written to the pin. For output modes (digital output
  * n  END_SYSEX (0xF7)
  */
 // default delay time between i2c read request and Wire.requestFrom()
-- (void) i2cConfig:(unsigned short int)delay data:(NSData *)data{
+- (void) i2cConfig:(unsigned short int)delay data:(NSData *)data selector:(SEL)aSelector
+{
 
     const unsigned char first[] = {START_SYSEX, I2C_CONFIG, delay, delay>>8};
     NSMutableData *dataToSend = [[NSMutableData alloc] initWithBytes:first length:sizeof(first)];
@@ -549,6 +602,10 @@ The pin "state" is any data written to the pin. For output modes (digital output
 
     NSLog(@"i2cConfig bytes in hex: %@", [dataToSend description]);
     
+    if(aSelector)
+        [selectorQueue enqueue:NSStringFromSelector(aSelector)];
+    else
+        [selectorQueue enqueue:[[NSString alloc] init]];
     [currentlyDisplayingService write:dataToSend];
 }
 
@@ -568,7 +625,8 @@ The pin "state" is any data written to the pin. For output modes (digital output
  * ...
  * n  END_SYSEX (0xF7)
  */
-- (void) i2cRequest:(I2CMODE)i2cMode address:(unsigned short int)address data:(NSData *)data{
+- (void) i2cRequest:(I2CMODE)i2cMode address:(unsigned short int)address data:(NSData *)data selector:(SEL)aSelector
+{
     
     const unsigned char first[] = {START_SYSEX, I2C_REQUEST, address, i2cMode};
     NSMutableData *dataToSend = [[NSMutableData alloc] initWithBytes:first length:sizeof(first)];
@@ -590,6 +648,10 @@ The pin "state" is any data written to the pin. For output modes (digital output
     
     NSLog(@"i2cRequest bytes in hex: %@", [dataToSend description]);
 
+    if(aSelector)
+        [selectorQueue enqueue:NSStringFromSelector(aSelector)];
+    else
+        [selectorQueue enqueue:[[NSString alloc] init]];
     [currentlyDisplayingService write:dataToSend];
 }
 
@@ -613,7 +675,8 @@ The pin "state" is any data written to the pin. For output modes (digital output
 //    [currentlyDisplayingService write:dataToSend];
 //}
 
-- (void) stringData:(NSString*)string{
+- (void) stringData:(NSString*)string selector:(SEL)aSelector
+{
     
     const unsigned char first[] = {START_SYSEX, STRING_DATA};
         
@@ -638,6 +701,10 @@ The pin "state" is any data written to the pin. For output modes (digital output
     
     NSLog(@"stringData bytes in hex: %@", [dataToSend description]);
 
+    if(aSelector)
+        [selectorQueue enqueue:NSStringFromSelector(aSelector)];
+    else
+        [selectorQueue enqueue:[[NSString alloc] init]];
     [currentlyDisplayingService write:dataToSend];
 }
 
@@ -659,13 +726,17 @@ The pin "state" is any data written to the pin. For output modes (digital output
  * 3  sampling interval on the millisecond time scale (MSB)
  * 4  END_SYSEX (0xF7)
  */
-- (void) samplingInterval:(unsigned short int)intervalMilliseconds
+- (void) samplingInterval:(unsigned short int)intervalMilliseconds selector:(SEL)aSelector
 {
     const unsigned char bytes[] = {START_SYSEX, SAMPLING_INTERVAL, intervalMilliseconds & 0x7f, (intervalMilliseconds>>7) & 0x7f, END_SYSEX};
     NSData *dataToSend = [[NSData alloc] initWithBytes:bytes length:sizeof(bytes)];
 
     NSLog(@"samplingInterval bytes in hex: %@", [dataToSend description]);
     
+    if(aSelector)
+        [selectorQueue enqueue:NSStringFromSelector(aSelector)];
+    else
+        [selectorQueue enqueue:[[NSString alloc] init]];
     [currentlyDisplayingService write:dataToSend];
 }
 
@@ -817,5 +888,21 @@ The pin "state" is any data written to the pin. For output modes (digital output
     }
 }
 
+- (void) didWriteFromService:(LeDataService *)service withError:(NSError *)error
+{
+    NSLog(@"did write %@", error);
+    
+    SEL aSelector = nil;
+    
+    //pop selector off queue and fire
+    NSString *selectorString = (NSString*)[selectorQueue dequeue];
+    
+    if(selectorString && [selectorString length] > 0)
+        aSelector = NSSelectorFromString(selectorString);
+    
+    if(aSelector)
+        [peripheralDelegate performSelector:aSelector withObject:error];
+
+}
 
 @end

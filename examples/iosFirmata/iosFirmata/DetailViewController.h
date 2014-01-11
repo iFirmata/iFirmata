@@ -17,10 +17,13 @@
 @property (retain, nonatomic) IBOutlet UITableView      *pinsTable;
 @property (strong, nonatomic) IBOutlet UILabel          *firmwareVersion;
 @property (strong, nonatomic) IBOutlet UITextField      *stringToSend;
+@property (weak, nonatomic)   IBOutlet UIBarButtonItem  *refreshButton;
+
 
 @property (retain, nonatomic) NSMutableArray            *pinsArray;
 @property (retain, nonatomic) NSMutableDictionary       *analogMapping;
 @property (retain, nonatomic) NSTimer                   *tableUpdate;
+@property int                                           refreshCounter;
 
 @property BOOL                                          REFRESH;
 

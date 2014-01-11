@@ -133,6 +133,7 @@
                     <connections>
                         <outlet property="currentlyConnectedSensor" destination="1TV-TR-Zha" id="j9g-MF-4hI"/>
                         <outlet property="pinsTable" destination="Dk7-3f-XyV" id="oeJ-0G-dPO"/>
+                        <outlet property="refreshButton" destination="OL3-z3-YpW" id="lJ1-GQ-OL3"/>
                         <outlet property="stringToSend" destination="Cej-WQ-40m" id="eD7-eq-TdY"/>
                         <segue destination="u5g-SY-Bhl" kind="push" identifier="digitalPinView" id="RIi-Mu-car"/>
                         <segue destination="ctc-tL-cAn" kind="push" identifier="analogPinView" id="fmm-7R-z0S"/>
@@ -218,7 +219,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SBn-RO-T0O" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="qrL-iI-aTO" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="2168" y="-277"/>
+            <point key="canvasLocation" x="2157" y="-332"/>
         </scene>
         <!--Pin View Controller - Shift Settings-->
         <scene sceneID="kJy-AR-aIE">
@@ -284,7 +285,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aKW-O7-ZWh" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="l7X-PY-CO4" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="2571" y="-277"/>
+            <point key="canvasLocation" x="2569" y="-332"/>
         </scene>
         <!--Pin View Controller - Digital Settings-->
         <scene sceneID="Cd9-G0-Vx7">

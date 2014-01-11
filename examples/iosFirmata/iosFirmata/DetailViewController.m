@@ -21,6 +21,8 @@
 @synthesize analogMapping;
 @synthesize tableUpdate;
 @synthesize stringToSend;
+@synthesize refreshCounter;
+@synthesize refreshButton;
 
 UITapGestureRecognizer *_tap;
 
@@ -50,7 +52,7 @@ UITapGestureRecognizer *_tap;
 
     if(!pinsArray){
         pinsArray = [[NSMutableArray alloc] init];
-        [currentFirmata analogMappingQuery];
+        [currentFirmata analogMappingQuery:@selector(alertError:)];
     }
     
     _tap = [[UITapGestureRecognizer alloc]
@@ -226,7 +228,6 @@ UITapGestureRecognizer *_tap;
                 break;
         }
     }
-    
 }
 
 
@@ -268,7 +269,7 @@ UITapGestureRecognizer *_tap;
 {
     self.analogMapping = analogMapping;
 
-    [currentFirmata capabilityQuery];
+    [currentFirmata capabilityQuery:@selector(alertError:)];
 }
 
 //returns an NSMutablearray of NSDictionary of modes
@@ -333,7 +334,6 @@ UITapGestureRecognizer *_tap;
 
         _REFRESH = YES;
     }
-
 }
 
 - (void) didConnect
@@ -364,21 +364,21 @@ UITapGestureRecognizer *_tap;
 
         if(newMode == ANALOG)
         {
-            [currentFirmata samplingInterval:1000]; //bluetooth really can't support more
+            [currentFirmata samplingInterval:1000 selector:@selector(alertError:)]; //bluetooth really can't support more
         
         }else if (newMode == I2C)
         {
             
-            [currentFirmata i2cConfig:0 data:[[NSData alloc]init]];
+            [currentFirmata i2cConfig:0 data:[[NSData alloc]init] selector:@selector(alertError:)];
             
             //issue first call never works?
             //https://github.com/firmata/arduino/issues/101
-            [currentFirmata i2cRequest:WRITE address:0 data:nil];
+            [currentFirmata i2cRequest:WRITE address:0 data:nil selector:@selector(alertError:)];
 
         }
         
         [pin removeObjectForKey:@"lastvalue"];
-        [currentFirmata setPinMode:actionSheet.tag mode:newMode];
+        [currentFirmata setPinMode:actionSheet.tag mode:newMode selector:@selector(alertError:)];
         [pin setValue:[NSNumber numberWithInt:newMode] forKey:@"currentMode"];
 
         _REFRESH = YES;
@@ -397,7 +397,6 @@ UITapGestureRecognizer *_tap;
 /****************************************************************************/
 /*                              UI Text Field Methods                       */
 /****************************************************************************/
-
 -(BOOL) textFieldShouldReturn:(UITextField *)textField{
     
     [stringToSend resignFirstResponder];
@@ -414,6 +413,7 @@ UITapGestureRecognizer *_tap;
     [self.view removeGestureRecognizer:_tap];
 }
 
+
 #pragma mark -
 #pragma mark App IO
 /****************************************************************************/
@@ -421,17 +421,22 @@ UITapGestureRecognizer *_tap;
 /****************************************************************************/
 -(IBAction)refresh:(id)sender
 {
-    //blocking delay because some devices can't handle spammed commands
-    //since blocking, lets put it in background
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,
-                                             (unsigned long)NULL), ^(void) {
-        for(int i=0; i<[pinsArray count]; i++)
-        {
-            [currentFirmata pinStateQuery:i];
-            [NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow: 0.4 ]];
-        }
-        
-    });
+    //if from IB reset pin counter, grey out refresh
+    if([sender isKindOfClass:[UIBarButtonItem class]])
+    {
+        refreshCounter = 0;
+        [refreshButton setEnabled:NO];
+    }
+    
+    //call us again if it completes until we get through all pins
+    if(refreshCounter<[pinsArray count]){
+        [currentFirmata pinStateQuery:refreshCounter++ selector:@selector(refresh:)];
+    }
+    
+    //enable refresh if we're done
+    if(refreshCounter == [pinsArray count]){
+        [refreshButton setEnabled:YES];
+    }
 }
 
 - (IBAction)selectMode:(UIButton*)sender {
@@ -468,8 +473,18 @@ UITapGestureRecognizer *_tap;
     [sender resignFirstResponder];
     NSLog(@"Sending ascii: %@", [input text]);
 
-    [currentFirmata stringData:[input text]];
+    [currentFirmata stringData:[input text] selector:@selector(alertError:)];
 }
 
+-(void) alertError:(NSError*)error{
+    if(error){
+        UIAlertView *alert = [[UIAlertView alloc]
+                              initWithTitle:@"Send Failed" message:@"Send to device failed. Try again or reset the device" delegate:nil
+                              cancelButtonTitle:nil otherButtonTitles:@"OK", nil];
+        [alert show];
+
+    }
+
+}
 
 @end
