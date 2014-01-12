@@ -337,9 +337,12 @@
         if(currentMode == ANALOG)
         {
             NSLog(@"Enabling analog pin reporting");
+            
+            NSArray *pins = [analogMapping allKeysForObject:[NSNumber numberWithInt: [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]];
+            
             [currentFirmata samplingInterval:1000 selector:@selector(alertError:)]; //bluetooth really can't support more
-            [currentFirmata reportAnalog:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]
-                                          enable:YES selector:@selector(alertError:)];
+            [currentFirmata reportAnalog:[(NSNumber*)[pins lastObject] intValue]
+                                  enable:YES selector:@selector(alertError:)];
         }else{
             
             NSLog(@"Enabling digital reporting for port");
