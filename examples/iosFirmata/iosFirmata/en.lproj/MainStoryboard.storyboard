@@ -77,15 +77,22 @@
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <button opaque="NO" tag="101" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Xea-4r-Bze">
-                                            <rect key="frame" x="124" y="7" width="72" height="30"/>
+                                            <rect key="frame" x="119" y="7" width="85" height="30"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <state key="normal" title="unknown">
+                                            <state key="normal">
                                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                             </state>
                                             <connections>
                                                 <action selector="selectMode:" destination="62h-Kv-0ar" eventType="touchUpInside" id="bMF-aK-A6N"/>
                                             </connections>
                                         </button>
+                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="unknown" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="oYx-A8-my1">
+                                            <rect key="frame" x="119" y="11" width="85" height="21"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <color key="textColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="value" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="8Mb-st-har">
                                             <rect key="frame" x="225" y="12" width="41" height="21"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -95,6 +102,7 @@
                                     </subviews>
                                 </tableViewCellContentView>
                                 <connections>
+                                    <outlet property="buttonLabel" destination="oYx-A8-my1" id="bMG-KK-YeT"/>
                                     <outlet property="modeButton" destination="Xea-4r-Bze" id="HMM-u3-LtR"/>
                                     <outlet property="name" destination="VVs-pN-q8P" id="iYM-Uw-Pu7"/>
                                     <outlet property="value" destination="8Mb-st-har" id="lTq-ro-doR"/>

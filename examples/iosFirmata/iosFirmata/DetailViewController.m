@@ -166,9 +166,10 @@
         [cell.value setText:@""];
     }
     
-    //in mode changed, change the button text
+    //if mode changed, change the button text
+    //change a label instead of button title because it flashes annoyingly
     if(currentModeNumber){
-        [cell.modeButton setTitle:currentModeString forState:UIControlStateNormal ];
+        [cell.buttonLabel setText:currentModeString];
     }
     
     //no accessory if unknown
