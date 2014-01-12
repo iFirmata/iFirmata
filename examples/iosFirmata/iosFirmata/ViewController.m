@@ -70,13 +70,10 @@
 
 - (void) viewDidUnload
 {
-
     [self setSensorsTable:nil];
-
     [self setConnectedServices:nil];
-
     [self setCurrentlyDisplayingService:nil];
-
+    [self setRefreshControl:nil];
     [[LeDiscovery sharedInstance] stopScanning];
     
     [super viewDidUnload];

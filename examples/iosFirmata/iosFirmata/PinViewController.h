@@ -10,25 +10,28 @@
 #import "Firmata.h"
 
 @interface PinViewController : UIViewController <FirmataProtocol, UITextFieldDelegate>
-@property (strong, nonatomic) Firmata                   *currentFirmata;
-@property (strong, nonatomic) IBOutlet UILabel          *deviceLabel;
-@property (strong, nonatomic) IBOutlet UILabel          *pinStatus;
-@property (strong, nonatomic) IBOutlet UILabel          *pinLabel;
-@property (strong, nonatomic) IBOutlet UISlider         *pinSlider;
-@property (strong, nonatomic) IBOutlet UISwitch         *modeSwitch;
-@property (strong, nonatomic) IBOutlet UISwitch         *statusSwitch;
-@property (strong, nonatomic) IBOutlet UISwitch         *reportSwitch;
-@property (strong, nonatomic) IBOutlet UITextField      *i2cAddressTextField;
-@property (strong, nonatomic) IBOutlet UITextField      *i2cPayloadTextField;
-@property (strong, nonatomic) IBOutlet UITextView       *i2cResultTextView;
-@property (strong, nonatomic) NSMutableDictionary       *pinDictionary;
-@property (strong, nonatomic) IBOutlet UIScrollView     *scrollView;
-@property (strong, nonatomic) UITextField               *activeField;
-@property (strong, nonatomic) NSMutableArray            *pinsArray;
-@property (retain, nonatomic) NSMutableDictionary       *analogMapping;
-@property (retain, nonatomic) NSTimer                   *ignoreTimer;
-@property                     bool                      ignoreReporting;
-@property                     int                       pinNumber;
+
+@property IBOutlet UILabel          *deviceLabel;
+@property IBOutlet UILabel          *pinStatus;
+@property IBOutlet UILabel          *pinLabel;
+@property IBOutlet UISlider         *pinSlider;
+@property IBOutlet UISwitch         *modeSwitch;
+@property IBOutlet UISwitch         *statusSwitch;
+@property IBOutlet UISwitch         *reportSwitch;
+@property IBOutlet UITextField      *i2cAddressTextField;
+@property IBOutlet UITextField      *i2cPayloadTextField;
+@property IBOutlet UITextView       *i2cResultTextView;
+@property IBOutlet UIScrollView     *scrollView;
+
+@property Firmata                   *currentFirmata;
+@property NSMutableDictionary       *pinDictionary;
+@property UITextField               *activeField;
+@property NSMutableArray            *pinsArray;
+@property NSMutableDictionary       *analogMapping;
+@property NSTimer                   *ignoreTimer;
+
+@property bool                      ignoreReporting;
+@property int                       pinNumber;
 
 -(IBAction)sendi2c:(id)sender;
 -(IBAction)toggleValue:(id)sender;

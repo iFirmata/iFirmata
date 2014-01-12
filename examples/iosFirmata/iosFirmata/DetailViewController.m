@@ -23,8 +23,7 @@
 @synthesize stringToSend;
 @synthesize refreshCounter;
 @synthesize refreshButton;
-
-UITapGestureRecognizer *_tap;
+@synthesize tap;
 
 #pragma mark -
 #pragma mark View lifecycle
@@ -55,7 +54,7 @@ UITapGestureRecognizer *_tap;
         [currentFirmata analogMappingQuery:@selector(alertError:)];
     }
     
-    _tap = [[UITapGestureRecognizer alloc]
+    tap = [[UITapGestureRecognizer alloc]
             initWithTarget:self
             action:@selector(textFieldShouldReturn:)];
 
@@ -64,12 +63,16 @@ UITapGestureRecognizer *_tap;
 - (void) viewDidUnload
 {
     [tableUpdate invalidate];
-    tableUpdate = nil;
-    _tap = nil;
-
+    [self setTableUpdate:nil];
+    [self setTap:nil];
     [self setPinsArray:nil];
     [self setCurrentlyConnectedSensor:nil];
     [self setPinsTable:nil];
+    [self setFirmwareVersion:nil];
+    [self setCurrentFirmata:nil];
+    [self setAnalogMapping:nil];
+    [self setStringToSend:nil];
+    [self setRefreshButton:nil];
     
     [super viewDidUnload];
 }
@@ -146,7 +149,6 @@ UITapGestureRecognizer *_tap;
     NSDictionary *pin = [pinsArray objectAtIndex:indexPath.row];
 
     NSNumber *currentModeNumber =  [pin objectForKey:@"currentMode"];
-    PINMODE currentMode = [currentModeNumber intValue];
     
     NSString *currentModeString = [currentFirmata pinmodeEnumToString:[currentModeNumber intValue]];
 
@@ -405,12 +407,12 @@ UITapGestureRecognizer *_tap;
 
 - (IBAction)textFieldDidBeginEditing:(UITextField *)textField
 {
-    [self.view addGestureRecognizer:_tap];
+    [self.view addGestureRecognizer:tap];
 }
 
 - (IBAction)textFieldDidEndEditing:(UITextField *)textField
 {
-    [self.view removeGestureRecognizer:_tap];
+    [self.view removeGestureRecognizer:tap];
 }
 
 
