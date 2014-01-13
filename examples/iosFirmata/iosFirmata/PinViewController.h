@@ -22,11 +22,11 @@
 @property (weak, nonatomic) IBOutlet UITextField *i2cPayloadTextField;
 @property (weak, nonatomic) IBOutlet UITextView *i2cResultTextView;
 
-@property (weak, nonatomic) Firmata *currentFirmata;
-@property (weak, nonatomic) NSMutableDictionary *pinDictionary;
-@property (weak, nonatomic) NSMutableArray *pinsArray;
-@property (weak, nonatomic) NSMutableDictionary *analogMapping;
-@property (weak, nonatomic) NSTimer *ignoreTimer;
+@property (strong, nonatomic) Firmata *currentFirmata;
+@property (strong, nonatomic) NSMutableDictionary *pinDictionary;
+@property (strong, nonatomic) NSMutableArray *pinsArray;
+@property (strong, nonatomic) NSMutableDictionary *analogMapping;
+@property (strong, nonatomic) NSTimer *ignoreTimer;
 
 @property bool ignoreReporting;
 @property int pinNumber;

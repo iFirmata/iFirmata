@@ -19,7 +19,7 @@
 @property (weak, nonatomic) IBOutlet UITableView *sensorsTable;
 @property (weak, nonatomic) IBOutlet UIRefreshControl *refreshControl;
 
-@property (weak, nonatomic) LeDataService *currentlyDisplayingService;
+@property (strong, nonatomic) LeDataService *currentlyDisplayingService;
 @property (strong, nonatomic) NSMutableArray *connectedServices;
 
 @end

@@ -18,9 +18,9 @@
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *refreshButton;
 @property (weak, nonatomic) IBOutlet UILabel *firmwareVersion;
 
-@property (weak, nonatomic) Firmata *currentFirmata;
+@property (strong, nonatomic) Firmata *currentFirmata;
 @property (strong, nonatomic) NSMutableArray *pinsArray;
-@property (weak, nonatomic) NSMutableDictionary *analogMapping;
+@property (strong, nonatomic) NSMutableDictionary *analogMapping;
 @property (strong, nonatomic) UITapGestureRecognizer *tap;
 
 @property int refreshCounter;
