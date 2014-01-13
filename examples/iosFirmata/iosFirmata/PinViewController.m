@@ -310,8 +310,14 @@
     //build a mask from first pin of this port, to last pin of this port
     for(int x = port * 8; x< port * 8 +7; x++){
         
-        int value = [(NSNumber*)[[pinsArray objectAtIndex:x] valueForKey:@"lastvalue"] intValue] ;
-        int shiftedpin = value << (x % 8);
+        //might run out of pins at some point, so just sub zeros
+        int shiftedpin = 0;
+        
+        if( x < [pinsArray count] ){
+            int value = [(NSNumber*)[[pinsArray objectAtIndex:x] valueForKey:@"lastvalue"] intValue] ;
+            shiftedpin = value << (x % 8);
+        }
+        
         mask = mask + shiftedpin;
         
     }
