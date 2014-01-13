@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "Firmata.h"
 
-@interface PinViewController : UIViewController <FirmataProtocol, UITextFieldDelegate>
+@interface PinViewController : UIViewController <FirmataProtocol, UITextFieldDelegate, UIGestureRecognizerDelegate>
 
 @property IBOutlet UILabel          *deviceLabel;
 @property IBOutlet UILabel          *pinStatus;

@@ -51,6 +51,8 @@
     
     [super viewDidLoad];
     
+    self.navigationController.interactivePopGestureRecognizer.delegate = self;
+
     pinDictionary = [pinsArray objectAtIndex:pinNumber];
     
     [currentFirmata setController:self];

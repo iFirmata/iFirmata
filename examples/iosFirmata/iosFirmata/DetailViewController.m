@@ -45,9 +45,9 @@
 {
     [super viewDidLoad];
     
+    self.navigationController.interactivePopGestureRecognizer.delegate = self;
+    
     currentlyConnectedSensor.text = [[[currentFirmata currentlyDisplayingService] peripheral] name];
-
-    [self reset:nil]; //currentFirmata firmata so must come before any firmata calls in setup
 
     if(!pinsArray){
         pinsArray = [[NSMutableArray alloc] init];
@@ -58,6 +58,19 @@
             initWithTarget:self
             action:@selector(textFieldShouldReturn:)];
 
+}
+
+//viewdidload doesnt fire when poproot controller
+-(void)viewWillAppear:(BOOL)animated
+{
+    [currentFirmata setController:self];
+    
+    tableUpdate = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                   target:self
+                                                 selector:@selector(refreshTable:)
+                                                 userInfo:nil
+                                                  repeats:YES];
+    _REFRESH = YES;
 }
 
 - (void) viewDidUnload
@@ -111,19 +124,6 @@
         _REFRESH = NO;
     }
     
-}
-
--(IBAction)reset:(UIStoryboardSegue *)segue {
-
-    [currentFirmata setController:self];
-
-    tableUpdate = [NSTimer scheduledTimerWithTimeInterval:1.0
-                                                   target:self
-                                                 selector:@selector(refreshTable:)
-                                                 userInfo:nil
-                                                  repeats:YES];
-    _REFRESH = YES;
-
 }
 
 

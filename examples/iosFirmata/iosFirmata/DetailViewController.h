@@ -10,7 +10,7 @@
 #import "LeDataService.h"
 #import "Firmata.h"
 
-@interface DetailViewController : UITableViewController  <FirmataProtocol, UIActionSheetDelegate>
+@interface DetailViewController : UITableViewController  <FirmataProtocol, UIActionSheetDelegate, UIGestureRecognizerDelegate>
 
 @property (strong, nonatomic) IBOutlet UILabel          *currentlyConnectedSensor;
 @property (retain, nonatomic) IBOutlet UITableView      *pinsTable;
@@ -29,7 +29,6 @@
 
 -(IBAction)refresh:(id)sender;
 -(IBAction)sendString:(id)sender;
--(IBAction)reset:(UIStoryboardSegue *)segue;
 -(IBAction)textFieldDidBeginEditing:(UITextField *)textField;
 -(IBAction)textFieldDidEndEditing:(UITextField *)textField;
 @end

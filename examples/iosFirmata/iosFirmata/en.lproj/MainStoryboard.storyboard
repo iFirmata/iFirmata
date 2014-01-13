@@ -115,12 +115,6 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="ShO-zL-Kc2">
-                        <nil key="title"/>
-                        <barButtonItem key="leftBarButtonItem" title="back" id="dqw-zS-SnQ">
-                            <connections>
-                                <segue destination="LLQ-Tm-DQJ" kind="unwind" unwindAction="reset:" id="xKP-uZ-ddr"/>
-                            </connections>
-                        </barButtonItem>
                         <textField key="titleView" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="string to send" minimumFontSize="17" id="Cej-WQ-40m">
                             <rect key="frame" x="52" y="7" width="217" height="30"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -150,7 +144,6 @@
                         <segue destination="jSJ-QS-3Q1" kind="push" identifier="analogInView" id="SAu-Vc-1e0"/>
                     </connections>
                 </tableViewController>
-                <exit id="LLQ-Tm-DQJ" userLabel="Exit" sceneMemberID="exit"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jWu-Pf-1F4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1279" y="292"/>
@@ -205,11 +198,6 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <navigationItem key="navigationItem" title="Servo/PWM settings" id="Ogi-EY-ejP">
-                        <barButtonItem key="leftBarButtonItem" title="back" id="go6-wr-aNk">
-                            <connections>
-                                <segue destination="qrL-iI-aTO" kind="unwind" unwindAction="reset:" id="sBS-BA-7pG"/>
-                            </connections>
-                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="mfg-7N-n03">
                             <connections>
                                 <action selector="refresh:" destination="ctc-tL-cAn" id="wmx-Ig-TcU"/>
@@ -221,11 +209,9 @@
                         <outlet property="pinLabel" destination="lZm-SX-b8U" id="5kk-8O-bPF"/>
                         <outlet property="pinSlider" destination="kjI-bL-cIk" id="z4w-Aj-SBG"/>
                         <outlet property="pinStatus" destination="sMA-ZF-rOZ" id="b0y-qV-ffc"/>
-                        <segue destination="qrL-iI-aTO" kind="unwind" unwindAction="reset:" id="JgE-wI-zKa"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SBn-RO-T0O" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <exit id="qrL-iI-aTO" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="2157" y="-332"/>
         </scene>
@@ -278,20 +264,13 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Shift Settings" id="2h4-hy-EA7">
-                        <barButtonItem key="leftBarButtonItem" title="back" id="pNu-5Y-mWM">
-                            <connections>
-                                <segue destination="l7X-PY-CO4" kind="unwind" unwindAction="reset:" id="l5k-Rq-ix8"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" title="Shift Settings" id="2h4-hy-EA7"/>
                     <connections>
                         <outlet property="deviceLabel" destination="90C-q4-V45" id="TwB-YT-64p"/>
                         <outlet property="pinLabel" destination="eE3-FD-BPq" id="NAf-AR-v3x"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aKW-O7-ZWh" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <exit id="l7X-PY-CO4" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="2569" y="-332"/>
         </scene>
@@ -364,11 +343,6 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <navigationItem key="navigationItem" title="Digital Settings" id="vO8-LF-dKG">
-                        <barButtonItem key="leftBarButtonItem" title="back" id="HeE-lc-NKj">
-                            <connections>
-                                <segue destination="jUF-0w-xWn" kind="unwind" unwindAction="reset:" id="fcG-RJ-L8F"/>
-                            </connections>
-                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="YT2-EG-JfZ">
                             <connections>
                                 <action selector="refresh:" destination="u5g-SY-Bhl" id="qAK-S0-Kh2"/>
@@ -381,11 +355,9 @@
                         <outlet property="pinLabel" destination="pbv-5N-9XB" id="9LR-17-pZ8"/>
                         <outlet property="pinStatus" destination="fsm-lj-BrD" id="0AO-vY-tdq"/>
                         <outlet property="statusSwitch" destination="QUk-u5-8V1" id="fRD-7z-5ok"/>
-                        <segue destination="jUF-0w-xWn" kind="unwind" unwindAction="reset:" id="rRV-cl-3PA"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="nIv-0U-RvX" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <exit id="jUF-0w-xWn" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="1648" y="292"/>
         </scene>
@@ -470,13 +442,7 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
-                    <navigationItem key="navigationItem" title="i2C Settings" id="BAV-id-fKr">
-                        <barButtonItem key="leftBarButtonItem" title="back" id="5w5-Ze-CRX">
-                            <connections>
-                                <segue destination="m2t-Pr-bsk" kind="unwind" unwindAction="reset:" id="j6F-hP-3nH"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" title="i2C Settings" id="BAV-id-fKr"/>
                     <connections>
                         <outlet property="deviceLabel" destination="oYh-SL-Lz2" id="iOf-oE-PxW"/>
                         <outlet property="i2cAddressTextField" destination="vz5-MT-MTG" id="e8P-uF-Z5z"/>
@@ -487,7 +453,6 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ghX-Pp-tbF" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <exit id="m2t-Pr-bsk" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="2038" y="292"/>
         </scene>
@@ -547,11 +512,6 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <navigationItem key="navigationItem" title="Analog Settings" id="hyG-00-AgE">
-                        <barButtonItem key="leftBarButtonItem" title="back" id="0Mn-gV-Yba">
-                            <connections>
-                                <segue destination="bfN-Cb-pHa" kind="unwind" unwindAction="reset:" id="FiY-Ut-w6C"/>
-                            </connections>
-                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="lum-BI-bbp">
                             <connections>
                                 <action selector="refresh:" destination="jSJ-QS-3Q1" id="MAy-GX-EIe"/>
@@ -566,7 +526,6 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SSH-c9-P80" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <exit id="bfN-Cb-pHa" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="2442" y="292"/>
         </scene>

@@ -17,13 +17,15 @@
 
 
 @interface ViewController ()  <LeDiscoveryDelegate, LeServiceDelegate, UITableViewDataSource, UITableViewDelegate>
+
+@property (retain, nonatomic) IBOutlet UITableView      *sensorsTable;
+@property (retain, nonatomic) IBOutlet UIRefreshControl *refreshControl;
+
 @property (retain, nonatomic) LeDataService             *currentlyDisplayingService;
 @property (retain, nonatomic) NSMutableArray            *connectedServices;
-@property (retain, nonatomic) IBOutlet UITableView      *sensorsTable;
 
-@property (retain, nonatomic) IBOutlet UIRefreshControl *refreshControl;
 -(IBAction)refresh:(id)sender;
--(IBAction)reset:(UIStoryboardSegue *)segue;
+
 @end
 
 @implementation ViewController
@@ -64,8 +66,8 @@
 
 -(void)viewWillAppear:(BOOL)animated
 {
-    
-    [self reset:nil];
+    [[LeDiscovery sharedInstance] setPeripheralDelegate:self];
+    [self refresh:nil];
 }
 
 - (void) viewDidUnload
@@ -121,11 +123,6 @@
         }];
         
     }
-}
-
-- (IBAction)reset:(id)sender {
-    [[LeDiscovery sharedInstance] setPeripheralDelegate:self];
-    [self refresh:nil];
 }
 
 
