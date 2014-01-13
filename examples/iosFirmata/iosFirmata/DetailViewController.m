@@ -63,6 +63,7 @@
 -(void)viewWillAppear:(BOOL)animated
 {
     [currentFirmata setController:self];
+    [self.tableView reloadData];
 }
 
 - (void)didReceiveMemoryWarning
