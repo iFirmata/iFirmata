@@ -2,8 +2,8 @@
 //  FirmataCell.h
 //  iosFirmata
 //
-//  Created by Jacob on 11/25/13.
-//  Copyright (c) 2013 Apple Inc. All rights reserved.
+//  Created by Jacob on 11/11/13.
+//  Copyright (c) 2013 Augmetous Inc.
 //
 
 #import <UIKit/UIKit.h>

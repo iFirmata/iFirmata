@@ -2,15 +2,14 @@
 //  PinViewController.m
 //  iosFirmata
 //
-//  Created by Jacob on 11/12/13.
-//  Copyright (c) 2013 Apple Inc. All rights reserved.
+//  Created by Jacob on 11/11/13.
+//  Copyright (c) 2013 Augmetous Inc.
 //
 
 #import "PinViewController.h"
 #import "DetailViewController.h"
 
 @implementation PinViewController
-
 
 @synthesize currentFirmata;
 @synthesize pinDictionary;

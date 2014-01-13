@@ -1,9 +1,9 @@
 //
 //  DetailViewController.h
-//  TemperatureSensor
+//  iosFirmata
 //
 //  Created by Jacob on 11/11/13.
-//  Copyright (c) 2013 Apple Inc. All rights reserved.
+//  Copyright (c) 2013 Augmetous Inc.
 //
 
 #import <UIKit/UIKit.h>
