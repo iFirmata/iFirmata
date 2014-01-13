@@ -24,8 +24,6 @@
 @property (retain, nonatomic) LeDataService             *currentlyDisplayingService;
 @property (retain, nonatomic) NSMutableArray            *connectedServices;
 
--(IBAction)refresh:(id)sender;
-
 @end
 
 @implementation ViewController
@@ -58,7 +56,12 @@
     
     connectedServices = [NSMutableArray new];
     
-    [self.refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
+    [self.refreshControl beginRefreshing];
+    
+    if (self.tableView.contentOffset.y == 0)
+    {
+        self.tableView.contentOffset = CGPointMake(0, -self.refreshControl.frame.size.height / 2);
+    }
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -66,7 +69,7 @@
     [[LeDiscovery sharedInstance] setPeripheralDelegate:self];
 	[[LeDiscovery sharedInstance] setDiscoveryDelegate:self];
 
-    [self refresh:nil];
+    [self reset:nil];
 }
 
 - (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -87,8 +90,8 @@
 	[[LeDiscovery sharedInstance] setDiscoveryDelegate:nil];
 }
 
-- (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
-    
+- (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
     DetailViewController *dest =[segue destinationViewController];
     
     //create new firmata to manage peripheral, and tell it to report to new page
@@ -98,26 +101,11 @@
     [[LeDiscovery sharedInstance] setPeripheralDelegate:dest.currentFirmata];
     
     [[LeDiscovery sharedInstance] stopScanning];
-    [self.refreshControl endRefreshing];
-    
 }
 
-- (IBAction)refresh:(id)sender {
+- (void)reset:(id)sender
+{
     [[LeDiscovery sharedInstance] startScanningForUUIDString:nil];
-    
-    [self.refreshControl beginRefreshing];
-    
-    if (self.tableView.contentOffset.y == 0) {
-        
-        [UIView animateWithDuration:0.25 delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations:^(void){
-            
-            self.tableView.contentOffset = CGPointMake(0, -self.refreshControl.frame.size.height);
-            
-        } completion:^(BOOL finished){
-            
-        }];
-        
-    }
 }
 
 
