@@ -176,10 +176,13 @@
 /****************************************************************************/
 - (void) serviceDidReceiveCharacteristicsFromService:(LeDataService*)service
 {
+    //Consider successfully connected, add to connected services
     NSLog(@"Service (%@) did receive characteristics", service.peripheral.name);
     if (![connectedServices containsObject:service]) {
         [connectedServices addObject:service];
     }
+    
+    //Segue
     currentlyDisplayingService = service;
     [self performSegueWithIdentifier: @"deviceView" sender:self];
 }
@@ -269,9 +272,20 @@
 	NSArray			*devices;
 	NSInteger		row	= [indexPath row];
 	
-	if ([indexPath section] == 0) {
-        //connected devices, segue on over, wait until we get characteristics
-	} else {
+	if ([indexPath section] == 0)
+    {
+		devices = [[LeDiscovery sharedInstance] connectedServices];
+        peripheral = [(LeDataService*)[devices objectAtIndex:row] peripheral];
+
+        //if connected, segue
+        if([self serviceForPeripheral:peripheral])
+        {
+            currentlyDisplayingService = [self serviceForPeripheral:peripheral];
+            [self performSegueWithIdentifier: @"deviceView" sender:self];
+        }
+
+	} else
+    {
         //found devices, send off connect which will segue if successful
 		devices = [[LeDiscovery sharedInstance] foundPeripherals];
     	peripheral = (CBPeripheral*)[devices objectAtIndex:row];
