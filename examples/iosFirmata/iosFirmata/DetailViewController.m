@@ -65,25 +65,15 @@
     [currentFirmata setController:self];
 }
 
-- (void) viewDidUnload
-{
-    [self setTap:nil];
-    [self setPinsArray:nil];
-    [self setCurrentlyConnectedSensor:nil];
-    [self setPinsTable:nil];
-    [self setFirmwareVersion:nil];
-    [self setCurrentFirmata:nil];
-    [self setAnalogMapping:nil];
-    [self setStringToSend:nil];
-    [self setRefreshButton:nil];
-    
-    [super viewDidUnload];
-}
-
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void) dealloc
+{
+    self.navigationController.interactivePopGestureRecognizer.delegate = nil;
 }
 
 - (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{

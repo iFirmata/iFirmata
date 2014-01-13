@@ -104,37 +104,17 @@
     
 }
 
-- (void) viewDidUnload
-{
-    [i2cPayloadTextField setDelegate:nil];
-    [i2cAddressTextField setDelegate:nil];
-    
-    [self setI2cAddressTextField:nil];
-    [self setI2cPayloadTextField:nil];
-    [self setI2cResultTextView:nil];
-    [self setCurrentFirmata:nil];
-    [self setPinDictionary:nil];
-    [self setDeviceLabel:nil];
-    [self setPinLabel:nil];
-    [self setPinStatus:nil];
-    [self setPinSlider:nil];
-    [self setModeSwitch:nil];
-    [self setStatusSwitch:nil];
-    [self setReportSwitch:nil];
-    [self setScrollView:nil];
-    [self setIgnoreTimer:nil];
-    [self setAnalogMapping:nil];
-    [self setPinsArray:nil];
-    [self setActiveField:nil];
-    
-    [super viewDidUnload];
-
-}
-
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void) dealloc
+{
+    [i2cPayloadTextField setDelegate:nil];
+    [i2cAddressTextField setDelegate:nil];
+    self.navigationController.interactivePopGestureRecognizer.delegate = nil;
 }
 
 

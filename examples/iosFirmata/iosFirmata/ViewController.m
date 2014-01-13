@@ -44,7 +44,10 @@
 {
     self = [super initWithStyle:style];
     if (self) {
-        // Custom initialization
+
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterBackgroundNotification:) name:kDataServiceEnteredBackgroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterForegroundNotification:) name:kDataServiceEnteredForegroundNotification object:nil];
+
     }
     return self;
 }
@@ -55,30 +58,15 @@
     
     connectedServices = [NSMutableArray new];
     
-	[[LeDiscovery sharedInstance] setDiscoveryDelegate:self];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterBackgroundNotification:) name:kDataServiceEnteredBackgroundNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterForegroundNotification:) name:kDataServiceEnteredForegroundNotification object:nil];
-    
     [self.refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
-    
 }
 
 -(void)viewWillAppear:(BOOL)animated
 {
     [[LeDiscovery sharedInstance] setPeripheralDelegate:self];
-    [self refresh:nil];
-}
+	[[LeDiscovery sharedInstance] setDiscoveryDelegate:self];
 
-- (void) viewDidUnload
-{
-    [self setSensorsTable:nil];
-    [self setConnectedServices:nil];
-    [self setCurrentlyDisplayingService:nil];
-    [self setRefreshControl:nil];
-    [[LeDiscovery sharedInstance] stopScanning];
-    
-    [super viewDidUnload];
+    [self refresh:nil];
 }
 
 - (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -86,10 +74,17 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
 - (void) dealloc 
 {
     [[LeDiscovery sharedInstance] stopScanning];
-    
+    [[LeDiscovery sharedInstance] setPeripheralDelegate:nil];
+	[[LeDiscovery sharedInstance] setDiscoveryDelegate:nil];
 }
 
 - (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
