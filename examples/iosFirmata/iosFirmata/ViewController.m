@@ -273,12 +273,7 @@
 	NSInteger		row	= [indexPath row];
 	
 	if ([indexPath section] == 0) {
-        //connected devices, segue on over
-		devices = [[LeDiscovery sharedInstance] connectedServices];
-        peripheral = [(LeDataService*)[devices objectAtIndex:row] peripheral];
-        currentlyDisplayingService = [self serviceForPeripheral:peripheral];
-        [self performSegueWithIdentifier: @"deviceView" sender:self];
-        
+        //connected devices, segue on over, wait until we get characteristics
 	} else {
         //found devices, send off connect which will segue if successful
 		devices = [[LeDiscovery sharedInstance] foundPeripherals];
