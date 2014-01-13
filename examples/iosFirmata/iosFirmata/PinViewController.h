@@ -11,25 +11,25 @@
 
 @interface PinViewController : UIViewController <FirmataProtocol, UITextFieldDelegate, UIGestureRecognizerDelegate>
 
-@property IBOutlet UILabel          *deviceLabel;
-@property IBOutlet UILabel          *pinStatus;
-@property IBOutlet UILabel          *pinLabel;
-@property IBOutlet UISlider         *pinSlider;
-@property IBOutlet UISwitch         *modeSwitch;
-@property IBOutlet UISwitch         *statusSwitch;
-@property IBOutlet UISwitch         *reportSwitch;
-@property IBOutlet UITextField      *i2cAddressTextField;
-@property IBOutlet UITextField      *i2cPayloadTextField;
-@property IBOutlet UITextView       *i2cResultTextView;
+@property (weak, nonatomic) IBOutlet UILabel *deviceLabel;
+@property (weak, nonatomic) IBOutlet UILabel *pinStatus;
+@property (weak, nonatomic) IBOutlet UILabel *pinLabel;
+@property (weak, nonatomic) IBOutlet UISlider *pinSlider;
+@property (weak, nonatomic) IBOutlet UISwitch *modeSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *statusSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *reportSwitch;
+@property (weak, nonatomic) IBOutlet UITextField *i2cAddressTextField;
+@property (weak, nonatomic) IBOutlet UITextField *i2cPayloadTextField;
+@property (weak, nonatomic) IBOutlet UITextView *i2cResultTextView;
 
-@property Firmata                   *currentFirmata;
-@property NSMutableDictionary       *pinDictionary;
-@property NSMutableArray            *pinsArray;
-@property NSMutableDictionary       *analogMapping;
-@property NSTimer                   *ignoreTimer;
+@property (weak, nonatomic) Firmata *currentFirmata;
+@property (weak, nonatomic) NSMutableDictionary *pinDictionary;
+@property (weak, nonatomic) NSMutableArray *pinsArray;
+@property (weak, nonatomic) NSMutableDictionary *analogMapping;
+@property (weak, nonatomic) NSTimer *ignoreTimer;
 
-@property bool                      ignoreReporting;
-@property int                       pinNumber;
+@property bool ignoreReporting;
+@property int pinNumber;
 
 -(IBAction)sendi2c:(id)sender;
 -(IBAction)toggleValue:(id)sender;

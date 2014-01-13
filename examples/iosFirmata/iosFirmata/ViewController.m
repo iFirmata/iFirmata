@@ -18,11 +18,11 @@
 
 @interface ViewController ()  <LeDiscoveryDelegate, LeServiceDelegate, UITableViewDataSource, UITableViewDelegate>
 
-@property (retain, nonatomic) IBOutlet UITableView      *sensorsTable;
-@property (retain, nonatomic) IBOutlet UIRefreshControl *refreshControl;
+@property (weak, nonatomic) IBOutlet UITableView *sensorsTable;
+@property (weak, nonatomic) IBOutlet UIRefreshControl *refreshControl;
 
-@property (retain, nonatomic) LeDataService             *currentlyDisplayingService;
-@property (retain, nonatomic) NSMutableArray            *connectedServices;
+@property (weak, nonatomic) LeDataService *currentlyDisplayingService;
+@property (strong, nonatomic) NSMutableArray *connectedServices;
 
 @end
 

@@ -12,18 +12,18 @@
 
 @interface DetailViewController : UITableViewController  <FirmataProtocol, UIActionSheetDelegate, UIGestureRecognizerDelegate>
 
-@property (strong, nonatomic) IBOutlet UILabel          *currentlyConnectedSensor;
-@property (retain, nonatomic) IBOutlet UITableView      *pinsTable;
-@property (strong, nonatomic) IBOutlet UILabel          *firmwareVersion;
-@property (strong, nonatomic) IBOutlet UITextField      *stringToSend;
-@property (weak, nonatomic)   IBOutlet UIBarButtonItem  *refreshButton;
+@property (weak, nonatomic) IBOutlet UILabel *currentlyConnectedSensor;
+@property (weak, nonatomic) IBOutlet UITableView *pinsTable;
+@property (weak, nonatomic) IBOutlet UITextField *stringToSend;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *refreshButton;
+@property (weak, nonatomic) IBOutlet UILabel *firmwareVersion;
 
-@property (strong, nonatomic) Firmata                   *currentFirmata;
-@property (retain, nonatomic) NSMutableArray            *pinsArray;
-@property (retain, nonatomic) NSMutableDictionary       *analogMapping;
-@property UITapGestureRecognizer                        *tap;
+@property (weak, nonatomic) Firmata *currentFirmata;
+@property (strong, nonatomic) NSMutableArray *pinsArray;
+@property (weak, nonatomic) NSMutableDictionary *analogMapping;
+@property (strong, nonatomic) UITapGestureRecognizer *tap;
 
-@property int                                           refreshCounter;
+@property int refreshCounter;
 
 -(IBAction)refresh:(id)sender;
 -(IBAction)sendString:(id)sender;
