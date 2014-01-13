@@ -56,7 +56,6 @@
     tap = [[UITapGestureRecognizer alloc]
             initWithTarget:self
             action:@selector(textFieldShouldReturn:)];
-
 }
 
 //viewdidload doesnt fire when poproot controller

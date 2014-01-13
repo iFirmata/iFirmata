@@ -119,8 +119,8 @@
                             <textInputTraits key="textInputTraits"/>
                             <connections>
                                 <action selector="sendString:" destination="62h-Kv-0ar" eventType="editingDidEndOnExit" id="MSE-26-Vvi"/>
-                                <action selector="textFieldDidBeginEditing:" destination="62h-Kv-0ar" eventType="editingDidBegin" id="T3e-JC-YRO"/>
-                                <action selector="textFieldDidEndEditing:" destination="62h-Kv-0ar" eventType="editingDidEnd" id="ZWn-S6-Fvy"/>
+                                <action selector="textFieldDidBeginEditing:" destination="62h-Kv-0ar" eventType="editingDidBegin" id="CA4-ho-1rD"/>
+                                <action selector="textFieldDidEndEditing:" destination="62h-Kv-0ar" eventType="editingDidEnd" id="vW6-m9-ITL"/>
                             </connections>
                         </textField>
                         <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="OL3-z3-YpW">
@@ -366,7 +366,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="805-iF-50c">
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="805-iF-50c" customClass="TPKeyboardAvoidingScrollView">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
@@ -377,8 +377,6 @@
                                         <textInputTraits key="textInputTraits"/>
                                         <connections>
                                             <action selector="sendi2c:" destination="eMm-iL-zH1" eventType="editingDidEndOnExit" id="ocl-Ns-K7c"/>
-                                            <action selector="textFieldDidBeginEditing:" destination="eMm-iL-zH1" eventType="editingDidBegin" id="z61-re-SbX"/>
-                                            <action selector="textFieldDidEndEditing:" destination="eMm-iL-zH1" eventType="editingDidEnd" id="8XK-Jo-cJK"/>
                                         </connections>
                                     </textField>
                                     <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Result" id="4Nh-iN-N8B">
@@ -395,8 +393,6 @@
                                         <textInputTraits key="textInputTraits"/>
                                         <connections>
                                             <action selector="sendi2c:" destination="eMm-iL-zH1" eventType="editingDidEndOnExit" id="RLe-No-7qf"/>
-                                            <action selector="textFieldDidBeginEditing:" destination="eMm-iL-zH1" eventType="editingDidBegin" id="Yo0-Ij-Mxk"/>
-                                            <action selector="textFieldDidEndEditing:" destination="eMm-iL-zH1" eventType="editingDidEnd" id="oWF-TC-ZrL"/>
                                         </connections>
                                     </textField>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pin: " lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="gjP-El-nVd">
@@ -435,6 +431,7 @@
                                         </connections>
                                     </button>
                                 </subviews>
+                                <gestureRecognizers/>
                             </scrollView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -446,7 +443,6 @@
                         <outlet property="i2cPayloadTextField" destination="FuR-lh-nCz" id="Tas-0Q-cRa"/>
                         <outlet property="i2cResultTextView" destination="4Nh-iN-N8B" id="Scj-1B-AEc"/>
                         <outlet property="pinLabel" destination="ubz-6S-KTI" id="y0Z-ae-FPP"/>
-                        <outlet property="scrollView" destination="805-iF-50c" id="ccG-jw-hut"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ghX-Pp-tbF" userLabel="First Responder" sceneMemberID="firstResponder"/>

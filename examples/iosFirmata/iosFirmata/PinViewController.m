@@ -24,8 +24,6 @@
 @synthesize modeSwitch;
 @synthesize statusSwitch;
 @synthesize reportSwitch;
-@synthesize scrollView;
-@synthesize activeField;
 @synthesize pinsArray;
 @synthesize pinNumber;
 @synthesize analogMapping;
@@ -79,10 +77,11 @@
     }
     else if (currentMode == I2C){
         
-        [self registerForKeyboardNotifications];
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
+                                       initWithTarget:self
+                                       action:@selector(textFieldShouldReturn:)];
         
-        [i2cPayloadTextField setDelegate:self];
-        [i2cAddressTextField setDelegate:self];
+        [self.view addGestureRecognizer:tap];
 
     }
     
@@ -91,17 +90,6 @@
     deviceLabel.text = [[[currentFirmata currentlyDisplayingService] peripheral] name];
     
     [currentFirmata pinStateQuery:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue] selector:@selector(alertError:)];
-
-    //fix for uiscrollview
-    //http://stackoverflow.com/questions/8528134/uiscrollview-not-scrolling-when-keyboard-covers-active-uitextfield-using-apple
-    CGRect applicationFrame = [[UIScreen mainScreen] applicationFrame];
-    CGRect navigationFrame = [[self.navigationController navigationBar] frame];
-    CGFloat height = applicationFrame.size.height - navigationFrame.size.height;
-    CGSize newContentSize = CGSizeMake(applicationFrame.size.width, height);
-    
-    scrollView.contentSize = newContentSize;
-    //end
-    
 }
 
 - (void)didReceiveMemoryWarning
@@ -112,8 +100,6 @@
 
 - (void) dealloc
 {
-    [i2cPayloadTextField setDelegate:nil];
-    [i2cAddressTextField setDelegate:nil];
     self.navigationController.interactivePopGestureRecognizer.delegate = nil;
 }
 
@@ -197,61 +183,6 @@
     [i2cAddressTextField resignFirstResponder];
     [i2cPayloadTextField resignFirstResponder];
     return YES;
-}
-
-// Call this method somewhere in your view controller setup code.
-- (void)registerForKeyboardNotifications
-{
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWasShown:)
-                                                 name:UIKeyboardDidShowNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillBeHidden:)
-                                                 name:UIKeyboardWillHideNotification object:nil];
-    
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
-                                   initWithTarget:self
-                                   action:@selector(textFieldShouldReturn:)];
-    [self.view addGestureRecognizer:tap];
-    
-}
-
-// Called when the UIKeyboardDidShowNotification is sent.
-- (void)keyboardWasShown:(NSNotification*)aNotification
-{
-    NSDictionary* info = [aNotification userInfo];
-    CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
-    
-    UIEdgeInsets contentInsets = UIEdgeInsetsMake(0.0, 0.0, kbSize.height, 0.0);
-    scrollView.contentInset = contentInsets;
-    scrollView.scrollIndicatorInsets = contentInsets;
-    
-    // If active text field is hidden by keyboard, scroll it so it's visible
-    // Your app might not need or want this behavior.
-    CGRect aRect = self.view.frame;
-    aRect.size.height -= kbSize.height;
-    if (!CGRectContainsPoint(aRect, activeField.frame.origin) ) {
-        [self.scrollView scrollRectToVisible:activeField.frame animated:YES];
-    }
-}
-
-// Called when the UIKeyboardWillHideNotification is sent
-- (void)keyboardWillBeHidden:(NSNotification*)aNotification
-{
-    UIEdgeInsets contentInsets = UIEdgeInsetsZero;
-    scrollView.contentInset = contentInsets;
-    scrollView.scrollIndicatorInsets = contentInsets;
-}
-
-- (IBAction)textFieldDidBeginEditing:(UITextField *)textField
-{
-    activeField = textField;
-}
-
-- (IBAction)textFieldDidEndEditing:(UITextField *)textField
-{
-    activeField = nil;
 }
 
 

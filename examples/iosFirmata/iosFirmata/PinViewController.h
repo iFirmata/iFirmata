@@ -21,11 +21,9 @@
 @property IBOutlet UITextField      *i2cAddressTextField;
 @property IBOutlet UITextField      *i2cPayloadTextField;
 @property IBOutlet UITextView       *i2cResultTextView;
-@property IBOutlet UIScrollView     *scrollView;
 
 @property Firmata                   *currentFirmata;
 @property NSMutableDictionary       *pinDictionary;
-@property UITextField               *activeField;
 @property NSMutableArray            *pinsArray;
 @property NSMutableDictionary       *analogMapping;
 @property NSTimer                   *ignoreTimer;
@@ -38,6 +36,5 @@
 -(IBAction)toggleMode:(id)sender;
 -(IBAction)toggleReporting:(id)sender;
 -(IBAction)refresh:(id)sender;
--(IBAction)textFieldDidBeginEditing:(UITextField *)textField;
--(IBAction)textFieldDidEndEditing:(UITextField *)textField;
+
 @end
