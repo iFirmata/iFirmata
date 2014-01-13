@@ -23,9 +23,6 @@
 @synthesize currentlyDisplayingService;
 @synthesize firmataData;
 @synthesize nonSysexData;
-@synthesize analogMapping;
-@synthesize ports;
-@synthesize pins;
 @synthesize selectorQueue;
 
 // Place this in the .m file, inside the @implementation block
@@ -55,8 +52,6 @@
 {
     self = [super init];
     if (self) {
-        ports = [[NSMutableArray alloc] init];
-        pins = [[NSMutableArray alloc] init];
         
         firmataData = [[NSMutableData alloc] init];
         nonSysexData = [[NSMutableArray alloc] init];
@@ -271,7 +266,7 @@ The pin "state" is any data written to the pin. For output modes (digital output
  */
 - (void) parseAnalogMappingResponse:(NSData*)data
 {
-    analogMapping = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *analogMapping = [[NSMutableDictionary alloc] init];
     
     int j = 0;
     unsigned char *bytes = (unsigned char *)[data bytes];
@@ -307,6 +302,8 @@ The pin "state" is any data written to the pin. For output modes (digital output
  */
 - (void) parseCapabilityResponse:(NSData*)data
  {
+
+     NSMutableArray        *pins = [[NSMutableArray alloc] init];
 
      int j = 0;
      

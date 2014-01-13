@@ -99,9 +99,6 @@ typedef enum {
 
 @property (strong, nonatomic) NSMutableData         *firmataData;
 @property (strong, nonatomic) NSMutableArray        *nonSysexData;
-@property (strong, nonatomic) NSMutableDictionary   *analogMapping;
-@property (strong, nonatomic) NSMutableArray        *ports;
-@property (strong, nonatomic) NSMutableArray        *pins;
 @property (strong, nonatomic) NSMutableArray        *selectorQueue;
 
 - (id) initWithService:(LeDataService*)service controller:(id<FirmataProtocol>)controller;
@@ -111,7 +108,6 @@ typedef enum {
 - (PINMODE) modeStringToEnum:(NSString*)strVal;
 
 - (void) reset:(SEL)aSelector;
-//- (void) start;
 
 - (void) pinStateQuery:(int)pin selector:(SEL)aSelector;
 - (void) reportFirmware:(SEL)aSelector;
@@ -135,7 +131,6 @@ typedef enum {
 - (void) servoConfig:(int)pin minPulse:(unsigned short int)minPulse maxPulse:(unsigned short int)maxPulse selector:(SEL)aSelector;
 
 - (void) stringData:(NSString*)string selector:(SEL)aSelector;
-/* Behave properly when heading into and out of the background */
 
 - (int) portForPin:(int)pin;
 - (unsigned short int) bitMaskForPin:(int)pin;
