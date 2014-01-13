@@ -19,7 +19,6 @@
 @synthesize pinsArray;
 @synthesize pinsTable;
 @synthesize analogMapping;
-@synthesize tableUpdate;
 @synthesize stringToSend;
 @synthesize refreshCounter;
 @synthesize refreshButton;
@@ -64,19 +63,10 @@
 -(void)viewWillAppear:(BOOL)animated
 {
     [currentFirmata setController:self];
-    
-    tableUpdate = [NSTimer scheduledTimerWithTimeInterval:1.0
-                                                   target:self
-                                                 selector:@selector(refreshTable:)
-                                                 userInfo:nil
-                                                  repeats:YES];
-    _REFRESH = YES;
 }
 
 - (void) viewDidUnload
 {
-    [tableUpdate invalidate];
-    [self setTableUpdate:nil];
     [self setTap:nil];
     [self setPinsArray:nil];
     [self setCurrentlyConnectedSensor:nil];
@@ -111,17 +101,6 @@
         dest.pinsArray = pinsArray;
         dest.pinNumber = indexPath.row;
         dest.analogMapping = analogMapping;
-        [tableUpdate invalidate];
-    }
-    
-}
-
-- (void)refreshTable:(NSTimer*)theTimer
-{
-    if(_REFRESH)
-    {
-        [self.tableView reloadData];
-        _REFRESH = NO;
     }
     
 }
@@ -253,7 +232,10 @@
      NSMutableDictionary *pinObject =[pinsArray objectAtIndex:pin];
     [pinObject setValue:[NSNumber numberWithInt:value] forKey:@"lastvalue"];
     [pinObject setValue:[NSNumber numberWithInt:mode] forKey:@"currentMode"];
-    _REFRESH = YES;
+
+    NSArray *indexPathArray = [NSArray arrayWithObject:[NSIndexPath indexPathForRow:pin inSection:0]];
+    [self.tableView reloadRowsAtIndexPaths:indexPathArray withRowAnimation:UITableViewRowAnimationFade];
+
 }
 
 - (void) didReportFirmware:(NSString*)name major:(unsigned short int)major minor:(unsigned short int)minor
@@ -273,6 +255,8 @@
     self.analogMapping = analogMapping;
 
     [currentFirmata capabilityQuery:@selector(alertError:)];
+
+    [self.tableView reloadData];
 }
 
 //returns an NSMutablearray of NSDictionary of modes
@@ -304,7 +288,8 @@
     }
 
     NSLog(@"Local Pins declaration %@",pinsArray);
-    _REFRESH = YES;
+
+    [self.tableView reloadData];
 }
 
 - (void) didReceiveAnalogPin:(int)pin value:(unsigned short)value
@@ -317,7 +302,9 @@
         [aPin setValue:[NSNumber numberWithInt:value] forKey:@"lastvalue"];
         [aPin setValue:[NSNumber numberWithInt:ANALOG] forKey:@"currentMode"];
 
-        _REFRESH = YES;
+        NSArray *indexPathArray = [NSArray arrayWithObject:[NSIndexPath indexPathForRow:translatedPin inSection:0]];
+        [self.tableView reloadRowsAtIndexPaths:indexPathArray withRowAnimation:UITableViewRowAnimationFade];
+
     }
 }
 
@@ -335,7 +322,8 @@
         [aPin setValue:[NSNumber numberWithInt:status] forKey:@"lastvalue"];
         [aPin setValue:[NSNumber numberWithInt:INPUT] forKey:@"currentMode"];
 
-        _REFRESH = YES;
+        NSArray *indexPathArray = [NSArray arrayWithObject:[NSIndexPath indexPathForRow:pin inSection:0]];
+        [self.tableView reloadRowsAtIndexPaths:indexPathArray withRowAnimation:UITableViewRowAnimationFade];
     }
 }
 
@@ -384,7 +372,8 @@
         [currentFirmata setPinMode:actionSheet.tag mode:newMode selector:@selector(alertError:)];
         [pin setValue:[NSNumber numberWithInt:newMode] forKey:@"currentMode"];
 
-        _REFRESH = YES;
+        NSArray *indexPathArray = [NSArray arrayWithObject:[NSIndexPath indexPathForRow:actionSheet.tag inSection:0]];
+        [self.tableView reloadRowsAtIndexPaths:indexPathArray withRowAnimation:UITableViewRowAnimationFade];
     }
 
 }
