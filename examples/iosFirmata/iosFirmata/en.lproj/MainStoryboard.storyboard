@@ -119,8 +119,8 @@
                             <textInputTraits key="textInputTraits"/>
                             <connections>
                                 <action selector="sendString:" destination="62h-Kv-0ar" eventType="editingDidEndOnExit" id="MSE-26-Vvi"/>
-                                <action selector="textFieldDidBeginEditing:" destination="62h-Kv-0ar" eventType="editingDidBegin" id="CA4-ho-1rD"/>
-                                <action selector="textFieldDidEndEditing:" destination="62h-Kv-0ar" eventType="editingDidEnd" id="vW6-m9-ITL"/>
+                                <action selector="textFieldDidBeginEditing:" destination="62h-Kv-0ar" eventType="editingDidBegin" id="YkZ-YM-rLn"/>
+                                <action selector="textFieldDidEndEditing:" destination="62h-Kv-0ar" eventType="editingDidEnd" id="mLc-fD-7GT"/>
                             </connections>
                         </textField>
                         <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="OL3-z3-YpW">

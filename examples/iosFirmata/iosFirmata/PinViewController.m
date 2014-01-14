@@ -45,7 +45,6 @@
 
 - (void)viewDidLoad
 {
-    
     [super viewDidLoad];
     
     self.navigationController.interactivePopGestureRecognizer.delegate = self;
@@ -75,12 +74,6 @@
         [pinSlider setMaximumValue:127];
     }
     else if (currentMode == I2C){
-        
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
-                                       initWithTarget:self
-                                       action:@selector(textFieldShouldReturn:)];
-        
-        [self.view addGestureRecognizer:tap];
 
     }
     
@@ -114,8 +107,6 @@
                           initWithTitle:@"String Data Recieved" message:string delegate:nil
                           cancelButtonTitle:nil otherButtonTitles:@"OK", nil];
     [alert show];
-    
-    
 }
 
 - (void) didReceiveAnalogPin:(int)pin value:(unsigned short)value
@@ -140,7 +131,6 @@
         [pinStatus setText:[[NSNumber numberWithBool:status] stringValue]];
         [statusSwitch setOn:status];
         [reportSwitch setOn:YES]; //were getting status from it, must be on?
-
     }
 }
 
@@ -151,11 +141,13 @@
 
 -(void) didUpdatePin:(int)pin currentMode:(PINMODE)mode value:(unsigned short)value
 {
-    if(pin ==  [(NSNumber *)[pinDictionary objectForKey:@"firmatapin"] intValue]){
-
+    if(pin ==  [(NSNumber *)[pinDictionary objectForKey:@"firmatapin"] intValue])
+    {
         [pinDictionary setObject:[NSNumber numberWithInt:value] forKey:@"lastvalue"];
         [pinDictionary setValue:[NSNumber numberWithInt:mode] forKey:@"currentMode"];
-        if(mode == PWM || mode == SERVO){
+        
+        if(mode == PWM || mode == SERVO)
+        {
             [pinSlider setValue:value];
         }else if(mode == INPUT){
             [modeSwitch setOn:YES];
@@ -169,19 +161,6 @@
         [pinStatus setText:[[NSString alloc] initWithFormat:@"%i",value] ];
 
     }
-}
-
-
-#pragma mark -
-#pragma mark UI Text Field Delegates
-/****************************************************************************/
-/*                        UI Text Field Methods                             */
-/****************************************************************************/
--(BOOL) textFieldShouldReturn:(UITextField *)textField{
-    
-    [i2cAddressTextField resignFirstResponder];
-    [i2cPayloadTextField resignFirstResponder];
-    return YES;
 }
 
 
@@ -207,12 +186,10 @@
     //wasteful but when it completes, lets call and get true status
     [currentFirmata setPinMode:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]
                           mode:modeToSend selector:@selector(refresh:)];
-
 }
 
 -(IBAction)toggleValue:(id)sender
 {
-    
     int port = [currentFirmata portForPin:
                 [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]];
     
@@ -229,7 +206,6 @@
         }
         
         mask = mask + shiftedpin;
-        
     }
     
     if([sender isOn])
@@ -253,7 +229,6 @@
 
 -(IBAction)toggleReporting:(id)sender
 {
-    
     NSNumber *currentModeNumber =  [pinDictionary objectForKey:@"currentMode"];
     PINMODE currentMode = [currentModeNumber intValue];
     
@@ -268,14 +243,14 @@
             [currentFirmata samplingInterval:1000 selector:@selector(alertError:)]; //bluetooth really can't support more
             [currentFirmata reportAnalog:[(NSNumber*)[pins lastObject] intValue]
                                   enable:YES selector:@selector(alertError:)];
-        }else{
+        }else
+        {
             
             NSLog(@"Enabling digital reporting for port");
             [currentFirmata reportDigital:[currentFirmata portForPin:
                                            [(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue]]
                                    enable:YES selector:@selector(alertError:)];
         }
-        
     }else
     {
         if(currentMode == ANALOG)
@@ -311,14 +286,13 @@
 }
 
 
--(IBAction)slider:(id)sender{
-    
+-(IBAction)slider:(id)sender
+{
     NSLog(@"%f", pinSlider.value);
     [pinStatus setText:[[NSString alloc] initWithFormat:@"%d",(int)pinSlider.value] ];
 
     //wasteful but when it completes, lets call and get true status
     [currentFirmata analogMessagePin:[[pinDictionary valueForKey:@"firmatapin"] intValue] value:pinSlider.value selector:@selector(refresh:)];
-
 }
 
 -(IBAction)sendi2c:(id)sender
@@ -344,7 +318,8 @@
         char byteChars[3] = {'\0','\0','\0'};
         unsigned long wholeByte;
         
-        while (i < len) {
+        while (i < len)
+        {
             byteChars[0] = chars[i++];
             byteChars[1] = chars[i++];
             wholeByte = strtoul(byteChars, NULL, 16);
@@ -360,15 +335,16 @@
     [currentFirmata pinStateQuery:[(NSNumber*)[pinDictionary valueForKey:@"firmatapin"] intValue] selector:@selector(alertError:)];
 }
 
--(void) alertError:(NSError*)error{
-    if(error){
+-(void) alertError:(NSError*)error
+{
+    if(error)
+    {
         UIAlertView *alert = [[UIAlertView alloc]
                               initWithTitle:@"Send Failed" message:@"Send to device failed. Try again or reset the device" delegate:nil
                               cancelButtonTitle:nil otherButtonTitles:@"OK", nil];
         [alert show];
         
     }
-    
 }
 
 @end
