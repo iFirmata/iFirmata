@@ -12,7 +12,7 @@
 
 @property (weak, nonatomic) IBOutlet UIButton *modeButton;
 @property (weak, nonatomic) IBOutlet UILabel *buttonLabel;
-@property (strong, nonatomic) IBOutlet UILabel* value;
-@property (strong, nonatomic) IBOutlet UILabel* name;
+@property (weak, nonatomic) IBOutlet UILabel *value;
+@property (weak, nonatomic) IBOutlet UILabel *name;
 
 @end
