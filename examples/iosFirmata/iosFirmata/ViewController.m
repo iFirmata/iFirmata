@@ -22,6 +22,8 @@
 @property (strong, nonatomic) LeDataService *currentlyDisplayingService;
 @property (strong, nonatomic) NSMutableArray *connectedServices;
 
+-(IBAction)refresh:(id)sender;
+
 @end
 
 @implementation ViewController
@@ -53,13 +55,7 @@
     [super viewDidLoad];
     
     connectedServices = [NSMutableArray new];
-    
-    [self.refreshControl beginRefreshing];
-    
-    if (self.tableView.contentOffset.y == 0)
-    {
-        self.tableView.contentOffset = CGPointMake(0, -self.refreshControl.frame.size.height / 2);
-    }
+
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -106,6 +102,15 @@
     [[LeDiscovery sharedInstance] startScanningForUUIDString:nil];
 }
 
+- (IBAction)refresh:(id)sender
+{
+    [self.refreshControl beginRefreshing];
+    [[LeDiscovery sharedInstance] stopScanning];
+    [[[LeDiscovery sharedInstance] foundPeripherals] removeAllObjects];
+    [[LeDiscovery sharedInstance] startScanningForUUIDString:nil];
+    [self.tableView reloadData];
+    [self.refreshControl endRefreshing];
+}
 
 #pragma mark -
 #pragma mark LeData Interactions
@@ -276,42 +281,37 @@
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
-
-    CBPeripheral	*peripheral;
-	NSArray			*devices;
- 
-    //if device isnt connected we get bounds exception for array
-    @try
-    {
-        devices = [[LeDiscovery sharedInstance] connectedServices];
-        peripheral = [(LeDataService*)[devices objectAtIndex:indexPath.row] peripheral];
-
-        if([peripheral isConnected]){
-            return YES;
-        }else{
-            return NO;
-        }
-    }
-    @catch(NSException* ex)
-    {
-        return NO;
-    }
-
+    return YES;
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    CBPeripheral	*peripheral;
-	NSArray			*devices;
-    devices = [[LeDiscovery sharedInstance] connectedServices];
-    peripheral = [(LeDataService*)[devices objectAtIndex:indexPath.row] peripheral];
-    
-    [[LeDiscovery sharedInstance] disconnectPeripheral:peripheral];
+    if([indexPath section])
+    {
+        [[[LeDiscovery sharedInstance] foundPeripherals] removeObjectAtIndex:indexPath.row];
+        [self.tableView reloadData];
+    }
+    else
+    {
+        CBPeripheral	*peripheral;
+        NSArray			*devices;
+        devices = [[LeDiscovery sharedInstance] connectedServices];
+        peripheral = [(LeDataService*)[devices objectAtIndex:indexPath.row] peripheral];
+        
+        [[LeDiscovery sharedInstance] disconnectPeripheral:peripheral];
+    }
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return @"disconnect";
+    if([indexPath section])
+    {
+        return @"delete";
+    }
+    else
+    {
+        return @"disconnect";
+    }
 }
 
 
