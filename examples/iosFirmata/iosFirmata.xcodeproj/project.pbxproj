@@ -33,7 +33,7 @@
 		5B410B0A1832D216000959E7 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		5B410B0B1832D216000959E7 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		5B410B141832D28B000959E7 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard.storyboard; sourceTree = "<group>"; };
-		5B4B0C7F1832D12A003800ED /* iosFirmata.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosFirmata.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5B4B0C7F1832D12A003800ED /* iFirmata.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iFirmata.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B4B0C851832D12A003800ED /* iosFirmata-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "iosFirmata-Info.plist"; sourceTree = "<group>"; };
 		5B4B0C871832D12A003800ED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5B4B0C891832D12A003800ED /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -107,7 +107,7 @@
 		B9182531148D762600D6064E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				5B4B0C7F1832D12A003800ED /* iosFirmata.app */,
+				5B4B0C7F1832D12A003800ED /* iFirmata.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -127,9 +127,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		5B4B0C7E1832D12A003800ED /* iosFirmata */ = {
+		5B4B0C7E1832D12A003800ED /* iFirmata */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5B4B0CA31832D12A003800ED /* Build configuration list for PBXNativeTarget "iosFirmata" */;
+			buildConfigurationList = 5B4B0CA31832D12A003800ED /* Build configuration list for PBXNativeTarget "iFirmata" */;
 			buildPhases = (
 				AA27E906505C4FAB9147F97E /* Check Pods Manifest.lock */,
 				5B4B0C7B1832D12A003800ED /* Sources */,
@@ -141,9 +141,9 @@
 			);
 			dependencies = (
 			);
-			name = iosFirmata;
+			name = iFirmata;
 			productName = iosFirmata;
-			productReference = 5B4B0C7F1832D12A003800ED /* iosFirmata.app */;
+			productReference = 5B4B0C7F1832D12A003800ED /* iFirmata.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -167,7 +167,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				5B4B0C7E1832D12A003800ED /* iosFirmata */,
+				5B4B0C7E1832D12A003800ED /* iFirmata */,
 			);
 		};
 /* End PBXProject section */
@@ -282,7 +282,7 @@
 					"/Users/jacobrosenthal/Documents/Code/iFirmata/examples/iosFirmata/Pods/build/Debug-iphoneos",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "064E1758-CF25-4188-8011-AF6243E9EF74";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -313,7 +313,7 @@
 					"/Users/jacobrosenthal/Documents/Code/iFirmata/examples/iosFirmata/Pods/build/Debug-iphoneos",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "064E1758-CF25-4188-8011-AF6243E9EF74";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -388,7 +388,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		5B4B0CA31832D12A003800ED /* Build configuration list for PBXNativeTarget "iosFirmata" */ = {
+		5B4B0CA31832D12A003800ED /* Build configuration list for PBXNativeTarget "iFirmata" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5B4B0CA41832D12A003800ED /* Debug */,
