@@ -154,6 +154,11 @@
 			attributes = {
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Apple Inc.";
+				TargetAttributes = {
+					5B4B0C7E1832D12A003800ED = {
+						DevelopmentTeam = J97VZ3QA63;
+					};
+				};
 			};
 			buildConfigurationList = B918252A148D762500D6064E /* Build configuration list for PBXProject "iosFirmata" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -282,7 +287,7 @@
 					"/Users/jacobrosenthal/Documents/Code/iFirmata/examples/iosFirmata/Pods/build/Debug-iphoneos",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "064E1758-CF25-4188-8011-AF6243E9EF74";
+				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -313,7 +318,7 @@
 					"/Users/jacobrosenthal/Documents/Code/iFirmata/examples/iosFirmata/Pods/build/Debug-iphoneos",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "064E1758-CF25-4188-8011-AF6243E9EF74";
+				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
